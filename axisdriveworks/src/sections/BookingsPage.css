@@ -1,0 +1,146 @@
+.bookings-page {
+  min-height: 100vh;
+  background: #050505;
+  color: #fff;
+  padding-top: 20px;
+}
+
+.bookings-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.no-bookings {
+  text-align: center;
+  padding: 80px 20px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+}
+
+.no-bookings h3 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  color: #00ffff;
+}
+
+.no-bookings p {
+  color: #aaa;
+  margin-bottom: 30px;
+}
+
+.bookings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+}
+
+.booking-card {
+  background: rgba(0, 255, 255, 0.03);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.booking-card:hover {
+  transform: translateY(-5px);
+  border-color: #00ffff;
+  box-shadow: 0 10px 30px rgba(0,255,255,0.1);
+}
+
+.booking-header {
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  padding-bottom: 15px;
+}
+
+.booking-header h3 {
+  font-size: 1.5rem;
+  margin: 0 0 5px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.booking-date {
+  color: #00ffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.booking-details p {
+  margin: 8px 0;
+  color: #ccc;
+  font-size: 0.95rem;
+}
+
+.booking-details strong {
+  color: #fff;
+}
+
+.test-drive-btn {
+  background: linear-gradient(90deg, #00ffff, #0088ff);
+  color: #000;
+  border: none;
+  padding: 15px;
+  border-radius: 6px;
+  font-weight: 800;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: 0.3s;
+  margin-top: auto;
+}
+
+.test-drive-btn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+}
+
+.completed-status {
+  margin-top: auto;
+  padding: 15px;
+  background: rgba(0, 255, 0, 0.1);
+  color: #00ff00;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.tick-mark {
+  margin-right: 8px;
+  font-size: 1.2rem;
+}
+
+.booking-card.completed {
+  border-color: rgba(0, 255, 0, 0.2);
+}
+
+.booking-card.completed:hover {
+  border-color: #00ff00;
+  box-shadow: 0 10px 30px rgba(0, 255, 0, 0.1);
+}
+
+.clear-btn {
+  background: transparent;
+  color: #ff3366;
+  border: 1px solid #ff3366;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.clear-btn:hover {
+  background: #ff3366;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(255, 51, 102, 0.4);
+}

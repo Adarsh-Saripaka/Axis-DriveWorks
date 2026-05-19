@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { searchCars, getCarImage } from "../Api/FetchApi";
 import VehicleCard from "./VehicleCard";
 import "./Showcase.css";
@@ -14,6 +15,8 @@ export default function Showcase() {
   const [images, setImages] = useState({});
   const [heroImage, setHeroImage] = useState("https://placehold.co/600x400/1C1C1C/00ffff?text=Axis+DriveWorks+Showroom");
   const [loading, setLoading] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
 
   // Redirect if no data
   useEffect(() => {
@@ -27,10 +30,19 @@ export default function Showcase() {
       setLoading(true);
       searchCars(title)
         .then((data) => {
-          setCars(data);
+          const uniqueCars = [];
+          const seenModels = new Set();
+          for (const car of data) {
+            if (!seenModels.has(car.model)) {
+              seenModels.add(car.model);
+              uniqueCars.push(car);
+            }
+          }
+          
+          setCars(uniqueCars);
           // If no hero was passed in navigation state, use the first result
-          if (!state?.hero && data.length > 0) {
-            setHero(data[0]);
+          if (!state?.hero && uniqueCars.length > 0) {
+            setHero(uniqueCars[0]);
           }
         })
         .finally(() => setLoading(false));
@@ -70,6 +82,28 @@ export default function Showcase() {
     navigate("/showcase", {
       state: { hero: car, brand: title }
     });
+  };
+
+  const handleBookTestDrive = (e) => {
+    e.preventDefault();
+    const data = new FormData(e.target);
+    const newBooking = {
+      id: Date.now(),
+      car: hero,
+      name: data.get("name"),
+      email: data.get("email"),
+      date: data.get("date"),
+    };
+    
+    const existing = JSON.parse(localStorage.getItem("autovision_bookings") || "[]");
+    localStorage.setItem("autovision_bookings", JSON.stringify([...existing, newBooking]));
+    
+    setBookingSuccess(true);
+    setTimeout(() => {
+      setShowBookingModal(false);
+      setBookingSuccess(false);
+      navigate("/bookings");
+    }, 2000);
   };
 
   const handleView3D = () => {
@@ -112,21 +146,63 @@ export default function Showcase() {
             </div>
             
             <p className="subtitle">
-              {hero.engine_type} Engine · {hero.transmission} · {hero.drivetrain}
+              {hero.engine_type || 'Standard'} Engine · {hero.transmission || 'Auto'} · {hero.drivetrain || 'AWD'}
             </p>
 
             <div className="spec-table">
-              <Spec label="Horsepower" value={`${hero.horsepower} HP`} />
-              <Spec label="Torque" value={`${hero.torque_nm} Nm`} />
-              <Spec label="0–100 km/h" value={`${hero.zero_to_hundred_kmh}s`} />
-              <Spec label="Top Speed" value={`${hero.top_speed_kmh} km/h`} />
-              <Spec label="Cylinders" value={hero.cylinders} />
-              <Spec label="Weight" value={`${hero.weight_kg} kg`} />
+              <Spec label="Horsepower" value={hero.horsepower ? `${hero.horsepower} HP` : 'N/A'} />
+              <Spec label="Torque" value={hero.torque_nm ? `${hero.torque_nm} Nm` : 'N/A'} />
+              <Spec label="0–100 km/h" value={hero.zero_to_hundred_kmh ? `${hero.zero_to_hundred_kmh}s` : 'N/A'} />
+              <Spec label="Top Speed" value={hero.top_speed_kmh ? `${hero.top_speed_kmh} km/h` : 'N/A'} />
+              <Spec label="Cylinders" value={hero.cylinders || 'N/A'} />
+              <Spec label="Weight" value={hero.weight_kg ? `${hero.weight_kg} kg` : 'N/A'} />
             </div>
 
-            <button className="primary-btn" onClick={() => alert("Booking System Coming Soon!")}>Reserve for Test Drive</button>
+            <button className="primary-btn" onClick={() => setShowBookingModal(true)}>
+              Reserve for Test Drive
+            </button>
           </div>
         </div>
+      )}
+
+      {/* Premium Booking Modal */}
+      {showBookingModal && createPortal(
+        <div className="modal-overlay" onClick={() => setShowBookingModal(false)}>
+          <div className="booking-modal" onClick={e => e.stopPropagation()}>
+            <button className="close-modal" onClick={() => setShowBookingModal(false)}>✕</button>
+            
+            {bookingSuccess ? (
+              <div className="booking-success">
+                <div className="success-icon">✓</div>
+                <h3>Reservation Confirmed</h3>
+                <p>Your test drive for the {hero.brand} {hero.model} has been scheduled. Check your email for details.</p>
+              </div>
+            ) : (
+              <form className="booking-form" onSubmit={handleBookTestDrive}>
+                <h3>Book Test Drive</h3>
+                <p className="modal-subtitle">{hero.brand} {hero.model}</p>
+                
+                <div className="form-group">
+                  <label>Full Name</label>
+                  <input name="name" type="text" required placeholder="John Doe" />
+                </div>
+                
+                <div className="form-group">
+                  <label>Email Address</label>
+                  <input name="email" type="email" required placeholder="john@example.com" />
+                </div>
+                
+                <div className="form-group">
+                  <label>Preferred Date</label>
+                  <input name="date" type="date" required />
+                </div>
+                
+                <button type="submit" className="confirm-btn">Confirm Reservation</button>
+              </form>
+            )}
+          </div>
+        </div>,
+        document.body
       )}
 
       {cars.length > 0 && (

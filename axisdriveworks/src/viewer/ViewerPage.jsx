@@ -12,6 +12,9 @@ export default function ViewerPage() {
   
   const [accentColor, setAccentColor] = useState("#ffffff");
   const [wheelColor, setWheelColor] = useState("#444444");
+  const [bodyFinish, setBodyFinish] = useState("metallic");
+  const [driveMode, setDriveMode] = useState(false);
+  const [stance, setStance] = useState("stock");
   const [isExploded, setIsExploded] = useState(false);
   const [envType, setEnvType] = useState("city");
   const [autoRotate, setAutoRotate] = useState(false);
@@ -20,20 +23,34 @@ export default function ViewerPage() {
     if (!state?.modelUrl) navigate("/");
   }, [state, navigate]);
 
+  const handleSnapshot = () => {
+    const canvas = document.querySelector("canvas");
+    if (canvas) {
+      const dataURL = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = dataURL;
+      link.download = `autovision_snapshot_${Date.now()}.png`;
+      link.click();
+    }
+  };
+
   if (!state?.modelUrl) return null;
 
   return (
     <div className="viewer-container">
       {/* Precision Navigation */}
-      <button
-        aria-label="Back to home"
-        className="exit-btn"
-        onClick={() => navigate(-1)}
-      >
-        [ EXIT_SHOWROOM ]
-      </button>
+      {!driveMode && (
+        <button
+          aria-label="Back to home"
+          className="exit-btn"
+          onClick={() => navigate(-1)}
+        >
+          [ EXIT_SHOWROOM ]
+        </button>
+      )}
 
       {/* Engineering Sidebar / Bottom Sheet on Mobile */}
+      {!driveMode ? (
       <aside className="config-sidebar">
         <div className="sidebar-header">
           <h2 style={{ fontSize: "1.8rem", margin: "0", fontWeight: 900, letterSpacing: '-1px', textTransform: 'uppercase' }}>
@@ -47,6 +64,17 @@ export default function ViewerPage() {
         {/* Exterior Section */}
         <div className="config-section">
           <label className="section-label">Surface_Finish</label>
+          <div className="toggle-group" style={{ marginBottom: '15px' }}>
+            {["metallic", "gloss", "matte"].map(finish => (
+              <button
+                key={finish}
+                onClick={() => setBodyFinish(finish)}
+                className={`toggle-btn ${bodyFinish === finish ? 'active' : ''}`}
+              >
+                {finish}
+              </button>
+            ))}
+          </div>
           <div className="color-grid">
             {BODY_COLORS.map(color => (
               <button
@@ -83,6 +111,26 @@ export default function ViewerPage() {
           </div>
         </div>
 
+        {/* Suspension Section */}
+        <div className="config-section">
+          <label className="section-label">Suspension_Stance</label>
+          <div className="toggle-group">
+            <button 
+              onClick={() => setStance("stock")} 
+              className={`toggle-btn ${stance === "stock" ? 'active' : ''}`}
+              style={{ borderRight: 'none' }}
+            >
+              FACTORY
+            </button>
+            <button 
+              onClick={() => setStance("lowered")} 
+              className={`toggle-btn ${stance === "lowered" ? 'active' : ''}`}
+            >
+              TRACK (LOWERED)
+            </button>
+          </div>
+        </div>
+
         {/* Environment Section */}
         <div className="config-section">
           <label className="section-label">Environment_Render</label>
@@ -115,17 +163,44 @@ export default function ViewerPage() {
           <button 
             onClick={() => setAutoRotate(!autoRotate)}
             className={`toggle-btn ${autoRotate ? 'active' : ''}`}
+            disabled={driveMode}
           >
             {autoRotate ? "MANUAL_ORBIT" : "CINEMATIC_ORBIT"}
           </button>
+          
+          <button 
+            onClick={() => setDriveMode(!driveMode)}
+            className={`action-btn ${driveMode ? 'active' : ''}`}
+            style={{ margin: 0, borderRadius: 0 }}
+          >
+            {driveMode ? "EXIT_TEST_DRIVE" : "TEST_DRIVE (WASD)"}
+          </button>
         </div>
+        
+        <button onClick={handleSnapshot} className="action-btn" style={{ marginTop: '20px' }}>
+          CAPTURE_2D_SNAPSHOT
+        </button>
       </aside>
+      ) : (
+        <div style={{ position: 'absolute', bottom: '40px', left: '50%', transform: 'translateX(-50%)', zIndex: 100 }}>
+          <button 
+            onClick={() => setDriveMode(false)}
+            className="action-btn active"
+            style={{ padding: '15px 40px', fontSize: '1.2rem', boxShadow: '0 0 20px #00ffff', borderRadius: '4px' }}
+          >
+            EXIT TEST DRIVE
+          </button>
+        </div>
+      )}
 
       <Vehicle3DViewer 
         modelUrl={state.modelUrl} 
         accentColor={accentColor} 
         wheelColor={wheelColor}
+        bodyFinish={bodyFinish}
+        stance={stance}
         isExploded={isExploded}
+        driveMode={driveMode}
         envType={envType}
         autoRotate={autoRotate}
       />

@@ -1,5 +1,5 @@
-const BASE =
-  "https://raw.githubusercontent.com/Adarsh-Saripaka/AxisDriveWorks-3d--ModelViewer/main";
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const BASE = `${API_BASE}/assets/cars`;
 
 export const AVAILABLE_MODELS = [
   { id: "aston_vantage", brand: "Aston Martin", name: "Vantage Roadster", url: `${BASE}/aston-martin/aston_martin_vantage_roadster__www.vecarz.com.glb`, img: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=600&auto=format&fit=crop" },

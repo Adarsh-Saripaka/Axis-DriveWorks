@@ -7,13 +7,14 @@ import {
   ContactShadows,
   Center,
   Environment,
+  Grid
 } from "@react-three/drei";
 import React, { Suspense, useEffect, useState, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { MODEL_MANIFEST, smartMatchMaterial } from "./modelConfig";
 
-// Draco CDN — passed as 2nd arg to useGLTF (supported in drei v9 and v10)
-const DRACO_URL = "https://www.gstatic.com/draco/versioned/decoders/1.5.5/";
+// Use default built-in draco decoder from drei by passing true to useGLTF
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -37,8 +38,8 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-function Model({ url, color, wheelColor, isExploded }) {
-  const { scene } = useGLTF(url, DRACO_URL);
+function Model({ url, color, wheelColor, bodyFinish, isExploded, stance }) {
+  const { scene } = useGLTF(url, true);
   const initialPositions = useRef(new Map());
 
   // Find manifest entry based on URL
@@ -55,6 +56,14 @@ function Model({ url, color, wheelColor, isExploded }) {
     const maxDim = Math.max(size.x, size.y, size.z);
     const scale = (MODEL_MANIFEST[modelKey]?.scale || 2.2) / maxDim;
     clone.scale.setScalar(scale);
+
+    // Force the bottom of the tires to rest exactly on Y = 0, and center X/Z
+    const scaledBox = new THREE.Box3().setFromObject(clone);
+    const center = scaledBox.getCenter(new THREE.Vector3());
+    
+    clone.position.x = -center.x;
+    clone.position.z = -center.z;
+    clone.position.y = -scaledBox.min.y;
 
     // Store initial positions for Exploded View
     clone.traverse((child) => {
@@ -91,14 +100,21 @@ function Model({ url, color, wheelColor, isExploded }) {
 
         // Apply Colors
         if (isPaint && !isGlass) {
-          child.material = child.material.clone();
           child.material.color.set(color);
-          child.material.roughness = 0.2;
-          child.material.metalness = 0.8;
+          
+          if (bodyFinish === "matte") {
+            child.material.roughness = 0.7;
+            child.material.metalness = 0.1;
+          } else if (bodyFinish === "gloss") {
+            child.material.roughness = 0.1;
+            child.material.metalness = 0.2;
+          } else { // metallic
+            child.material.roughness = 0.2;
+            child.material.metalness = 0.8;
+          }
         }
 
         if (isWheel && !isGlass) {
-          child.material = child.material.clone();
           child.material.color.set(wheelColor);
         }
 
@@ -111,19 +127,98 @@ function Model({ url, color, wheelColor, isExploded }) {
             child.position.y += 0.6;
             child.position.z += meshName.includes("hood") ? 0.4 : -0.4;
           }
+        } else if (stance === "lowered") {
+          if (!(meshName.includes("wheel") || meshName.includes("rim") || meshName.includes("tire") || meshName.includes("brake"))) {
+             child.position.y -= 0.15; // lower chassis for track stance
+          }
         }
       }
     });
-  }, [model, color, wheelColor, isExploded, modelKey]);
+  }, [model, color, wheelColor, bodyFinish, isExploded, stance, modelKey]);
 
   return <primitive object={model} />;
+}
+
+function DriveController({ driveMode, targetRef }) {
+  const [keys, setKeys] = useState({ w: false, a: false, s: false, d: false, arrowup: false, arrowdown: false, arrowleft: false, arrowright: false });
+  const velocity = useRef(0);
+  const rotation = useRef(0);
+  const prevPosition = useRef(new THREE.Vector3());
+
+  useEffect(() => {
+    if (!driveMode) return;
+    const handleKeyDown = (e) => setKeys((k) => ({ ...k, [e.key.toLowerCase()]: true }));
+    const handleKeyUp = (e) => setKeys((k) => ({ ...k, [e.key.toLowerCase()]: false }));
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+      setKeys({ w: false, a: false, s: false, d: false, arrowup: false, arrowdown: false, arrowleft: false, arrowright: false });
+      velocity.current = 0;
+    };
+  }, [driveMode]);
+
+  useFrame((state, delta) => {
+    if (!driveMode || !targetRef.current) return;
+    
+    // W/ArrowUp is forward, S/ArrowDown is backward
+    if (keys.w || keys.arrowup) velocity.current += 15 * delta;
+    if (keys.s || keys.arrowdown) velocity.current -= 15 * delta;
+    
+    velocity.current *= 0.92; // friction
+    
+    if (Math.abs(velocity.current) > 0.05) {
+      const turnSpeed = 2 * delta * (velocity.current > 0 ? 1 : -1);
+      if (keys.a || keys.arrowleft) rotation.current += turnSpeed;
+      if (keys.d || keys.arrowright) rotation.current -= turnSpeed;
+    }
+
+    // Save previous position to calculate delta
+    prevPosition.current.copy(targetRef.current.position);
+
+    // Update car position (Forward is positive Z when rotated, but Math.sin/cos depends on standard axis)
+    // Moving along the local Z axis
+    targetRef.current.position.x += Math.sin(rotation.current) * velocity.current * delta;
+    targetRef.current.position.z += Math.cos(rotation.current) * velocity.current * delta;
+    targetRef.current.rotation.y = rotation.current;
+
+    // Follow Camera while allowing user rotation via OrbitControls
+    if (state.controls) {
+      const deltaX = targetRef.current.position.x - prevPosition.current.x;
+      const deltaZ = targetRef.current.position.z - prevPosition.current.z;
+      
+      // Move camera by the exact same amount the car moved
+      state.camera.position.x += deltaX;
+      state.camera.position.z += deltaZ;
+      
+      // Update controls target to the car's new position
+      state.controls.target.copy(targetRef.current.position);
+      state.controls.update();
+    }
+  });
+
+  if (!driveMode) return null;
+
+  return (
+    <Grid 
+      infiniteGrid 
+      fadeDistance={80} 
+      cellColor="#00ffff" 
+      sectionColor="#0088ff" 
+      position={[0, 0, 0]} 
+    />
+  );
 }
 
 export default function Vehicle3DViewer({
   modelUrl,
   accentColor = "#ffffff",
   wheelColor = "#ffffff",
+  bodyFinish = "metallic",
+  stance = "stock",
   isExploded = false,
+  driveMode = false,
   envType = "city",
   autoRotate = false
 }) {
@@ -135,6 +230,8 @@ export default function Vehicle3DViewer({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const carGroup = useRef();
+
   if (!modelUrl) return null;
 
   return (
@@ -142,6 +239,7 @@ export default function Vehicle3DViewer({
       <div style={{ width: "100%", height: "100vh", background: "#050505" }}>
         <Canvas
           shadows
+          gl={{ preserveDrawingBuffer: true }}
           camera={{
             position: isMobile ? [5, 3, 5] : [4, 2, 4],
             fov: isMobile ? 50 : 35
@@ -162,18 +260,22 @@ export default function Vehicle3DViewer({
             />
             <directionalLight position={[-5, 3, -5]} intensity={0.3} />
 
-            {/* ✅ Center without deprecated 'top' prop */}
-            <Center>
+            {/* Vehicle Group */}
+            <group ref={carGroup}>
               <Model
                 url={modelUrl}
                 color={accentColor}
                 wheelColor={wheelColor}
+                bodyFinish={bodyFinish}
                 isExploded={isExploded}
+                stance={stance}
               />
-            </Center>
+            </group>
+
+            <DriveController driveMode={driveMode} targetRef={carGroup} />
 
             <ContactShadows
-              position={[0, -0.01, 0]}
+              position={[0, 0, 0]}
               opacity={0.6}
               scale={15}
               blur={2.5}

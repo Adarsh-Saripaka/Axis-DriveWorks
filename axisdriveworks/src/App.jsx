@@ -10,6 +10,7 @@ import BrandCard from "./sections/BrandCard";
 import BrandPage from "./sections/BrandPage";
 import ModelsLibrary from "./viewer/ModelsLibrary";
 import ViewerPage from "./viewer/ViewerPage";
+import BookingsPage from "./sections/BookingsPage";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -52,6 +53,15 @@ const Home = ({ onSearch }) => {
               }}
             >
               3D Models Explorer
+            </a>
+            <a
+              href="/bookings"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate('/bookings');
+              }}
+            >
+              My Bookings
             </a>
             <a
               href="#contact"
@@ -123,6 +133,7 @@ export default function App() {
       <Route path="/brand/:brand" element={<BrandPage />} />
       <Route path="/models" element={<ModelsLibrary />} />
       <Route path="/viewer" element={<ViewerPage />} />
+      <Route path="/bookings" element={<BookingsPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
     </>

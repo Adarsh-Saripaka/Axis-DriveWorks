@@ -2,7 +2,7 @@ services:
   # Backend Node.js Web Service
   - type: web
     name: axis-driveworks-backend
-    env: node
+    runtime: node
     plan: free
     rootDir: axisdriveworks-backend
     buildCommand: npm install
@@ -13,15 +13,16 @@ services:
       - key: FRONTEND_URL
         fromService:
           name: axis-driveworks-frontend
-          type: static
+          type: web
           property: url
 
   # Frontend Static Site
-  - type: static
+  - type: web
     name: axis-driveworks-frontend
+    runtime: static
     rootDir: axisdriveworks
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         fromService:

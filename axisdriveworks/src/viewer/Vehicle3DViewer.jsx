@@ -239,7 +239,8 @@ export default function Vehicle3DViewer({
       <div style={{ width: "100%", height: "100vh", background: "#050505" }}>
         <Canvas
           shadows
-          gl={{ preserveDrawingBuffer: true }}
+          dpr={isMobile ? [1, 1.2] : [1, 1.5]}
+          gl={{ preserveDrawingBuffer: true, powerPreference: "high-performance" }}
           camera={{
             position: isMobile ? [5, 3, 5] : [4, 2, 4],
             fov: isMobile ? 50 : 35
@@ -256,7 +257,8 @@ export default function Vehicle3DViewer({
               position={[5, 8, 5]}
               intensity={envType === "city" ? 1.5 : 0.5}
               castShadow
-              shadow-mapSize={[2048, 2048]}
+              shadow-mapSize={isMobile ? [512, 512] : [1024, 1024]}
+              shadow-bias={-0.0001}
             />
             <directionalLight position={[-5, 3, -5]} intensity={0.3} />
 
@@ -270,17 +272,19 @@ export default function Vehicle3DViewer({
                 isExploded={isExploded}
                 stance={stance}
               />
+              <ContactShadows
+                key={`${modelUrl}-${stance}-${isExploded}`}
+                frames={1}
+                position={[0, 0, 0]}
+                opacity={0.6}
+                scale={15}
+                blur={2.5}
+                far={1}
+                resolution={isMobile ? 256 : 512}
+              />
             </group>
 
             <DriveController driveMode={driveMode} targetRef={carGroup} />
-
-            <ContactShadows
-              position={[0, 0, 0]}
-              opacity={0.6}
-              scale={15}
-              blur={2.5}
-              far={1}
-            />
           </Suspense>
 
           <OrbitControls

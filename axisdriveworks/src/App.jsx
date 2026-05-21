@@ -111,6 +111,8 @@ const Home = ({ onSearch }) => {
 
 export default function App() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { pathname } = location;
 
   const handleSearch = (results, query) => {
     if (!Array.isArray(results) || results.length === 0) {
@@ -124,18 +126,37 @@ export default function App() {
     });
   };
 
+  const hideMobileNav = pathname === '/viewer';
+
   return (
     <>
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home onSearch={handleSearch} />} />
-      <Route path="/showcase" element={<Showcase />} />
-      <Route path="/brand/:brand" element={<BrandPage />} />
-      <Route path="/models" element={<ModelsLibrary />} />
-      <Route path="/viewer" element={<ViewerPage />} />
-      <Route path="/bookings" element={<BookingsPage />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        <Route path="/showcase" element={<Showcase />} />
+        <Route path="/brand/:brand" element={<BrandPage />} />
+        <Route path="/models" element={<ModelsLibrary />} />
+        <Route path="/viewer" element={<ViewerPage />} />
+        <Route path="/bookings" element={<BookingsPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {!hideMobileNav && (
+        <nav className="mobile-nav-bar">
+          <button className={`mobile-nav-item ${pathname === '/' ? 'active' : ''}`} onClick={() => navigate('/')}>
+            <span className="nav-icon">🏠</span>
+            <span className="nav-label">Home</span>
+          </button>
+          <button className={`mobile-nav-item ${pathname === '/models' ? 'active' : ''}`} onClick={() => navigate('/models')}>
+            <span className="nav-icon">🚗</span>
+            <span className="nav-label">3D Models</span>
+          </button>
+          <button className={`mobile-nav-item ${pathname === '/bookings' ? 'active' : ''}`} onClick={() => navigate('/bookings')}>
+            <span className="nav-icon">📅</span>
+            <span className="nav-label">Bookings</span>
+          </button>
+        </nav>
+      )}
     </>
   );
 }

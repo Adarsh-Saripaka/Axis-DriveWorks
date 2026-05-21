@@ -142,6 +142,10 @@
   gap: 1px;
 }
 
+.collapse-toggle {
+  display: none;
+}
+
 /* ================= MOBILE RESPONSIVENESS ================= */
 @media (max-width: 768px) {
   .exit-btn {
@@ -163,8 +167,48 @@
     border-top: 2px solid #00ffff;
     border-left: none;
     border-right: none;
-    padding: 30px 25px 50px; /* Added extra bottom padding for mobile home bars */
+    padding: 15px 25px 50px;
     box-shadow: 0 -20px 40px rgba(0,0,0,0.8);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .config-sidebar.collapsed {
+    transform: translateY(calc(100% - 50px)); /* Leaves just the toggle bar visible at the bottom */
+    overflow-y: hidden;
+  }
+
+  .collapse-toggle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 5px 0 15px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .toggle-handle {
+    width: 40px;
+    height: 4px;
+    background: rgba(0, 255, 255, 0.4);
+    border-radius: 2px;
+    margin-bottom: 6px;
+    transition: background 0.3s;
+  }
+
+  .collapse-toggle:hover .toggle-handle {
+    background: #00ffff;
+  }
+
+  .toggle-text {
+    font-size: 0.6rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: #00ffff;
+    text-transform: uppercase;
   }
 
   .sidebar-header {

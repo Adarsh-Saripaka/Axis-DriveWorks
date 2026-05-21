@@ -18,6 +18,7 @@ export default function ViewerPage() {
   const [isExploded, setIsExploded] = useState(false);
   const [envType, setEnvType] = useState("city");
   const [autoRotate, setAutoRotate] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     if (!state?.modelUrl) navigate("/");
@@ -51,7 +52,15 @@ export default function ViewerPage() {
 
       {/* Engineering Sidebar / Bottom Sheet on Mobile */}
       {!driveMode ? (
-      <aside className="config-sidebar">
+      <aside className={`config-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+        <button 
+          className="collapse-toggle" 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          aria-label={isCollapsed ? "Expand panel" : "Collapse panel"}
+        >
+          <span className="toggle-handle"></span>
+          <span className="toggle-text">{isCollapsed ? "SHOW CONFIGURATION" : "HIDE CONFIGURATION"}</span>
+        </button>
         <div className="sidebar-header">
           <h2 style={{ fontSize: "1.8rem", margin: "0", fontWeight: 900, letterSpacing: '-1px', textTransform: 'uppercase' }}>
             Config<span style={{ color: "#00ffff" }}>v1</span>

@@ -1,101 +1,88 @@
 # Axis DriveWorks
 
-An Interactive 3D Car Configurator and Vehicle Search Platform
+**Interactive 3D Car Configurator & Vehicle Search Platform**
 
 ---
 
 ## Project Overview
 
-Axis DriveWorks is a full-stack 3D car configurator and vehicle search platform. It allows users to search cars from a vehicle database, view vehicle details, load dynamic car images, and interact with 3D car models in the browser. The platform demonstrates the integration of large datasets with real-time 3D rendering, providing a clean and responsive interface for automotive exploration.
+Axis DriveWorks is a full‑stack 3D car configurator and vehicle search platform. Users can search a massive vehicle dataset, view detailed specifications, reserve test drives, and explore interactive 3D models with real‑time customization.
+
+---
+
+## New Features
+
+- **Test‑Drive Scheduler** – Reserve a test drive; bookings are stored in local storage and listed on a dedicated *My Reservations* page.
+- **WASD Driving Controller** – Engage *Test Drive* mode to drive the vehicle on an infinite neon grid.
+- **Exploded View & Stance Options** – Separate chassis components, toggle factory or lowered (track) stance.
+- **Dynamic Paint & Wheel Colors** – Choose from a curated palette with live updates.
+- **Responsive Mobile Layout** – Optimized UI for tablets & phones, collapsible configuration sidebar.
+- **Backend Rate Limiting & Security Headers** – Limits to 60 requests/min per IP and hardened HTTP headers.
+- **Zoom‑free UI** – All zoom‑in/out controls removed for a cleaner experience.
 
 ---
 
 ## System Architecture
 
-The following diagram illustrates the data flow and communication between the frontend, backend, and external APIs.
+```mermaid
+graph TD
+    subgraph Client [React Frontend]
+        UI[User Interface]
+        GL[Three.js / React‑Three‑Fiber Canvas]
+        Drive[WASD Driving Controller]
+        Storage[(Local Storage – Bookings)]
+    end
+    subgraph Server [Node.js Express Backend]
+        API[API Endpoints]
+        CSVReader[CSV Stream Parser]
+        Assets[Static Asset Server]
+        Limiter[Rate Limiter & Security]
+    end
+    subgraph Data [Data Layer]
+        CSV[(cardata.csv – 150k+ rows)]
+        Models3D[(data/axisdriveworks-3d-assets)]
+    end
+    subgraph External [External APIs]
+        Unsplash[Unsplash Photo API]
+    end
+    UI <-->|Bookings| Storage
+    UI -->|Search/API Requests| Limiter
+    Limiter --> API
+    API -->|Read CSV| CSVReader
+    CSVReader -->|Stream Lines| CSV
+    API -->|JSON Results| UI
+    GL -->|Load GLB/GLTF| Assets
+    Assets -->|Serve Models| Models3D
+    UI -->|Image Queries| Unsplash
+    Unsplash -->|Photo URLs| UI
+```
+
+---
+
+## How the Website Works
 
 ```mermaid
 graph TD
-    User([User Interface]) -->|Search Query| Frontend[React Frontend]
-    Frontend -->|API Request| Backend[Node.js Backend]
-    Backend -->|File Read| CSV[(Vehicle Dataset)]
-    CSV -->|JSON Response| Backend
-    Backend -->|Search Results| Frontend
-    Frontend -->|Asset Fetch| Unsplash[Unsplash API]
-    Unsplash -->|Vehicle Images| Frontend
-    Frontend -->|3D Request| Registry[Model Registry]
-    Registry -->|GLB/GLTF Models| Frontend
+    Start([Landing Page]) --> Search[Search & Explore]
+    Search -->|Query| BackendSearch[Express Backend]
+    BackendSearch -->|Read CSV| Results[Display Results & Unsplash Images]
+    Results -->|Select Car| Showcase[Vehicle Showcase & Specs]
+    Showcase -->|Reserve| BookForm[Reservation Form]
+    BookForm -->|Save| LocalSave[(LocalStorage)]
+    LocalSave --> Bookings[My Reservations]
+    Bookings -->|Start Test Drive| Viewer[3D Configurator]
+    Showcase -->|Direct 3D| Viewer
+    Viewer -->|Render GLB| Canvas[Three.js Canvas]
+    Canvas -->|Customize| Config{Options}
+    Config -->|Paint Finish| Finish[Matte / Gloss / Metallic]
+    Config -->|Colors| Palette[Update Colors]
+    Config -->|Stance| Stance[Factory / Lowered]
+    Config -->|Explode| Explode[Chassis Explode]
+    Config -->|Snapshot| Snapshot[Save PNG]
+    Canvas -->|Test Drive| DriveMode[Active Drive]
+    DriveMode -->|WASD| Movement[Translate Car]
+    Movement -->|Camera Follow| Camera[Dynamic Camera]
 ```
-
----
-
-## 3D Rendering Pipeline
-
-The 3D viewer utilizes a modular pipeline to ensure performance and interactive stability.
-
-```mermaid
-graph LR
-    Model[3D Model] --> Loader[GLTFLoader]
-    Loader --> Scene[Three.js Scene]
-    Scene --> Viewer[Interactive Viewer]
-    Scene --> Lighting[Environment Lighting]
-    UI[Color Picker] -->|Texture Update| Scene
-    Scene --> Canvas[React Three Fiber Canvas]
-```
-
----
-
-## Core Features
-
-- Vehicle search powered by a dedicated backend API.
-- Integration of a comprehensive vehicle dataset stored in CSV format.
-- Interactive 3D car viewer for real-time model interaction.
-- Dynamic paint color customization for 3D models.
-- Dynamic vehicle imagery retrieval via the Unsplash API.
-- Fully responsive frontend interface built for multiple devices.
-- Decoupled frontend and backend architecture for better maintainability.
-- Pre-configured for seamless deployment on Render.
-
----
-
-## Tech Stack
-
-### Frontend
-
-| Technology | Purpose |
-|---|---|
-| React 19 | Building the user interface using functional components and hooks |
-| Vite | Fast development server and optimized production build |
-| Vanilla CSS | Custom responsive styling and layout design |
-
-### 3D Rendering
-
-| Technology | Purpose |
-|---|---|
-| Three.js | Rendering and managing 3D car models in the browser |
-| React Three Fiber | React-based renderer for Three.js scenes |
-| GLB/GLTF Models | Loading interactive 3D vehicle models |
-
-### Backend
-
-| Technology | Purpose |
-|---|---|
-| Node.js | JavaScript runtime for backend execution |
-| Express.js | Creating REST API endpoints and handling server-side logic |
-| CORS | Enabling frontend-backend communication across different origins |
-
-### Data and API Integration
-
-| Technology | Purpose |
-|---|---|
-| CSV Dataset | Storing and reading vehicle information |
-| Unsplash API | Fetching dynamic high-resolution vehicle images |
-
-### Deployment
-
-| Technology | Purpose |
-|---|---|
-| Render | Hosting and deployment configuration for the application |
 
 ---
 
@@ -104,17 +91,15 @@ graph LR
 ```bash
 axis-driveworks/
 ├── axisdriveworks/              # Frontend React Application
-│   ├── public/                  # Static assets
-│   │   ├── Logo.png             # Application logo
-│   │   └── cardata.csv          # Vehicle database (fallback)
+│   ├── public/                  # Static assets (logo, fallback CSV)
+│   │   ├── Logo.png
+│   │   └── cardata.csv
 │   ├── src/
 │   │   ├── Api/                 # API service logic
-│   │   │   └── FetchApi.js      # Backend communication logic
-│   │   ├── images/              # UI assets
-│   │   │   ├── car1.png
-│   │   │   ├── car2.png
-│   │   │   └── car3.png
-│   │   ├── sections/            # Modular UI components
+│   │   │   └── FetchApi.js
+│   │   ├── images/              # UI icons & images
+│   │   ├── sections/            # Page components
+│   │   │   ├── BookingsPage.css / BookingsPage.jsx   # Reservations dashboard (new)
 │   │   │   ├── BrandCard.css / BrandCard.jsx
 │   │   │   ├── BrandPage.css / BrandPage.jsx
 │   │   │   ├── Footer.css / Footer.jsx
@@ -122,81 +107,81 @@ axis-driveworks/
 │   │   │   ├── Search.css / Search.jsx
 │   │   │   ├── Showcase.css / Showcase.jsx
 │   │   │   └── VehicleCard.css / VehicleCard.jsx
-│   │   ├── viewer/              # 3D viewer components
-│   │   ├── App.css / App.jsx    # Root component
-│   │   ├── index.css            # Global styling
-│   │   └── main.jsx             # Application entry point
-│   ├── package.json             # Frontend dependencies
-│   └── vite.config.js           # Vite configuration
+│   │   ├── viewer/              # 3D viewer modules
+│   │   │   ├── modelConfig.js
+│   │   │   ├── ModelRegistry.jsx
+│   │   │   ├── ModelsLibrary.css / ModelsLibrary.jsx
+│   │   │   ├── Vehicle3DViewer.jsx
+│   │   │   └── ViewerPage.css / ViewerPage.jsx
+│   │   ├── App.css / App.jsx    # Router & layout
+│   │   ├── index.css            # Global CSS tokens & theme
+│   │   └── main.jsx             # React entry point
+│   ├── package.json
+│   └── vite.config.js
 │
-├── axisdriveworks-backend/      # Node.js Express Backend
+├── axisdriveworks-backend/      # Express.js REST API
 │   ├── data/
-│   │   ├── axisdriveworks-3d-assets/ # 3D model registry
-│   │   └── cardata.csv          # Vehicle search database
-│   ├── server.js                # Main API server
-│   └── package.json             # Backend dependencies
+│   │   ├── axisdriveworks-3d-assets/ # GLB/GLTF assets
+│   │   └── cardata.csv               # Vehicle database (151k+ rows)
+│   ├── server.js
+│   └── package.json
 │
-└── README.md                    # Project Documentation
+├── render.yaml                  # Render.com multi‑service config
+└── README.md                    # Project documentation (this file)
 ```
 
 ---
 
 ## Environment Variables
 
-### Frontend (.env)
+### Frontend (`.env`)
 ```env
 VITE_API_URL=http://localhost:3000
 VITE_UNSPLASH_ACCESS_KEY=your_unsplash_access_key
 ```
-
-### Backend (.env)
+### Backend (`.env`)
 ```env
 PORT=3000
 FRONTEND_URL=http://localhost:5173
 ```
-
 ---
 
-## Installation and Setup
+## Installation & Setup
 
-### 1. Backend Setup
-1. Navigate to the backend directory: `cd axisdriveworks-backend`
-2. Install dependencies: `npm install`
-3. Configure the environment variables in a `.env` file.
-4. Start the server: `node server.js`
-
-### 2. Frontend Setup
-1. Navigate to the frontend directory: `cd axisdriveworks`
-2. Install dependencies: `npm install`
-3. Configure the environment variables in a `.env` file.
-4. Start the development server: `npm run dev`
-
+1. **Backend**
+   ```bash
+   cd axisdriveworks-backend
+   npm install
+   cp .env.example .env   # set PORT & FRONTEND_URL
+   node server.js
+   ```
+2. **Frontend**
+   ```bash
+   cd axisdriveworks
+   npm install
+   cp .env.example .env   # set VITE_API_URL & UNSPLASH key
+   npm run dev
+   ```
 ---
 
 ## Usage
 
-1. Launch the application in your browser (defaults to localhost:5173).
-2. Use the search bar to find specific car models or brands.
-3. Click on a vehicle from the search results to view its 3D model.
-4. Use the provided color palette to change the vehicle's paint finish.
-
----
-
-## Project Status
-
-The project is currently functional and serves as a portfolio demonstration for full-stack 3D integration. It is fully configured for production deployment on Render.
-
+- Open `http://localhost:5173`.
+- Search for a brand/model; view results with images.
+- Click a car to open the **Showcase** page.
+- Use the **Reserve for Test Drive** button to schedule a test drive (saved locally).
+- In the **Viewer** page, customize paint, wheels, stance, explode the chassis, or enter **Test Drive** mode with WASD controls.
+- Capture a snapshot with the **Capture 2D Snapshot** button.
 ---
 
 ## Future Improvements
 
-- Implementation of physics-based rendering (PBR) for higher material fidelity.
-- User account system to save and manage customized vehicle configurations.
-- Expansion of the backend API to support advanced filtering and technical data.
-- Integration of a persistent database (e.g., MongoDB or PostgreSQL) to replace CSV storage.
-
+- Add persistent user accounts & cloud storage for bookings.
+- Replace CSV with a relational database (PostgreSQL/MongoDB).
+- Implement PBR materials for realistic rendering.
+- Expand backend API for advanced filters (price, engine, drivetrain).
 ---
 
 ## Author
 
-Adarsh Saripaka
+**Adarsh Saripaka**

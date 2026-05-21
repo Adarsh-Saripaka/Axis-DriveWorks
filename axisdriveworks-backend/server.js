@@ -117,7 +117,12 @@ async function loadCarData() {
     const car = {};
     headers.forEach((h, i) => {
       const cleanHeader = h.toLowerCase().trim();
-      if (["brand", "model", "year", "body_style", "msrp_usd", "horsepower"].includes(cleanHeader)) {
+      const allowedHeaders = [
+        "brand", "model", "year", "body_style", "msrp_usd", "horsepower", 
+        "torque_nm", "zero_to_hundred_kmh", "top_speed_kmh", "cylinders", 
+        "weight_kg", "engine_type", "transmission", "drivetrain", "country_origin"
+      ];
+      if (allowedHeaders.includes(cleanHeader)) {
         car[cleanHeader] = values[i] ? values[i].replace(/^"|"$/g, "").trim() : "";
       }
     });

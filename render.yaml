@@ -1,0 +1,32 @@
+services:
+  # Backend Node.js Web Service
+  - type: web
+    name: axis-driveworks-backend
+    env: node
+    plan: free
+    rootDir: axisdriveworks-backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: FRONTEND_URL
+        fromService:
+          name: axis-driveworks-frontend
+          type: static
+          property: url
+
+  # Frontend Static Site
+  - type: static
+    name: axis-driveworks-frontend
+    rootDir: axisdriveworks
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: axis-driveworks-backend
+          type: web
+          property: url
+      - key: VITE_UNSPLASH_ACCESS_KEY
+        value: Z0FOl7pQ7-mLxc8UvCma-j2M3rtAYiwnGmotIMGP3uM

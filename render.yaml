@@ -11,10 +11,7 @@ services:
       - key: PORT
         value: 10000
       - key: FRONTEND_URL
-        fromService:
-          name: axis-driveworks-frontend
-          type: web
-          property: url
+        value: https://axis-driveworks-frontend.onrender.com
 
   # Frontend Static Site
   - type: web
@@ -25,9 +22,6 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: axis-driveworks-backend
-          type: web
-          property: url
+        value: https://axis-driveworks-backend.onrender.com
       - key: VITE_UNSPLASH_ACCESS_KEY
         value: Z0FOl7pQ7-mLxc8UvCma-j2M3rtAYiwnGmotIMGP3uM

@@ -34,12 +34,12 @@ graph TD
     end
     subgraph Server [Node.js Express Backend]
         API[API Endpoints]
-        CSVReader[CSV Stream Parser]
+        SQLite[SQLite Database Engine]
         Assets[Static Asset Server]
         Limiter[Rate Limiter & Security]
     end
     subgraph Data [Data Layer]
-        CSV[(cardata.csv – 150k+ rows)]
+        DB[(cardata.sqlite – 150k+ rows)]
         Models3D[(data/axisdriveworks-3d-assets)]
     end
     subgraph External [External APIs]
@@ -48,8 +48,8 @@ graph TD
     UI <-->|Bookings| Storage
     UI -->|Search/API Requests| Limiter
     Limiter --> API
-    API -->|Read CSV| CSVReader
-    CSVReader -->|Stream Lines| CSV
+    API -->|Query| SQLite
+    SQLite -->|Read Data| DB
     API -->|JSON Results| UI
     GL -->|Load GLB/GLTF| Assets
     Assets -->|Serve Models| Models3D
@@ -61,11 +61,13 @@ graph TD
 
 ## How the Website Works
 
+*Note: The backend has recently been migrated from a flat CSV file to a robust SQLite database layer to ensure data integrity, prevent silent truncation, and massively improve search and filtering performance.*
+
 ```mermaid
 graph TD
     Start([Landing Page]) --> Search[Search & Explore]
     Search -->|Query| BackendSearch[Express Backend]
-    BackendSearch -->|Read CSV| Results[Display Results & Unsplash Images]
+    BackendSearch -->|Query SQLite| Results[Display Results & Unsplash Images]
     Results -->|Select Car| Showcase[Vehicle Showcase & Specs]
     Showcase -->|Reserve| BookForm[Reservation Form]
     BookForm -->|Save| LocalSave[(LocalStorage)]
@@ -177,7 +179,6 @@ FRONTEND_URL=http://localhost:5173
 ## Future Improvements
 
 - Add persistent user accounts & cloud storage for bookings.
-- Replace CSV with a relational database (PostgreSQL/MongoDB).
 - Implement PBR materials for realistic rendering.
 - Expand backend API for advanced filters (price, engine, drivetrain).
 ---

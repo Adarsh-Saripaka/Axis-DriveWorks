@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { AVAILABLE_MODELS } from "./ModelRegistry";
 import { getCarImage } from "../Api/FetchApi";
+import { useGLTF } from "@react-three/drei";
 import "./ModelsLibrary.css";
 
 function ModelCard({ model, onClick }) {
@@ -28,8 +29,14 @@ function ModelCard({ model, onClick }) {
     }
   };
 
+  const handleMouseEnter = () => {
+    if (model.url) {
+      useGLTF.preload(model.url, true);
+    }
+  };
+
   return (
-    <div className="model-card" onClick={onClick}>
+    <div className="model-card" onClick={onClick} onMouseEnter={handleMouseEnter}>
       <div className="model-img-wrapper">
         <img src={imgSrc} alt={model.name} loading="lazy" onError={handleError} />
         <div className="hover-overlay">

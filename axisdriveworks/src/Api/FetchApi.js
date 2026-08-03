@@ -67,3 +67,46 @@ export async function getAllBrands() {
     return [];
   }
 }
+
+// --- Reservations API ---
+
+export async function bookTestDrive(data) {
+  try {
+    const res = await fetch(`${BASE_URL}/reserve`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    return res.ok;
+  } catch (err) {
+    console.error("Booking failed:", err);
+    return false;
+  }
+}
+
+export async function getReservations() {
+  try {
+    const res = await fetch(`${BASE_URL}/reservations`);
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    console.error("Failed to fetch reservations:", err);
+    return [];
+  }
+}
+
+export async function markReservationComplete(id) {
+  try {
+    await fetch(`${BASE_URL}/reservations/${id}/complete`, { method: "PUT" });
+  } catch (err) {
+    console.error("Failed to update reservation:", err);
+  }
+}
+
+export async function clearCompletedReservations() {
+  try {
+    await fetch(`${BASE_URL}/reservations/completed`, { method: "DELETE" });
+  } catch (err) {
+    console.error("Failed to clear reservations:", err);
+  }
+}

@@ -187,6 +187,58 @@ app.get("/api/car/:id", async (req, res) => {
   }
 });
 
+// --- Reservations API ---
+
+app.post("/api/reserve", async (req, res) => {
+  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
+  
+  const { car_id, car_brand, car_model, name, email, date } = req.body;
+  if (!name || !email || !date) {
+    return res.status(400).json({ error: "Missing required fields." });
+  }
+  
+  try {
+    const result = await db.run(
+      "INSERT INTO reservations (car_id, car_brand, car_model, name, email, date) VALUES (?, ?, ?, ?, ?, ?)",
+      [car_id || null, car_brand, car_model, name, email, date]
+    );
+    res.json({ success: true, id: result.lastID });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to create reservation." });
+  }
+});
+
+app.get("/api/reservations", async (req, res) => {
+  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
+  try {
+    const reservations = await db.all("SELECT * FROM reservations ORDER BY id DESC");
+    res.json(reservations);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch reservations." });
+  }
+});
+
+app.put("/api/reservations/:id/complete", async (req, res) => {
+  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
+  try {
+    await db.run("UPDATE reservations SET completed = 1 WHERE id = ?", req.params.id);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update reservation." });
+  }
+});
+
+app.delete("/api/reservations/completed", async (req, res) => {
+  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
+  try {
+    await db.run("DELETE FROM reservations WHERE completed = 1");
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete completed reservations." });
+  }
+});
+
 // --- Global error handler ---
 app.use((err, _req, res, _next) => {
   console.error("Unhandled error:", err);

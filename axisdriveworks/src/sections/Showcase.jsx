@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { searchCars, getCarImage } from "../Api/FetchApi";
+import { searchCars, getCarImage, bookTestDrive } from "../Api/FetchApi";
 import VehicleCard from "./VehicleCard";
 import "./Showcase.css";
 
@@ -84,19 +84,19 @@ export default function Showcase() {
     });
   };
 
-  const handleBookTestDrive = (e) => {
+  const handleBookTestDrive = async (e) => {
     e.preventDefault();
     const data = new FormData(e.target);
     const newBooking = {
-      id: Date.now(),
-      car: hero,
+      car_id: hero.id,
+      car_brand: hero.brand,
+      car_model: hero.model,
       name: data.get("name"),
       email: data.get("email"),
       date: data.get("date"),
     };
     
-    const existing = JSON.parse(localStorage.getItem("autovision_bookings") || "[]");
-    localStorage.setItem("autovision_bookings", JSON.stringify([...existing, newBooking]));
+    await bookTestDrive(newBooking);
     
     setBookingSuccess(true);
     setTimeout(() => {

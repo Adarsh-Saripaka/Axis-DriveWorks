@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getReservations, markReservationComplete, clearCompletedReservations } from "../Api/FetchApi";
 import "./BookingsPage.css";
 
 export default function BookingsPage() {
@@ -7,25 +8,24 @@ export default function BookingsPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("autovision_bookings") || "[]");
-    setBookings(saved);
+    getReservations().then(setBookings);
   }, []);
 
-  const handleTestDrive = (booking) => {
+  const handleTestDrive = async (booking) => {
     // Mark as completed
+    await markReservationComplete(booking.id);
     const updatedBookings = bookings.map(b => 
-      b.id === booking.id ? { ...b, completed: true } : b
+      b.id === booking.id ? { ...b, completed: 1 } : b
     );
     setBookings(updatedBookings);
-    localStorage.setItem("autovision_bookings", JSON.stringify(updatedBookings));
 
-    navigate("/models", { state: { filterBrand: booking.car.brand } });
+    navigate("/models", { state: { filterBrand: booking.car_brand } });
   };
 
-  const clearCompleted = () => {
+  const clearCompleted = async () => {
+    await clearCompletedReservations();
     const remaining = bookings.filter(b => !b.completed);
     setBookings(remaining);
-    localStorage.setItem("autovision_bookings", JSON.stringify(remaining));
   };
 
   return (
@@ -52,7 +52,7 @@ export default function BookingsPage() {
             {bookings.map((booking) => (
               <div key={booking.id} className={`booking-card ${booking.completed ? 'completed' : ''}`}>
                 <div className="booking-header">
-                  <h3>{booking.car.brand} {booking.car.model}</h3>
+                  <h3>{booking.car_brand} {booking.car_model}</h3>
                   <span className="booking-date">{booking.date}</span>
                 </div>
                 <div className="booking-details">

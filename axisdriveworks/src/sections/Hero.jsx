@@ -1,8 +1,35 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./Hero.css";
 
 const Hero = () => {
   const canvasRef = useRef();
+  const heroRef = useRef();
+  const contentRef = useRef();
+  const silhouetteRef = useRef();
+
+  useEffect(() => {
+    let rAF;
+    const handleMouseMove = (e) => {
+      cancelAnimationFrame(rAF);
+      rAF = requestAnimationFrame(() => {
+        const { innerWidth, innerHeight } = window;
+        const x = (e.clientX / innerWidth - 0.5) * 16;
+        const y = (e.clientY / innerHeight - 0.5) * -16;
+        if (contentRef.current) {
+          contentRef.current.style.transform = `translateZ(50px) rotateX(${y}deg) rotateY(${x}deg)`;
+        }
+        if (silhouetteRef.current) {
+          silhouetteRef.current.style.transform = `translate(-50%, -50%) translateZ(-50px) rotateX(${y * 0.5}deg) rotateY(${x * 0.5}deg)`;
+        }
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(rAF);
+    };
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -45,17 +72,19 @@ const Hero = () => {
     }
 
     const particles = [];
-    for (let i = 0; i < 150; i++) particles.push(new Particle());
+    for (let i = 0; i < 45; i++) particles.push(new Particle());
 
     const connectParticles = () => {
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
+      const len = particles.length;
+      for (let i = 0; i < len; i++) {
+        for (let j = i + 1; j < len; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          if (distance < 150) {
-            ctx.strokeStyle = `rgba(0,255,255,${0.5 * (1 - distance / 150)})`;
-            ctx.lineWidth = 0.8;
+          const distSq = dx * dx + dy * dy;
+          if (distSq < 10000) { // 100px max distance squared
+            const distance = Math.sqrt(distSq);
+            ctx.strokeStyle = `rgba(0,255,255,${0.35 * (1 - distance / 100)})`;
+            ctx.lineWidth = 0.6;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -67,10 +96,10 @@ const Hero = () => {
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((p) => {
-        p.update();
-        p.draw();
-      });
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+      }
       connectParticles();
       animId = requestAnimationFrame(animate);
     };
@@ -78,7 +107,6 @@ const Hero = () => {
 
     const handleResize = () => {
       setCanvasSize();
-      // Re-distribute particles that may be off-screen after resize
       particles.forEach((p) => {
         if (p.x > canvas.width || p.y > canvas.height) {
           p.reset();
@@ -99,14 +127,27 @@ const Hero = () => {
   };
 
   return (
-    <div className="hero-container">
+    <div className="hero-container" ref={heroRef}>
       <canvas ref={canvasRef} className="particles-canvas" />
+      
+      {/* Floating 3D Silhouette */}
+      <div 
+        ref={silhouetteRef}
+        className="hero-silhouette"
+      />
+
+      <div 
+        ref={contentRef}
+        className="hero-content"
+      >
         <h1 className="logo-text">Axis DriveWorks</h1>
-        <br />
         <p className="tagline">When Engineering meets Elegance</p>
-        <br />
-        <a href="#brands" className="cta-btn" onClick={handleExploreClick}>Explore Now</a>
+        <div className="cta-wrapper">
+          <div className="cta-glow" />
+          <a href="#brands" className="cta-btn" onClick={handleExploreClick}>Explore Now</a>
+        </div>
       </div>
+    </div>
   );
 };
 

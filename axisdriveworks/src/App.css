@@ -15,7 +15,7 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(10, 10, 10, 0.7);
+  background: rgba(10, 10, 10, 0.5);
   backdrop-filter: blur(30px) saturate(180%);
   -webkit-backdrop-filter: blur(30px) saturate(180%);
   min-height: 90px;
@@ -26,7 +26,9 @@ html, body {
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 -1px 0 rgba(0,255,255,0.1);
+  transform: translateZ(10px);
 }
 
 .logo_title {
@@ -89,8 +91,25 @@ html, body {
   padding: 100px 50px 40px;
   text-transform: uppercase;
   letter-spacing: -2px;
-  border-left: 5px solid #00ffff;
+  position: relative;
   margin-bottom: 30px;
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 30px;
+  top: 100px;
+  bottom: 40px;
+  width: 5px;
+  background: linear-gradient(to bottom, transparent, #00ffff, transparent);
+  border-radius: 5px;
+  animation: border-glow 3s infinite alternate;
+}
+
+@keyframes border-glow {
+  0% { box-shadow: 0 0 10px rgba(0,255,255,0.2); opacity: 0.5; }
+  100% { box-shadow: 0 0 20px rgba(0,255,255,0.8), 0 0 40px rgba(0,255,255,0.4); opacity: 1; }
 }
 
 .brands-section {
@@ -102,11 +121,12 @@ html, body {
 .brand-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 20px;
+  gap: 30px;
+  perspective: 1000px;
 }
 
 .brand-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.02);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 45px 30px;
@@ -115,11 +135,26 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 28px;
-  transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
-  border-radius: 24px; /* Softer, modern 2026 radii */
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border-radius: 24px;
   text-align: center;
   position: relative;
   overflow: hidden;
+  transform-style: preserve-3d;
+}
+
+.brand-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 2px;
+  background: linear-gradient(135deg, rgba(0,255,255,0.5), transparent 50%, rgba(255,0,150,0.5));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 .brand-card::before {
@@ -133,15 +168,18 @@ html, body {
   opacity: 0;
   transition: opacity 0.5s ease;
   pointer-events: none;
+  transform: translateZ(-1px);
 }
 
 .brand-card:hover {
-  background: rgba(255, 255, 255, 0.07);
-  border-color: rgba(0, 255, 255, 0.3);
-  transform: translateY(-12px) scale(1.02);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-15px) rotateX(10deg) rotateY(-5deg) scale(1.05);
+  box-shadow: 
+    -20px 20px 40px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(0, 255, 255, 0.2);
 }
 
+.brand-card:hover::after,
 .brand-card:hover::before {
   opacity: 1;
 }

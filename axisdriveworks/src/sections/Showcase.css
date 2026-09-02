@@ -187,12 +187,18 @@
   display: flex;
   flex-direction: column;
   gap: 28px;
-  transition: all 0.4s ease;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
+  perspective: 1000px;
 }
 
 .showcase-info:hover {
   border-color: rgba(0, 255, 255, 0.4);
-  box-shadow: 0 50px 100px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(0,255,255,0.05);
+  box-shadow: 
+    0 50px 100px rgba(0, 0, 0, 0.8), 
+    inset 0 0 40px rgba(0,255,255,0.05),
+    -10px 10px 30px rgba(0,255,255,0.2);
+  transform: translateY(-10px) rotateX(2deg) rotateY(-2deg);
 }
 
 .subtitle {
@@ -215,6 +221,20 @@
   border-bottom: 1px solid rgba(255,255,255,0.05);
   padding-bottom: 8px;
   font-size: 15px;
+  opacity: 0;
+  animation: slide-in-spec 0.5s forwards;
+}
+
+.spec-row:nth-child(1) { animation-delay: 0.1s; }
+.spec-row:nth-child(2) { animation-delay: 0.2s; }
+.spec-row:nth-child(3) { animation-delay: 0.3s; }
+.spec-row:nth-child(4) { animation-delay: 0.4s; }
+.spec-row:nth-child(5) { animation-delay: 0.5s; }
+.spec-row:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes slide-in-spec {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 .spec-row span {
@@ -223,6 +243,7 @@
 
 .spec-row b {
   color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.2);
 }
 
 .view-3d-btn {
@@ -285,6 +306,26 @@
   font-weight: 800;
   color: #ffffff;
   margin: 0;
+  position: relative;
+  display: inline-block;
+}
+
+.showcase-info .price::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #00ffff;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s ease;
+}
+
+.showcase-info:hover .price::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 /* =========================
@@ -339,21 +380,25 @@
 }
 
 .booking-modal {
-  background: #0f1115;
+  background: rgba(15, 17, 21, 0.95);
+  backdrop-filter: blur(30px);
   width: 90%;
   max-width: 450px;
   border-radius: 20px;
   padding: 40px;
-  border: 1px solid rgba(0, 255, 255, 0.2);
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9), inset 0 0 20px rgba(0, 255, 255, 0.05);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.9), 
+    inset 0 0 20px rgba(0, 255, 255, 0.05),
+    0 0 30px rgba(0,255,255,0.1);
   position: relative;
-  transform: translateY(0);
-  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateZ(100px);
+  animation: modal-enter 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@keyframes slideUp {
-  from { transform: translateY(50px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes modal-enter {
+  from { transform: translateZ(-200px) translateY(50px) scale(0.8); opacity: 0; }
+  to { transform: translateZ(100px) translateY(0) scale(1); opacity: 1; }
 }
 
 .close-modal {

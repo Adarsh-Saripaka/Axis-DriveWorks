@@ -59,6 +59,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 30px;
+  perspective: 1200px;
 }
 
 .model-card {
@@ -67,13 +68,33 @@
   overflow: hidden;
   border: 1px solid rgba(0, 255, 255, 0.1);
   cursor: pointer;
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.model-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(125deg, transparent 20%, rgba(255,255,255,0.1) 40%, rgba(0,255,255,0.2) 50%, transparent 60%);
+  background-size: 200% 200%;
+  background-position: 200% 0;
+  pointer-events: none;
+  transition: all 0.5s ease;
+  z-index: 10;
 }
 
 .model-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-10px) rotateX(5deg) rotateY(-5deg) scale(1.02);
   border-color: #00ffff;
-  box-shadow: 0 10px 30px rgba(0, 255, 255, 0.15);
+  box-shadow: 
+    -15px 15px 30px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(0, 255, 255, 0.2);
+}
+
+.model-card:hover::after {
+  background-position: 0 100%;
 }
 
 .model-img-wrapper {

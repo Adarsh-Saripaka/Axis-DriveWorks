@@ -1,18 +1,19 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { AVAILABLE_MODELS } from "./ModelRegistry";
-import { getCarImage } from "../Api/FetchApi";
+import { getCarImage, getCarPlaceholderSvg } from "../Api/FetchApi";
 import { useGLTF } from "@react-three/drei";
 import "./ModelsLibrary.css";
 
 function ModelCard({ model, onClick }) {
-  const [imgSrc, setImgSrc] = useState(model.img);
+  const placeholder = getCarPlaceholderSvg(model.name, model.brand);
+  const [imgSrc, setImgSrc] = useState(model.img || placeholder);
   const [retrying, setRetrying] = useState(false);
 
   useEffect(() => {
-    setImgSrc(model.img);
+    setImgSrc(model.img || placeholder);
     setRetrying(false);
-  }, [model]);
+  }, [model, placeholder]);
 
   const handleError = () => {
     if (!retrying) {
@@ -22,10 +23,10 @@ function ModelCard({ model, onClick }) {
           setImgSrc(url);
         })
         .catch(() => {
-          setImgSrc("https://placehold.co/600x400/1C1C1C/00ffff?text=Image+Not+Found");
+          setImgSrc(placeholder);
         });
     } else {
-      setImgSrc("https://placehold.co/600x400/1C1C1C/00ffff?text=Image+Not+Found");
+      setImgSrc(placeholder);
     }
   };
 

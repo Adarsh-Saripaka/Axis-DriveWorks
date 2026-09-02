@@ -24,12 +24,12 @@ const Home = ({ onSearch }) => {
   const navigate = useNavigate();
 
   const popularBrands = [
-    { name: "BMW", logo: "https://www.carlogos.org/car-logos/bmw-logo-2020.png" },
-    { name: "Audi", logo: "https://www.carlogos.org/car-logos/audi-logo.png" },
-    { name: "Porsche", logo: "https://www.carlogos.org/car-logos/porsche-logo.png" },
-    { name: "Ferrari", logo: "https://www.carlogos.org/car-logos/ferrari-logo.png" },
-    { name: "Lamborghini", logo: "https://www.carlogos.org/car-logos/lamborghini-logo.png" },
-    { name: "Mercedes", logo: "https://www.carlogos.org/car-logos/mercedes-benz-logo.png" }
+    { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg" },
+    { name: "Audi", logo: "https://upload.wikimedia.org/wikipedia/commons/9/92/Audi-Logo_2016.svg" },
+    { name: "Porsche", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/porsche.svg" },
+    { name: "Ferrari", logo: "https://cdn.jsdelivr.net/npm/simple-icons@v10/icons/ferrari.svg" },
+    { name: "Lamborghini", logo: "https://upload.wikimedia.org/wikipedia/en/d/df/Lamborghini_Logo.svg" },
+    { name: "Mercedes", logo: "https://upload.wikimedia.org/wikipedia/commons/9/90/Mercedes-Logo.svg" }
   ];
 
   return (

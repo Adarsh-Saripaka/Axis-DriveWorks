@@ -34,24 +34,22 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 30px;
+  perspective: 1500px;
 }
 
 .booking-card {
   background: rgba(0, 255, 255, 0.03);
   border: 1px solid rgba(0, 255, 255, 0.2);
   border-radius: 12px;
-  padding: 25px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  transition: all 0.3s ease;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   backdrop-filter: blur(10px);
-}
-
-.booking-card:hover {
-  transform: translateY(-5px);
-  border-color: #00ffff;
-  box-shadow: 0 10px 30px rgba(0,255,255,0.1);
+  transform-style: preserve-3d;
+  opacity: 0;
+  animation: card-flip-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  position: relative;
+  overflow: hidden;
 }
 
 .booking-header {
@@ -117,6 +115,218 @@
 .tick-mark {
   margin-right: 8px;
   font-size: 1.2rem;
+}
+
+/* --- Auth Gate Styles --- */
+.auth-gate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 20px;
+}
+
+.auth-card {
+  background: rgba(15, 17, 20, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 40px;
+  width: 100%;
+  max-width: 450px;
+  text-align: center;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5), inset 0 0 20px rgba(0,255,255,0.05);
+  animation: slide-up 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes slide-up {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.auth-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px rgba(0,255,255,0.3));
+}
+
+.auth-card h3 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+  color: #fff;
+}
+
+.auth-card p {
+  color: #aaa;
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.auth-input-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.auth-input-wrapper input {
+  width: 100%;
+  padding: 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  z-index: 2;
+  position: relative;
+}
+
+.auth-input-wrapper input:focus {
+  outline: none;
+  border-color: #00ffff;
+  background: rgba(0,255,255,0.05);
+}
+
+.input-glow {
+  position: absolute;
+  inset: -2px;
+  background: #00ffff;
+  border-radius: 10px;
+  filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.auth-input-wrapper input:focus + .input-glow {
+  opacity: 0.3;
+}
+
+.auth-error {
+  color: #ff3366;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+}
+
+.auth-submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(90deg, #00ffff, #0088ff);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 20px rgba(0,255,255,0.2);
+}
+
+.auth-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px rgba(0,255,255,0.4);
+}
+
+/* --- Authenticated Header Actions --- */
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.session-email {
+  color: #888;
+  font-size: 0.9rem;
+  background: rgba(255,255,255,0.05);
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.logout-btn {
+  background: transparent;
+  color: #888;
+  border: 1px solid #444;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.logout-btn:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
+/* --- 3D Cards Update --- */
+.bookings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+  perspective: 1500px;
+}
+
+.booking-card {
+  background: rgba(0, 255, 255, 0.03);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  backdrop-filter: blur(10px);
+  transform-style: preserve-3d;
+  opacity: 0;
+  animation: card-flip-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes card-flip-in {
+  from { opacity: 0; transform: rotateX(-45deg) translateY(50px) translateZ(-100px); }
+  to { opacity: 1; transform: rotateX(0) translateY(0) translateZ(0); }
+}
+
+.booking-card-inner {
+  padding: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+  transform: translateZ(30px);
+}
+
+.card-reflection {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.7s ease;
+  pointer-events: none;
+}
+
+.booking-card:hover {
+  transform: translateY(-10px) rotateX(5deg) rotateY(-5deg);
+  border-color: #00ffff;
+  box-shadow: 
+    -10px 20px 30px rgba(0,0,0,0.5),
+    0 0 30px rgba(0,255,255,0.1);
+}
+
+.booking-card:hover .card-reflection {
+  left: 200%;
+}
+
+.bookings-loading {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.bookings-loading .loader {
+  margin: 0 auto 20px;
 }
 
 .booking-card.completed {

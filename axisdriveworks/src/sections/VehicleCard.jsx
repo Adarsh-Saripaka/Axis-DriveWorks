@@ -1,27 +1,72 @@
-import React from "react";
+import React, { useRef, useState } from "react";
+import { getCarPlaceholderSvg } from "../Api/FetchApi";
 import "./VehicleCard.css";
 
 const VehicleCard = ({ name, brand, price, feature, image, onView }) => {
+  const cardRef = useRef();
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    
+    const rotateX = ((y - centerY) / centerY) * -8;
+    const rotateY = ((x - centerX) / centerX) * 8;
+    
+    cardRef.current.style.setProperty('--rx', `${rotateX}deg`);
+    cardRef.current.style.setProperty('--ry', `${rotateY}deg`);
+    cardRef.current.style.setProperty('--glare-opacity', '0.25');
+  };
+
+  const handleMouseLeave = () => {
+    if (!cardRef.current) return;
+    cardRef.current.style.setProperty('--rx', '0deg');
+    cardRef.current.style.setProperty('--ry', '0deg');
+    cardRef.current.style.setProperty('--glare-opacity', '0');
+  };
+
+  const placeholder = getCarPlaceholderSvg(name || "Car", brand || "Axis");
+
   return (
-    <div className="CarCard">
-      <div className="car-section">
-        <h2 className="CarName">{name}</h2>
+    <div 
+      className="CarCard-wrapper"
+      style={{ perspective: '1000px' }}
+    >
+      <div 
+        className="CarCard"
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+      >
+        <div className="card-glare" />
+        
+        <div className="car-section">
+          <h2 className="CarName">{name}</h2>
 
-        <img
-          src={image}
-          alt={name}
-          className="car-img"
-          loading="lazy"
-        />
+          <div className="car-img-wrapper">
+            <img
+              src={image || placeholder}
+              alt={name}
+              className="car-img"
+              loading="lazy"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = placeholder;
+              }}
+            />
+          </div>
 
-        <p className="brand">Brand Name: {brand}</p>
-        <p className="price">Price: ${price}</p>
-        <p className="feature">Feature: {feature}</p>
+          <p className="brand">Brand Name: {brand}</p>
+          <p className="price">Price: ${price ? Number(price).toLocaleString() : 'N/A'}</p>
+          <p className="feature">Feature: {feature}</p>
 
-        {/* 🔥 FINAL: button triggers parent navigation */}
-        <button className="details" onClick={onView}>
-          View Details
-        </button>
+          <button className="details" onClick={onView}>
+            View Details
+          </button>
+        </div>
       </div>
     </div>
   );

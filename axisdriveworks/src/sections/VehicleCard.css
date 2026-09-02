@@ -1,3 +1,10 @@
+.CarCard-wrapper {
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  perspective: 1000px;
+}
+
 .CarCard { 
   background: rgba(18, 20, 24, 0.7);
   backdrop-filter: blur(12px); 
@@ -5,16 +12,37 @@
   border-radius: 20px; 
   padding: 20px; 
   cursor: pointer; 
-  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-  max-width: 380px;
+  transition: transform 0.15s ease-out, box-shadow 0.3s ease;
   width: 100%;
-  margin: 0 auto;
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
 }
 
-.CarCard:hover{
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); 
-  transform: translateY(-10px); 
+.card-glare {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.6) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 2;
+  transition: opacity 0.2s ease;
+  opacity: var(--glare-opacity, 0);
+  mix-blend-mode: overlay;
 }
+
+.CarCard:hover {
+  box-shadow: 
+    -20px 20px 40px rgba(0, 0, 0, 0.6),
+    0 0 20px rgba(0, 255, 255, 0.3);
+  border-color: rgba(0, 255, 255, 0.5);
+  z-index: 10;
+}
+
 .car-section { 
   display: flex; 
   flex-direction: column; 
@@ -22,7 +50,8 @@
   gap: 15px;
   width: 100%;
   height: 100%;
- }
+  transform: translateZ(30px); /* Push content out in 3D */
+}
 
 .CarName {
    font-size: 30px; 
@@ -32,40 +61,52 @@
    background-clip: text;
    -webkit-background-clip: text;
    -webkit-text-fill-color: transparent; 
-   margin-bottom: 10px; 
+   margin-bottom: 5px; 
    letter-spacing: 1px; 
-}
-.car-img {
-   width: 100%; 
-   height: 220px;
-   object-fit: cover;
-   border-radius: 12px;
-   border: 1px solid rgba(0, 255, 255, 0.1);
-}
-.car-img { 
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+   transform: translateZ(40px);
 }
 
-.car-img:hover { 
-  transform: scale(1.05); 
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); 
+.car-img-wrapper {
+  width: 100%;
+  height: 220px;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+  transform: translateZ(50px);
+  border: 1px solid rgba(0, 255, 255, 0.1);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+}
+
+.car-img {
+   width: 100%; 
+   height: 100%;
+   object-fit: cover;
+   transition: transform 0.5s ease;
+}
+
+.CarCard:hover .car-img { 
+  transform: scale(1.1); 
 }
 
 .brand, .price, .feature { 
-  font-size: 20px; color: rgba(255, 255, 255, 0.85); 
-  margin: 5px 0; letter-spacing: 0.5px; 
+  font-size: 16px; 
+  color: rgba(255, 255, 255, 0.85); 
+  margin: 2px 0; 
+  letter-spacing: 0.5px; 
+  transform: translateZ(35px);
 }
 
 .price { 
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 800;
   color: #00ffff;
+  text-shadow: 0 0 10px rgba(0,255,255,0.3);
 }
  
 .details { 
-    background-color: transparent; 
+    background-color: rgba(0,0,0,0.5); 
     color: #00ffff; 
-    font-weight: 600; 
+    font-weight: 700; 
     border: 1px solid #00ffff; 
     width: 100%;
     max-width: 220px;
@@ -74,25 +115,55 @@
     font-size: 16px;
     font-family: inherit;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     margin-top: 10px;
+    transform: translateZ(40px);
+    position: relative;
+    overflow: hidden;
 } 
+
+.details::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,255,255,0.4), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+}
+
+.CarCard:hover .details {
+  box-shadow: 0 5px 15px rgba(0, 255, 255, 0.2);
+}
+
 .details:hover { 
   background-color: #00ffff;
   color: #0A0A0A;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
-  transform: scale(1.02); 
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+  transform: translateZ(50px) scale(1.05); 
+}
+
+.details:hover::before {
+  left: 200%;
 }
 
 @media (max-width: 768px) { 
   .CarName { 
     font-size: 22px;
   }
-  .car-img {
+  .car-img-wrapper {
      height: 160px; 
   }
   .details {
-     padding: 10px 25px;
      font-size: 14px;
-     } 
+     height: 40px;
+  } 
+  .car-section {
+    transform: none !important;
   }
+  .CarCard {
+    transform: none !important;
+  }
+}

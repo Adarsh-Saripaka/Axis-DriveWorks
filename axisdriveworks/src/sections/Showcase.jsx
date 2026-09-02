@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { searchCars, getCarImage, bookTestDrive } from "../Api/FetchApi";
+import { searchCars, getCarImage, getCarPlaceholderSvg, bookTestDrive, hasSession, createSession, getSessionEmail } from "../Api/FetchApi";
 import VehicleCard from "./VehicleCard";
 import "./Showcase.css";
 
@@ -17,6 +17,7 @@ export default function Showcase() {
   const [loading, setLoading] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [bookingError, setBookingError] = useState("");
 
   // Redirect if no data
   useEffect(() => {
@@ -38,9 +39,8 @@ export default function Showcase() {
               uniqueCars.push(car);
             }
           }
-          
+
           setCars(uniqueCars);
-          // If no hero was passed in navigation state, use the first result
           if (!state?.hero && uniqueCars.length > 0) {
             setHero(uniqueCars[0]);
           }
@@ -86,24 +86,42 @@ export default function Showcase() {
 
   const handleBookTestDrive = async (e) => {
     e.preventDefault();
+    setBookingError("");
+
     const data = new FormData(e.target);
-    const newBooking = {
-      car_id: hero.id,
-      car_brand: hero.brand,
-      car_model: hero.model,
-      name: data.get("name"),
-      email: data.get("email"),
-      date: data.get("date"),
-    };
-    
-    await bookTestDrive(newBooking);
-    
-    setBookingSuccess(true);
-    setTimeout(() => {
-      setShowBookingModal(false);
-      setBookingSuccess(false);
-      navigate("/bookings");
-    }, 2000);
+    const email = data.get("email");
+    const name = data.get("name");
+    const date = data.get("date");
+
+    try {
+      // Auto-create session if not exists (or update if different email)
+      if (!hasSession() || getSessionEmail() !== email.toLowerCase().trim()) {
+        await createSession(email);
+      }
+
+      const newBooking = {
+        car_id: hero.id,
+        car_brand: hero.brand,
+        car_model: hero.model,
+        name: name,
+        date: date,
+      };
+
+      const success = await bookTestDrive(newBooking);
+
+      if (success) {
+        setBookingSuccess(true);
+        setTimeout(() => {
+          setShowBookingModal(false);
+          setBookingSuccess(false);
+          navigate("/bookings");
+        }, 2000);
+      } else {
+        setBookingError("Failed to create reservation. Please try again.");
+      }
+    } catch (err) {
+      setBookingError(err.message || "An error occurred. Please try again.");
+    }
   };
 
   const handleView3D = () => {
@@ -112,6 +130,9 @@ export default function Showcase() {
   };
 
   if (!title && !hero) return null;
+
+  // Get today's date for min date validation
+  const todayStr = new Date().toISOString().split('T')[0];
 
   return (
     <div className="showcase loaded">
@@ -123,7 +144,14 @@ export default function Showcase() {
       {hero && (
         <div className="showcase-main showcase-split">
           <div className="showcase-hero">
-            <img src={heroImage} alt={hero.model} />
+            <img 
+              src={heroImage || getCarPlaceholderSvg(hero.model, hero.brand)} 
+              alt={hero.model} 
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = getCarPlaceholderSvg(hero.model, hero.brand);
+              }}
+            />
             <div className="hero-shadow" />
             <div className="hero-overlay">
               <h1>{hero.brand} {hero.model}</h1>
@@ -144,7 +172,7 @@ export default function Showcase() {
               <span className="label">MSRP</span>
               <h3 className="price">${Number(hero.msrp_usd).toLocaleString()}</h3>
             </div>
-            
+
             <p className="subtitle">
               {hero.engine_type || 'Standard'} Engine · {hero.transmission || 'Auto'} · {hero.drivetrain || 'AWD'}
             </p>
@@ -170,33 +198,42 @@ export default function Showcase() {
         <div className="modal-overlay" onClick={() => setShowBookingModal(false)}>
           <div className="booking-modal" onClick={e => e.stopPropagation()}>
             <button className="close-modal" onClick={() => setShowBookingModal(false)}>✕</button>
-            
+
             {bookingSuccess ? (
               <div className="booking-success">
                 <div className="success-icon">✓</div>
                 <h3>Reservation Confirmed</h3>
-                <p>Your test drive for the {hero.brand} {hero.model} has been scheduled. Check your email for details.</p>
+                <p>Your test drive for the {hero.brand} {hero.model} has been scheduled. Redirecting to your bookings...</p>
               </div>
             ) : (
               <form className="booking-form" onSubmit={handleBookTestDrive}>
                 <h3>Book Test Drive</h3>
                 <p className="modal-subtitle">{hero.brand} {hero.model}</p>
-                
+
                 <div className="form-group">
                   <label>Full Name</label>
                   <input name="name" type="text" required placeholder="John Doe" />
                 </div>
-                
+
                 <div className="form-group">
                   <label>Email Address</label>
-                  <input name="email" type="email" required placeholder="john@example.com" />
+                  <input
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="john@example.com"
+                    defaultValue={getSessionEmail() || ""}
+                  />
+                  <span className="field-hint">Your bookings will be linked to this email</span>
                 </div>
-                
+
                 <div className="form-group">
                   <label>Preferred Date</label>
-                  <input name="date" type="date" required />
+                  <input name="date" type="date" required min={todayStr} />
                 </div>
-                
+
+                {bookingError && <p className="booking-error">{bookingError}</p>}
+
                 <button type="submit" className="confirm-btn">Confirm Reservation</button>
               </form>
             )}

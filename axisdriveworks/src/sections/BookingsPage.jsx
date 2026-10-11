@@ -17,7 +17,15 @@ export default function BookingsPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(hasSession());
   const [authError, setAuthError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [actionError, setActionError] = useState("");
   const navigate = useNavigate();
+
+  const getErrorMessage = (errType) => {
+    if (errType === "rate_limited") return "Too many requests, try again shortly.";
+    if (errType === "auth") return "Session expired. Please sign in again.";
+    if (errType === "network") return "Check your connection.";
+    return "Server error, try later.";
+  };
 
   // Load bookings when authenticated
   useEffect(() => {
@@ -26,10 +34,6 @@ export default function BookingsPage() {
       getReservations()
         .then(data => {
           setBookings(data);
-          // If returned empty and we had a session, it might be expired
-          if (data.length === 0 && hasSession()) {
-            // Session might still be valid, just no bookings
-          }
         })
         .finally(() => setLoading(false));
     }
@@ -51,21 +55,46 @@ export default function BookingsPage() {
     setIsAuthenticated(false);
     setBookings([]);
     setEmail("");
+    setActionError("");
   };
 
   const handleTestDrive = async (booking) => {
-    await markReservationComplete(booking.id);
-    const updatedBookings = bookings.map(b =>
-      b.id === booking.id ? { ...b, completed: 1 } : b
-    );
-    setBookings(updatedBookings);
-    navigate("/models", { state: { filterBrand: booking.car_brand } });
+    setActionError("");
+    const res = await markReservationComplete(booking.id);
+    const { ok, error } = typeof res === "object" ? res : { ok: Boolean(res), error: res ? null : "server" };
+
+    if (ok) {
+      const updatedBookings = bookings.map(b =>
+        b.id === booking.id ? { ...b, completed: 1 } : b
+      );
+      setBookings(updatedBookings);
+      navigate("/models", { state: { filterBrand: booking.car_brand } });
+    } else {
+      if (error === "aborted") return;
+      if (error === "auth") {
+        setIsAuthenticated(false);
+        clearSession();
+      }
+      setActionError(getErrorMessage(error));
+    }
   };
 
   const clearCompleted = async () => {
-    await clearCompletedReservations();
-    const remaining = bookings.filter(b => !b.completed);
-    setBookings(remaining);
+    setActionError("");
+    const res = await clearCompletedReservations();
+    const { ok, error } = typeof res === "object" ? res : { ok: Boolean(res), error: res ? null : "server" };
+
+    if (ok) {
+      const remaining = bookings.filter(b => !b.completed);
+      setBookings(remaining);
+    } else {
+      if (error === "aborted") return;
+      if (error === "auth") {
+        setIsAuthenticated(false);
+        clearSession();
+      }
+      setActionError(getErrorMessage(error));
+    }
   };
 
   // ── Email Gate (Not Authenticated) ──
@@ -121,6 +150,7 @@ export default function BookingsPage() {
       </div>
 
       <div className="bookings-container">
+        {actionError && <p className="auth-error" style={{ textAlign: "center", margin: "10px 0" }}>{actionError}</p>}
         {loading ? (
           <div className="bookings-loading">
             <div className="loader" />

@@ -563,3 +563,160 @@
     padding: 100px 20px;
   }
 }
+
+/* =============================================
+   DYNAMIC SPECS, BADGES & ATTRIBUTION
+   ============================================= */
+
+.confidence-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+
+.confidence-high {
+  background: rgba(0, 255, 128, 0.12);
+  border-color: #00ff80;
+  color: #00ff80;
+  box-shadow: 0 0 10px rgba(0, 255, 128, 0.25);
+}
+
+.confidence-medium {
+  background: rgba(0, 200, 255, 0.12);
+  border-color: #00c8ff;
+  color: #00c8ff;
+  box-shadow: 0 0 10px rgba(0, 200, 255, 0.25);
+}
+
+.confidence-low {
+  background: rgba(255, 180, 0, 0.12);
+  border-color: #ffb400;
+  color: #ffb400;
+  box-shadow: 0 0 10px rgba(255, 180, 0, 0.25);
+}
+
+.variant-badge {
+  background: rgba(0, 255, 255, 0.18) !important;
+  color: #00ffff !important;
+  border-color: rgba(0, 255, 255, 0.4) !important;
+}
+
+.image-attribution-bar {
+  position: absolute;
+  bottom: 8px;
+  right: 16px;
+  background: rgba(10, 15, 25, 0.75);
+  backdrop-filter: blur(8px);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  color: #a0b2c6;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  z-index: 10;
+}
+
+.image-attribution-bar strong {
+  color: #00ffff;
+}
+
+.sources-box {
+  margin: 20px 0;
+  padding: 14px 18px;
+  background: rgba(0, 255, 255, 0.03);
+  border: 1px solid rgba(0, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.sources-label {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #8fa5ba;
+  margin-bottom: 8px;
+}
+
+.sources-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.source-tag {
+  background: rgba(15, 25, 40, 0.8);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  color: #00ffff;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.source-tag:hover {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: #00ffff;
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
+}
+
+.actions-row {
+  display: flex;
+  gap: 14px;
+  margin-top: 24px;
+  align-items: center;
+}
+
+.report-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #8da2b5;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.report-btn:hover {
+  border-color: #ff5555;
+  color: #ff5555;
+  background: rgba(255, 85, 85, 0.08);
+}
+
+.showcase-loading-box,
+.showcase-error-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 40px;
+  gap: 16px;
+}
+
+.showcase-loading-box h3 {
+  font-size: 1.8rem;
+  color: #00ffff;
+  margin: 0;
+}
+
+.showcase-loading-box p {
+  color: #8fa5ba;
+  max-width: 500px;
+}
+
+.showcase-error-box h3 {
+  font-size: 1.8rem;
+  color: #ff5555;
+  margin: 0;
+}
+
+.showcase-error-box p {
+  color: #8fa5ba;
+  max-width: 500px;
+}

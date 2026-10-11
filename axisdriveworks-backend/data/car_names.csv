@@ -1,0 +1,1463 @@
+id,brand,model,year_start,year_end,body_style,has_3d_model,model_3d_id,model_3d_label,sources,search_key
+1,Acura,ILX Premium,,,,0,,,Cars_Datasets_2025,acura ilx premium
+2,Acura,ILX Special Edition,,,,0,,,Cars_Datasets_2025,acura ilx special edition
+3,Acura,ILX Technology Package,,,,0,,,Cars_Datasets_2025,acura ilx technology package
+4,Acura,ILX Technology Plus,,,,0,,,Cars_Datasets_2025,acura ilx technology plus
+5,Acura,MDX Advance,,,,0,,,Cars_Datasets_2025,acura mdx advance
+6,Acura,MDX Elite,,,,0,,,Cars_Datasets_2025,acura mdx elite
+7,Acura,MDX Hybrid,,,,0,,,Cars_Datasets_2025,acura mdx hybrid
+8,Acura,Mdx Sh-awd,,,,0,,,Cars_Datasets_2025,acura mdx sh-awd
+9,Acura,MDX SH-AWD w/Technology Package,,,,0,,,Cars_Datasets_2025,acura mdx sh-awd w/technology package
+10,Acura,MDX Sport Hybrid,,,,0,,,Cars_Datasets_2025,acura mdx sport hybrid
+11,Acura,NSX 3.5L Hybrid Coupe,,,,0,,,Cars_Datasets_2025,acura nsx 3.5l hybrid coupe
+12,Acura,NSX Carbon Edition,,,,0,,,Cars_Datasets_2025,acura nsx carbon edition
+13,Acura,NSX GT3 (Track Version),,,,0,,,Cars_Datasets_2025,acura nsx gt3 (track version)
+14,Acura,NSX Type S,,,,0,,,Cars_Datasets_2025,acura nsx type s
+15,Acura,RDX Hybrid,,,,0,,,Cars_Datasets_2025,acura rdx hybrid
+16,Acura,RDX Platinum Elite,,,,0,,,Cars_Datasets_2025,acura rdx platinum elite
+17,Acura,Rdx Sh-awd,,,,0,,,Cars_Datasets_2025,acura rdx sh-awd
+18,Acura,RDX Technology,,,,0,,,Cars_Datasets_2025,acura rdx technology
+19,Acura,RDX Turbo AWD,,,,0,,,Cars_Datasets_2025,acura rdx turbo awd
+20,Acura,RDX Turbo SH-AWD,,,,0,,,Cars_Datasets_2025,acura rdx turbo sh-awd
+21,Acura,Tlx 2.4L,,,,0,,,Cars_Datasets_2025,acura tlx 2.4l
+22,Acura,Tlx 3.5L V6,,,,0,,,Cars_Datasets_2025,acura tlx 3.5l v6
+23,Acura,TLX A-Spec,,,,0,,,Cars_Datasets_2025,acura tlx a-spec
+24,Acura,TLX A-Spec Sedan,,,,0,,,Cars_Datasets_2025,acura tlx a-spec sedan
+25,Acura,TLX PMC Edition,,,,0,,,Cars_Datasets_2025,acura tlx pmc edition
+26,Acura,TLX Type S PMC Edition,,,,0,,,Cars_Datasets_2025,acura tlx type s pmc edition
+27,Acura,TLX V6 Advance,,,,0,,,Cars_Datasets_2025,acura tlx v6 advance
+28,Alfa Romeo,Giulia,2023,2024,,0,,,Car_Models,alfa romeo giulia
+29,Alfa Romeo,Giulia Quadrifoglio,2023,2024,,0,,,Car_Models,alfa romeo giulia quadrifoglio
+30,Alfa Romeo,Stelvio,2023,2024,,0,,,Car_Models,alfa romeo stelvio
+31,Alfa Romeo,Stelvio Quadrifoglio,2023,2024,,0,,,Car_Models,alfa romeo stelvio quadrifoglio
+32,Alpina,B3,2023,,,0,,,Car_Models,alpina b3
+33,Alpina,B4,2023,,,0,,,Car_Models,alpina b4
+34,Alpina,B5,2023,,,0,,,Car_Models,alpina b5
+35,Alpina,B7,2023,,,0,,,Car_Models,alpina b7
+36,Alpina,XB7,2023,,,0,,,Car_Models,alpina xb7
+37,Aston Martin,DB11,,,,0,,,Cars_Datasets_2025,aston martin db11
+38,Aston Martin,DBS Superleggera,,,,0,,,Cars_Datasets_2025,aston martin dbs superleggera
+39,Aston Martin,DBX,,,,0,,,Cars_Datasets_2025,aston martin dbx
+40,Aston Martin,Lagonda Taraf,,,,0,,,Cars_Datasets_2025,aston martin lagonda taraf
+41,Aston Martin,Rapide Amr,,,,0,,,Cars_Datasets_2025,aston martin rapide amr
+42,Aston Martin,Valhalla,,,,0,,,Cars_Datasets_2025,aston martin valhalla
+43,Aston Martin,Valkyrie,,,,0,,,Cars_Datasets_2025,aston martin valkyrie
+44,Aston Martin,Vanquish,,,,0,,,Cars_Datasets_2025,aston martin vanquish
+45,Aston Martin,Vantage,,,,1,aston_vantage,Vantage Roadster,3d_registry|Cars_Datasets_2025,aston martin vantage
+46,Aston Martin,Vantage F1,,,,0,,,Cars_Datasets_2025,aston martin vantage f1
+47,Aston Martin,Victor,,,,0,,,Cars_Datasets_2025,aston martin victor
+48,Audi,A3,2019,,,0,,,Car_Models,audi a3
+49,Audi,A4,2016,,,0,,,Car_Models|Cars_Datasets_2025,audi a4
+50,Audi,A5,2018,,,0,,,Car_Models,audi a5
+51,Audi,A5 Coupe,,,,0,,,Cars_Datasets_2025,audi a5 coupe
+52,Audi,A6,,,,0,,,Cars_Datasets_2025,audi a6
+53,Audi,A7,,,,0,,,Cars_Datasets_2025,audi a7
+54,Audi,A8,,,,0,,,Cars_Datasets_2025,audi a8
+55,Audi,E-tron,,,,0,,,Cars_Datasets_2025,audi e-tron
+56,Audi,E-tron Sportback,,,,0,,,Cars_Datasets_2025,audi e-tron sportback
+57,Audi,Q3,2019,,,0,,,Car_Models|Cars_Datasets_2025,audi q3
+58,Audi,Q5,2018,,,0,,,Car_Models|Cars_Datasets_2025,audi q5
+59,Audi,Q7,2017,,,0,,,Car_Models|Cars_Datasets_2025,audi q7
+60,Audi,R8,,,,1,audi_r8,Audi R8,3d_registry,audi r8
+61,Audi,R8 GT,,,,0,,,Cars_Datasets_2025,audi r8 gt
+62,Audi,R8 V10 Plus,,,,0,,,Cars_Datasets_2025,audi r8 v10 plus
+63,Audi,RS6 Avant,,,,0,,,Cars_Datasets_2025,audi rs6 avant
+64,Audi,RS7 Sportback,,,,1,audi_rs7,2014 Audi RS7,3d_registry|Cars_Datasets_2025,audi rs7 sportback
+65,Audi,S3 Sedan,,,,0,,,Cars_Datasets_2025,audi s3 sedan
+66,Audi,S4 Sedan,,,,0,,,Cars_Datasets_2025,audi s4 sedan
+67,Audi,S5 Coupe,,,,0,,,Cars_Datasets_2025,audi s5 coupe
+68,Audi,S7 Sportback,,,,0,,,Cars_Datasets_2025,audi s7 sportback
+69,Audi,S8,,,,0,,,Cars_Datasets_2025,audi s8
+70,Audi,SQ5,,,,0,,,Cars_Datasets_2025,audi sq5
+71,Audi,TT Coupe,,,,0,,,Cars_Datasets_2025,audi tt coupe
+72,Bentley,Continental GT Azure,,,,0,,,Cars_Datasets_2025,bentley continental gt azure
+73,BMW,114D,,,,0,,,Cars_Datasets_2025,bmw 114d
+74,BMW,114D Sport Line,,,,0,,,Cars_Datasets_2025,bmw 114d sport line
+75,BMW,114i,,,,0,,,Cars_Datasets_2025,bmw 114i
+76,BMW,116D,,,,0,,,Cars_Datasets_2025,bmw 116d
+77,BMW,116D Advantage,,,,0,,,Cars_Datasets_2025,bmw 116d advantage
+78,BMW,116D Efficientdynamics,,,,0,,,Cars_Datasets_2025,bmw 116d efficientdynamics
+79,BMW,116i,,,,0,,,Cars_Datasets_2025,bmw 116i
+80,BMW,116i EFFICIENTDYNAMICS,,,,0,,,Cars_Datasets_2025,bmw 116i efficientdynamics
+81,BMW,118D,,,,0,,,Cars_Datasets_2025,bmw 118d
+82,BMW,118D Sport Line,,,,0,,,Cars_Datasets_2025,bmw 118d sport line
+83,BMW,118i,,,,0,,,Cars_Datasets_2025,bmw 118i
+84,BMW,118i M SPORT,,,,0,,,Cars_Datasets_2025,bmw 118i m sport
+85,BMW,118i SHADOW LINE,,,,0,,,Cars_Datasets_2025,bmw 118i shadow line
+86,BMW,118i SPORTLINE,,,,0,,,Cars_Datasets_2025,bmw 118i sportline
+87,BMW,118i URBAN LINE,,,,0,,,Cars_Datasets_2025,bmw 118i urban line
+88,BMW,118i XDRIVE,,,,0,,,Cars_Datasets_2025,bmw 118i xdrive
+89,BMW,120D Efficientdynamics,,,,0,,,Cars_Datasets_2025,bmw 120d efficientdynamics
+90,BMW,120D Xdrive,,,,0,,,Cars_Datasets_2025,bmw 120d xdrive
+91,BMW,120i,,,,0,,,Cars_Datasets_2025,bmw 120i
+92,BMW,120i M SPORT,,,,0,,,Cars_Datasets_2025,bmw 120i m sport
+93,BMW,120i XDRIVE,,,,0,,,Cars_Datasets_2025,bmw 120i xdrive
+94,BMW,125D,,,,0,,,Cars_Datasets_2025,bmw 125d
+95,BMW,125i,,,,0,,,Cars_Datasets_2025,bmw 125i
+96,BMW,128ti,,,,0,,,Cars_Datasets_2025,bmw 128ti
+97,BMW,330i,,,,0,,,Cars_Datasets_2025,bmw 330i
+98,BMW,330i Sedan,2020,2022,,0,,,Car_Models,bmw 330i sedan
+99,BMW,430i COUPE,,,,0,,,Cars_Datasets_2025,bmw 430i coupe
+100,BMW,530i,,,,0,,,Cars_Datasets_2025,bmw 530i
+101,BMW,530i Sedan,2020,2022,,0,,,Car_Models,bmw 530i sedan
+102,BMW,740i Sedan,2020,2022,,0,,,Car_Models,bmw 740i sedan
+103,BMW,i8 Roadster,,,,1,bmw_i8,2015 BMW i8 XS,3d_registry|Cars_Datasets_2025,bmw i8 roadster
+104,BMW,M135i XDRIVE,,,,0,,,Cars_Datasets_2025,bmw m135i xdrive
+105,BMW,M2 CS,,,,0,,,Cars_Datasets_2025,bmw m2 cs
+106,BMW,M3,,,,1,bmw_m3,BMW M3 Sedan,3d_registry,bmw m3
+107,BMW,M3 Competition,,,,0,,,Cars_Datasets_2025,bmw m3 competition
+108,BMW,M340i XDRIVE,,,,0,,,Cars_Datasets_2025,bmw m340i xdrive
+109,BMW,M4 Competition,,,,1,bmw_m4,2021 BMW M4 Competition,3d_registry|Cars_Datasets_2025,bmw m4 competition
+110,BMW,M4 Coupe,2020,2022,,0,,,Car_Models,bmw m4 coupe
+111,BMW,M4 GTS,,,,0,,,Cars_Datasets_2025,bmw m4 gts
+112,BMW,M5 CS,,,,0,,,Cars_Datasets_2025,bmw m5 cs
+113,BMW,M550i XDRIVE,,,,0,,,Cars_Datasets_2025,bmw m550i xdrive
+114,BMW,M8 Convertible,2020,2022,,0,,,Car_Models,bmw m8 convertible
+115,BMW,M8 Gran Coupe,,,,0,,,Cars_Datasets_2025,bmw m8 gran coupe
+116,BMW,M850i DRIVE COUPE,,,,0,,,Cars_Datasets_2025,bmw m850i drive coupe
+117,BMW,X1 sDrive28i,2020,2022,,0,,,Car_Models,bmw x1 sdrive28i
+118,BMW,X3 M Competition,,,,0,,,Cars_Datasets_2025,bmw x3 m competition
+119,BMW,X3 xDrive30i,2020,2022,,0,,,Car_Models,bmw x3 xdrive30i
+120,BMW,X5 M Competition,,,,0,,,Cars_Datasets_2025,bmw x5 m competition
+121,BMW,X5 xDrive40i,2020,2022,,0,,,Car_Models,bmw x5 xdrive40i
+122,Bugatti,Bolide,,,,0,,,Cars_Datasets_2025,bugatti bolide
+123,Bugatti,Centodieci,,,,0,,,Cars_Datasets_2025,bugatti centodieci
+124,Bugatti,Chiron,2016,,,0,,,Car_Models|Cars_Datasets_2025,bugatti chiron
+125,Bugatti,Chiron Noire,,,,0,,,Cars_Datasets_2025,bugatti chiron noire
+126,Bugatti,Chiron Pur Sport,,,,0,,,Cars_Datasets_2025,bugatti chiron pur sport
+127,Bugatti,Chiron Sport,,,,0,,,Cars_Datasets_2025,bugatti chiron sport
+128,Bugatti,Chiron Super Sport,,,,0,,,Cars_Datasets_2025,bugatti chiron super sport
+129,Bugatti,Divo,,,,0,,,Cars_Datasets_2025,bugatti divo
+130,Bugatti,EB 110,1991,1995,,0,,,Car_Models,bugatti eb 110
+131,Bugatti,EB 110 SS,1993,1995,,0,,,Car_Models,bugatti eb 110 ss
+132,Bugatti,La Voiture Noire,,,,0,,,Cars_Datasets_2025,bugatti la voiture noire
+133,Bugatti,Mistral,,,,0,,,Cars_Datasets_2025,bugatti mistral
+134,Bugatti,Veyron,2005,2015,,0,,,Car_Models,bugatti veyron
+135,Cadillac,CT4,2023,,,0,,,Car_Models|Cars_Datasets_2025,cadillac ct4
+136,Cadillac,CT4-V,2023,,,0,,,Car_Models|Cars_Datasets_2025,cadillac ct4-v
+137,Cadillac,CT4-V Blackwing,,,,0,,,Cars_Datasets_2025,cadillac ct4-v blackwing
+138,Cadillac,CT5,2023,,,0,,,Car_Models|Cars_Datasets_2025,cadillac ct5
+139,Cadillac,CT5 Premium Luxury,,,,0,,,Cars_Datasets_2025,cadillac ct5 premium luxury
+140,Cadillac,CT5-V,2023,,,0,,,Car_Models|Cars_Datasets_2025,cadillac ct5-v
+141,Cadillac,CT5-V Blackwing,2023,,,0,,,Car_Models|Cars_Datasets_2025,cadillac ct5-v blackwing
+142,Cadillac,Escalade,2023,,,0,,,Car_Models|Cars_Datasets_2025,cadillac escalade
+143,Cadillac,Escalade ESV,,,,0,,,Cars_Datasets_2025,cadillac escalade esv
+144,Cadillac,Escalade Platinum,,,,0,,,Cars_Datasets_2025,cadillac escalade platinum
+145,Cadillac,Escalade V,,,,0,,,Cars_Datasets_2025,cadillac escalade v
+146,Cadillac,Lyriq EV,,,,0,,,Cars_Datasets_2025,cadillac lyriq ev
+147,Cadillac,Lyriq EV Premium,,,,0,,,Cars_Datasets_2025,cadillac lyriq ev premium
+148,Cadillac,Lyriq Launch Edition,,,,0,,,Cars_Datasets_2025,cadillac lyriq launch edition
+149,Cadillac,XT4,2023,,,0,,,Car_Models|Cars_Datasets_2025,cadillac xt4
+150,Cadillac,XT4 Sport,,,,0,,,Cars_Datasets_2025,cadillac xt4 sport
+151,Cadillac,XT5,2023,,,0,,,Car_Models|Cars_Datasets_2025,cadillac xt5
+152,Cadillac,XT5 Sport,,,,0,,,Cars_Datasets_2025,cadillac xt5 sport
+153,Cadillac,XT6,2023,,,0,,,Car_Models|Cars_Datasets_2025,cadillac xt6
+154,Cadillac,XT6 Sport,,,,0,,,Cars_Datasets_2025,cadillac xt6 sport
+155,Caterham,Seven 170,2023,,,0,,,Car_Models,caterham seven 170
+156,Caterham,Seven 270,2023,,,0,,,Car_Models,caterham seven 270
+157,Caterham,Seven 360,2023,,,0,,,Car_Models,caterham seven 360
+158,Caterham,Seven 420,2023,,,0,,,Car_Models,caterham seven 420
+159,Caterham,Seven 620,2023,,,0,,,Car_Models,caterham seven 620
+160,Chevrolet,Blazer,,,,0,,,Cars_Datasets_2025,chevrolet blazer
+161,Chevrolet,Blazer LT,,,,0,,,Cars_Datasets_2025,chevrolet blazer lt
+162,Chevrolet,Blazer Premier,,,,0,,,Cars_Datasets_2025,chevrolet blazer premier
+163,Chevrolet,Blazer RS,,,,0,,,Cars_Datasets_2025,chevrolet blazer rs
+164,Chevrolet,Bolt EUV,,,,0,,,Cars_Datasets_2025,chevrolet bolt euv
+165,Chevrolet,Bolt EV,2017,2021,,0,,,Car_Models|Cars_Datasets_2025,chevrolet bolt ev
+166,Chevrolet,Bolt EV 2LT,,,,0,,,Cars_Datasets_2025,chevrolet bolt ev 2lt
+167,Chevrolet,Bolt EV Premier,,,,0,,,Cars_Datasets_2025,chevrolet bolt ev premier
+168,Chevrolet,Camaro,2010,2021,,0,,,Car_Models|Cars_Datasets_2025,chevrolet camaro
+169,Chevrolet,Camaro SS,,,,1,chevy_camaro,2016 Camaro SS,3d_registry|Cars_Datasets_2025,chevrolet camaro ss
+170,Chevrolet,Camaro ZL1,,,,0,,,Cars_Datasets_2025,chevrolet camaro zl1
+171,Chevrolet,Colorado,2004,2021,,0,,,Car_Models|Cars_Datasets_2025,chevrolet colorado
+172,Chevrolet,Colorado WT,,,,0,,,Cars_Datasets_2025,chevrolet colorado wt
+173,Chevrolet,Colorado ZR2,,,,0,,,Cars_Datasets_2025,chevrolet colorado zr2
+174,Chevrolet,Corvette,1953,2021,,1,chevy_corvette,2020 Corvette C8,3d_registry|Car_Models|Cars_Datasets_2025,chevrolet corvette
+175,Chevrolet,Corvette Grand Sport,,,,0,,,Cars_Datasets_2025,chevrolet corvette grand sport
+176,Chevrolet,Corvette Stingray,,,,0,,,Cars_Datasets_2025,chevrolet corvette stingray
+177,Chevrolet,Cruze,2016,,,0,,,Car_Models,chevrolet cruze
+178,Chevrolet,Equinox,2005,2021,,0,,,Car_Models|Cars_Datasets_2025,chevrolet equinox
+179,Chevrolet,Equinox LT,,,,0,,,Cars_Datasets_2025,chevrolet equinox lt
+180,Chevrolet,Equinox Premier,,,,0,,,Cars_Datasets_2025,chevrolet equinox premier
+181,Chevrolet,Equinox RS,,,,0,,,Cars_Datasets_2025,chevrolet equinox rs
+182,Chevrolet,Malibu,,,,0,,,Cars_Datasets_2025,chevrolet malibu
+183,Chevrolet,Malibu LT,,,,0,,,Cars_Datasets_2025,chevrolet malibu lt
+184,Chevrolet,Malibu Premier,,,,0,,,Cars_Datasets_2025,chevrolet malibu premier
+185,Chevrolet,Silverado 1500,1999,2021,,0,,,Car_Models|Cars_Datasets_2025,chevrolet silverado 1500
+186,Chevrolet,Silverado 1500 Custom,,,,0,,,Cars_Datasets_2025,chevrolet silverado 1500 custom
+187,Chevrolet,Silverado 1500 High Country,,,,0,,,Cars_Datasets_2025,chevrolet silverado 1500 high country
+188,Chevrolet,Silverado 1500 RST,,,,0,,,Cars_Datasets_2025,chevrolet silverado 1500 rst
+189,Chevrolet,Silverado 1500 Trail Boss,,,,0,,,Cars_Datasets_2025,chevrolet silverado 1500 trail boss
+190,Chevrolet,Silverado 2500HD,1999,,,0,,,Car_Models|Cars_Datasets_2025,chevrolet silverado 2500hd
+191,Chevrolet,Silverado 2500HD LTZ,,,,0,,,Cars_Datasets_2025,chevrolet silverado 2500hd ltz
+192,Chevrolet,Silverado 3500HD,,,,0,,,Cars_Datasets_2025,chevrolet silverado 3500hd
+193,Chevrolet,Silverado 3500HD High Country,,,,0,,,Cars_Datasets_2025,chevrolet silverado 3500hd high country
+194,Chevrolet,Silverado Custom,,,,0,,,Cars_Datasets_2025,chevrolet silverado custom
+195,Chevrolet,Silverado HD (2500/3500),,,,0,,,Car_Models,chevrolet silverado hd (2500/3500)
+196,Chevrolet,Sonic,,,,0,,,Cars_Datasets_2025,chevrolet sonic
+197,Chevrolet,Spark,2013,2021,,0,,,Car_Models|Cars_Datasets_2025,chevrolet spark
+198,Chevrolet,Spark Activ,,,,0,,,Cars_Datasets_2025,chevrolet spark activ
+199,Chevrolet,Spark LS,,,,0,,,Cars_Datasets_2025,chevrolet spark ls
+200,Chevrolet,Suburban,1935,2021,,0,,,Car_Models|Cars_Datasets_2025,chevrolet suburban
+201,Chevrolet,Suburban High Country,,,,0,,,Cars_Datasets_2025,chevrolet suburban high country
+202,Chevrolet,Suburban LT,,,,0,,,Cars_Datasets_2025,chevrolet suburban lt
+203,Chevrolet,Tahoe,1995,2021,,0,,,Car_Models|Cars_Datasets_2025,chevrolet tahoe
+204,Chevrolet,Tahoe High Country,,,,0,,,Cars_Datasets_2025,chevrolet tahoe high country
+205,Chevrolet,Tahoe LS,,,,0,,,Cars_Datasets_2025,chevrolet tahoe ls
+206,Chevrolet,Tahoe LT,,,,0,,,Cars_Datasets_2025,chevrolet tahoe lt
+207,Chevrolet,Tahoe Midnight Edition,,,,0,,,Cars_Datasets_2025,chevrolet tahoe midnight edition
+208,Chevrolet,Tahoe Premier,,,,0,,,Cars_Datasets_2025,chevrolet tahoe premier
+209,Chevrolet,Tahoe RST,,,,0,,,Cars_Datasets_2025,chevrolet tahoe rst
+210,Chevrolet,Tahoe Sport Edition,,,,0,,,Cars_Datasets_2025,chevrolet tahoe sport edition
+211,Chevrolet,Tahoe Z71,,,,0,,,Cars_Datasets_2025,chevrolet tahoe z71
+212,Chevrolet,Trailblazer,2020,,,0,,,Car_Models|Cars_Datasets_2025,chevrolet trailblazer
+213,Chevrolet,Traverse,,,,0,,,Cars_Datasets_2025,chevrolet traverse
+214,Chevrolet,Traverse LT,,,,0,,,Cars_Datasets_2025,chevrolet traverse lt
+215,Chevrolet,Traverse Premier,,,,0,,,Cars_Datasets_2025,chevrolet traverse premier
+216,Chevrolet,Traverse RS,,,,0,,,Cars_Datasets_2025,chevrolet traverse rs
+217,Chevrolet,Trax,2013,,,0,,,Car_Models,chevrolet trax
+218,Chevrolet,Trax LT,,,,0,,,Cars_Datasets_2025,chevrolet trax lt
+219,Chrysler,300,2023,,,0,,,Car_Models,chrysler 300
+220,Chrysler,Pacifica,2023,,,0,,,Car_Models,chrysler pacifica
+221,Chrysler,Pacifica Hybrid,2023,,,0,,,Car_Models,chrysler pacifica hybrid
+222,Chrysler,Voyager,2023,,,0,,,Car_Models,chrysler voyager
+223,Citroën,C1,2023,2024,,0,,,Car_Models,citroën c1
+224,Citroën,C3,2023,2024,,0,,,Car_Models,citroën c3
+225,Citroën,C3 Aircross,2023,2024,,0,,,Car_Models,citroën c3 aircross
+226,Citroën,C4,2023,2024,,0,,,Car_Models,citroën c4
+227,Citroën,C5 Aircross,2023,2024,,0,,,Car_Models,citroën c5 aircross
+228,Dodge,Challenger,2023,2024,,1,ford_dodge,Challenger SRT Hellcat,3d_registry|Car_Models,dodge challenger
+229,Dodge,Challenger SRT Demon,2018,,,0,,,Car_Models,dodge challenger srt demon
+230,Dodge,Charger,2023,2024,,0,,,Car_Models,dodge charger
+231,Dodge,Durango,2023,2024,,0,,,Car_Models,dodge durango
+232,Dodge,Grand Caravan,1984,2020,,0,,,Car_Models,dodge grand caravan
+233,Dodge,Journey,2023,2024,,0,,,Car_Models,dodge journey
+234,Dodge,Viper,1992,2017,,0,,,Car_Models,dodge viper
+235,Faraday Future,FF 91,2023,,,0,,,Car_Models,faraday future ff 91
+236,Ferrari,488 GTB,2016,2019,,1,ferrari_488,2016 Ferrari 488 GTB,3d_registry|Car_Models,ferrari 488 gtb
+237,Ferrari,488 Pista,2019,2020,,0,,,Car_Models,ferrari 488 pista
+238,Ferrari,812 GTS,,,,0,,,Cars_Datasets_2025,ferrari 812 gts
+239,Ferrari,812 Superfast,2018,,,0,,,Car_Models,ferrari 812 superfast
+240,Ferrari,California T,2015,2018,,0,,,Car_Models,ferrari california t
+241,Ferrari,F8 Spider,,,,0,,,Cars_Datasets_2025,ferrari f8 spider
+242,Ferrari,F8 Tributo,2020,,,1,ferrari_f8,2020 Ferrari F8 Tributo,3d_registry|Car_Models|Cars_Datasets_2025,ferrari f8 tributo
+243,Ferrari,GTC4Lusso,2017,2020,,0,,,Car_Models,ferrari gtc4lusso
+244,Ferrari,LaFerrari,2014,2016,,0,,,Car_Models,ferrari laferrari
+245,Ferrari,Monza SP2,,,,0,,,Cars_Datasets_2025,ferrari monza sp2
+246,Ferrari,Portofino,,,,0,,,Cars_Datasets_2025,ferrari portofino
+247,Ferrari,Portofino M,2021,,,0,,,Car_Models|Cars_Datasets_2025,ferrari portofino m
+248,Ferrari,Roma,2021,,,0,,,Car_Models|Cars_Datasets_2025,ferrari roma
+249,Ferrari,Roma Spider,,,,0,,,Cars_Datasets_2025,ferrari roma spider
+250,Ferrari,SF90 Stradale,2020,,,0,,,Car_Models|Cars_Datasets_2025,ferrari sf90 stradale
+251,Fiat,124 Spider,2023,2024,,0,,,Car_Models,fiat 124 spider
+252,Fiat,500,2023,2024,,0,,,Car_Models,fiat 500
+253,Fiat,500X,2023,2024,,0,,,Car_Models,fiat 500x
+254,Fisker,Ocean,2023,,,0,,,Car_Models,fisker ocean
+255,Fisker,Pear,2023,,,0,,,Car_Models,fisker pear
+256,Ford,Bronco,,,,0,,,Cars_Datasets_2025,ford bronco
+257,Ford,Bronco (2024),,,,0,,,Cars_Datasets_2025,ford bronco (2024)
+258,Ford,Bronco Raptor,,,,0,,,Cars_Datasets_2025,ford bronco raptor
+259,Ford,Bronco Sport,2021,,,0,,,Car_Models|Cars_Datasets_2025,ford bronco sport
+260,Ford,E-Series Cutaway,,,,0,,,Cars_Datasets_2025,ford e-series cutaway
+261,Ford,EcoSport,,,,0,,,Cars_Datasets_2025,ford ecosport
+262,Ford,Edge,2015,2021,,0,,,Car_Models|Cars_Datasets_2025,ford edge
+263,Ford,Escape,2015,2021,,0,,,Car_Models,ford escape
+264,Ford,Escape (Kuga),,,,0,,,Cars_Datasets_2025,ford escape (kuga)
+265,Ford,Escape Hybrid,,,,0,,,Cars_Datasets_2025,ford escape hybrid
+266,Ford,Escape Plug-in Hybrid (2024),,,,0,,,Cars_Datasets_2025,ford escape plug-in hybrid (2024)
+267,Ford,Everest,,,,0,,,Cars_Datasets_2025,ford everest
+268,Ford,Expedition,,,,0,,,Cars_Datasets_2025,ford expedition
+269,Ford,Expedition King Ranch,,,,0,,,Cars_Datasets_2025,ford expedition king ranch
+270,Ford,Explorer,2015,2021,,0,,,Car_Models|Cars_Datasets_2025,ford explorer
+271,Ford,Explorer (2024),,,,0,,,Cars_Datasets_2025,ford explorer (2024)
+272,Ford,Explorer Hybrid,,,,0,,,Cars_Datasets_2025,ford explorer hybrid
+273,Ford,Explorer Platinum,,,,0,,,Cars_Datasets_2025,ford explorer platinum
+274,Ford,Explorer Plug-in Hybrid,,,,0,,,Cars_Datasets_2025,ford explorer plug-in hybrid
+275,Ford,F-150,2015,2021,,0,,,Car_Models|Cars_Datasets_2025,ford f-150
+276,Ford,F-150 Lightning,,,,0,,,Cars_Datasets_2025,ford f-150 lightning
+277,Ford,F-150 Limited,,,,0,,,Cars_Datasets_2025,ford f-150 limited
+278,Ford,F-150 Platinum,,,,0,,,Cars_Datasets_2025,ford f-150 platinum
+279,Ford,F-150 Raptor,,,,1,ford_f150,2018 F-150 Raptor,3d_registry|Cars_Datasets_2025,ford f-150 raptor
+280,Ford,F-250 Super Duty,,,,0,,,Cars_Datasets_2025,ford f-250 super duty
+281,Ford,F-350 Super Duty,,,,0,,,Cars_Datasets_2025,ford f-350 super duty
+282,Ford,F-450 Super Duty,,,,0,,,Cars_Datasets_2025,ford f-450 super duty
+283,Ford,F-550 Super Duty,,,,0,,,Cars_Datasets_2025,ford f-550 super duty
+284,Ford,Fiesta,,,,0,,,Cars_Datasets_2025,ford fiesta
+285,Ford,Fiesta ST,,,,0,,,Cars_Datasets_2025,ford fiesta st
+286,Ford,Flex,,,,0,,,Cars_Datasets_2025,ford flex
+287,Ford,Focus,,,,0,,,Cars_Datasets_2025,ford focus
+288,Ford,Focus ST,,,,0,,,Cars_Datasets_2025,ford focus st
+289,Ford,Fusion (Mondeo),,,,0,,,Cars_Datasets_2025,ford fusion (mondeo)
+290,Ford,GT,,,,0,,,Cars_Datasets_2025,ford gt
+291,Ford,KA+,,,,0,,,Cars_Datasets_2025,ford ka+
+292,Ford,Maverick,,,,0,,,Cars_Datasets_2025,ford maverick
+293,Ford,Maverick Hybrid,,,,0,,,Cars_Datasets_2025,ford maverick hybrid
+294,Ford,Mustang,2015,2021,,1,ford_mus,1968 Mustang GT,3d_registry|Car_Models|Cars_Datasets_2025,ford mustang
+295,Ford,Mustang (2024),,,,0,,,Cars_Datasets_2025,ford mustang (2024)
+296,Ford,Mustang Mach-E,,,,0,,,Cars_Datasets_2025,ford mustang mach-e
+297,Ford,Mustang Shelby GT350,,,,0,,,Cars_Datasets_2025,ford mustang shelby gt350
+298,Ford,Mustang Shelby GT500,,,,0,,,Cars_Datasets_2025,ford mustang shelby gt500
+299,Ford,Puma,,,,0,,,Cars_Datasets_2025,ford puma
+300,Ford,Ranger,2019,2021,,0,,,Car_Models|Cars_Datasets_2025,ford ranger
+301,Ford,Ranger (2024),,,,0,,,Cars_Datasets_2025,ford ranger (2024)
+302,Ford,Ranger Raptor,,,,0,,,Cars_Datasets_2025,ford ranger raptor
+303,Ford,Taurus,,,,0,,,Cars_Datasets_2025,ford taurus
+304,Ford,Territory,,,,0,,,Cars_Datasets_2025,ford territory
+305,Ford,Transit,,,,0,,,Cars_Datasets_2025,ford transit
+306,Ford,Transit Chassis Cab,,,,0,,,Cars_Datasets_2025,ford transit chassis cab
+307,Ford,Transit Connect,,,,0,,,Cars_Datasets_2025,ford transit connect
+308,Ford,Transit Custom,,,,0,,,Cars_Datasets_2025,ford transit custom
+309,Ford,Transit Electric (E-Transit),,,,0,,,Cars_Datasets_2025,ford transit electric (e-transit)
+310,Genesis,G70,2019,,,0,,,Car_Models,genesis g70
+311,Genesis,G80,2020,,,0,,,Car_Models,genesis g80
+312,Genesis,GV70,2022,,,0,,,Car_Models,genesis gv70
+313,Genesis,GV80,2021,,,0,,,Car_Models,genesis gv80
+314,Genesis,GV90,2023,,,0,,,Car_Models,genesis gv90
+315,GMC,Acadia,,,,0,,,Cars_Datasets_2025,gmc acadia
+316,GMC,Acadia AT4,,,,0,,,Cars_Datasets_2025,gmc acadia at4
+317,GMC,Acadia Black Edition,,,,0,,,Cars_Datasets_2025,gmc acadia black edition
+318,GMC,Acadia Denali,,,,0,,,Cars_Datasets_2025,gmc acadia denali
+319,GMC,Acadia Denali Ultimate,,,,0,,,Cars_Datasets_2025,gmc acadia denali ultimate
+320,GMC,Acadia SLE,,,,0,,,Cars_Datasets_2025,gmc acadia sle
+321,GMC,Canyon,,,,0,,,Cars_Datasets_2025,gmc canyon
+322,GMC,Canyon AT4,,,,0,,,Cars_Datasets_2025,gmc canyon at4
+323,GMC,Canyon AT4X,,,,0,,,Cars_Datasets_2025,gmc canyon at4x
+324,GMC,Canyon AT4X Edition 1,,,,0,,,Cars_Datasets_2025,gmc canyon at4x edition 1
+325,GMC,Canyon Denali,,,,0,,,Cars_Datasets_2025,gmc canyon denali
+326,GMC,Canyon Denali Black Edition,,,,0,,,Cars_Datasets_2025,gmc canyon denali black edition
+327,GMC,Canyon Elevation,,,,0,,,Cars_Datasets_2025,gmc canyon elevation
+328,GMC,Canyon SLT,,,,0,,,Cars_Datasets_2025,gmc canyon slt
+329,GMC,Hummer EV Adventure Series,,,,0,,,Cars_Datasets_2025,gmc hummer ev adventure series
+330,GMC,Hummer EV Omega Edition,,,,0,,,Cars_Datasets_2025,gmc hummer ev omega edition
+331,GMC,Hummer EV Pickup,,,,0,,,Cars_Datasets_2025,gmc hummer ev pickup
+332,GMC,Hummer EV Pickup Edition 1,,,,0,,,Cars_Datasets_2025,gmc hummer ev pickup edition 1
+333,GMC,Hummer EV SUV,,,,0,,,Cars_Datasets_2025,gmc hummer ev suv
+334,GMC,Hummer EV SUV Edition 1,,,,0,,,Cars_Datasets_2025,gmc hummer ev suv edition 1
+335,GMC,Hummer EV SUV Extreme Off-Road,,,,0,,,Cars_Datasets_2025,gmc hummer ev suv extreme off-road
+336,GMC,Sierra 1500,,,,0,,,Cars_Datasets_2025,gmc sierra 1500
+337,GMC,Sierra 1500 AT4,,,,0,,,Cars_Datasets_2025,gmc sierra 1500 at4
+338,GMC,Sierra 1500 AT4X,,,,0,,,Cars_Datasets_2025,gmc sierra 1500 at4x
+339,GMC,Sierra 1500 Denali Ultimate,,,,0,,,Cars_Datasets_2025,gmc sierra 1500 denali ultimate
+340,GMC,Sierra 1500 Elevation,,,,0,,,Cars_Datasets_2025,gmc sierra 1500 elevation
+341,GMC,Sierra 1500 Pro,,,,0,,,Cars_Datasets_2025,gmc sierra 1500 pro
+342,GMC,Sierra 1500 SLT,,,,0,,,Cars_Datasets_2025,gmc sierra 1500 slt
+343,GMC,Sierra 2500HD,,,,0,,,Cars_Datasets_2025,gmc sierra 2500hd
+344,GMC,Sierra 2500HD AT4,,,,0,,,Cars_Datasets_2025,gmc sierra 2500hd at4
+345,GMC,Sierra 2500HD Denali,,,,0,,,Cars_Datasets_2025,gmc sierra 2500hd denali
+346,GMC,Sierra 2500HD Denali Black Edition,,,,0,,,Cars_Datasets_2025,gmc sierra 2500hd denali black edition
+347,GMC,Sierra 2500HD Pro,,,,0,,,Cars_Datasets_2025,gmc sierra 2500hd pro
+348,GMC,Sierra 3500HD,,,,0,,,Cars_Datasets_2025,gmc sierra 3500hd
+349,GMC,Sierra 3500HD AT4,,,,0,,,Cars_Datasets_2025,gmc sierra 3500hd at4
+350,GMC,Sierra 3500HD Pro,,,,0,,,Cars_Datasets_2025,gmc sierra 3500hd pro
+351,GMC,Sierra Denali,,,,0,,,Cars_Datasets_2025,gmc sierra denali
+352,GMC,Sierra Denali CarbonPro,,,,0,,,Cars_Datasets_2025,gmc sierra denali carbonpro
+353,GMC,Sierra Elevation,,,,0,,,Cars_Datasets_2025,gmc sierra elevation
+354,GMC,Sierra EV Denali,,,,0,,,Cars_Datasets_2025,gmc sierra ev denali
+355,GMC,Sierra HD Denali Reserve,,,,0,,,Cars_Datasets_2025,gmc sierra hd denali reserve
+356,GMC,Terrain,,,,0,,,Cars_Datasets_2025,gmc terrain
+357,GMC,Terrain All-Terrain Edition,,,,0,,,Cars_Datasets_2025,gmc terrain all-terrain edition
+358,GMC,Terrain AT4,,,,0,,,Cars_Datasets_2025,gmc terrain at4
+359,GMC,Terrain Denali,,,,0,,,Cars_Datasets_2025,gmc terrain denali
+360,GMC,Terrain Elevation Edition,,,,0,,,Cars_Datasets_2025,gmc terrain elevation edition
+361,GMC,Terrain SLT,,,,0,,,Cars_Datasets_2025,gmc terrain slt
+362,GMC,Yukon,,,,0,,,Cars_Datasets_2025,gmc yukon
+363,GMC,Yukon AT4,,,,0,,,Cars_Datasets_2025,gmc yukon at4
+364,GMC,Yukon Denali,,,,0,,,Cars_Datasets_2025,gmc yukon denali
+365,GMC,Yukon Denali Performance,,,,0,,,Cars_Datasets_2025,gmc yukon denali performance
+366,GMC,Yukon Denali Ultimate Black,,,,0,,,Cars_Datasets_2025,gmc yukon denali ultimate black
+367,GMC,Yukon Trailering Edition,,,,0,,,Cars_Datasets_2025,gmc yukon trailering edition
+368,GMC,Yukon XL,,,,0,,,Cars_Datasets_2025,gmc yukon xl
+369,GMC,Yukon XL AT4,,,,0,,,Cars_Datasets_2025,gmc yukon xl at4
+370,GMC,Yukon XL Denali Reserve,,,,0,,,Cars_Datasets_2025,gmc yukon xl denali reserve
+371,GMC,Yukon XL Denali Ultimate,,,,0,,,Cars_Datasets_2025,gmc yukon xl denali ultimate
+372,GMC,Yukon XL Elevation,,,,0,,,Cars_Datasets_2025,gmc yukon xl elevation
+373,GMC,Yukon XL SLT,,,,0,,,Cars_Datasets_2025,gmc yukon xl slt
+374,Honda,Accord,2021,,,0,,,Car_Models|Cars_Datasets_2025,honda accord
+375,Honda,City,,,,0,,,Cars_Datasets_2025,honda city
+376,Honda,Civic,2022,,,0,,,Car_Models|Cars_Datasets_2025,honda civic
+377,Honda,Civic Hatchback,,,,0,,,Cars_Datasets_2025,honda civic hatchback
+378,Honda,Civic Type R,,,,1,honda_civic,2024 Civic Type-R,3d_registry|Cars_Datasets_2025,honda civic type r
+379,Honda,Cr-v,2023,,,0,,,Car_Models|Cars_Datasets_2025,honda cr-v
+380,Honda,Hr-v,2023,,,0,,,Car_Models,honda hr-v
+381,Honda,Insight,2023,,,0,,,Car_Models,honda insight
+382,Honda,NSX,2016,,,1,honda_nsx,1990 Honda NSX,3d_registry|Car_Models,honda nsx
+383,Honda,Odyssey,2023,,,0,,,Car_Models,honda odyssey
+384,Honda,Pilot,2023,,,0,,,Car_Models|Cars_Datasets_2025,honda pilot
+385,Honda,S2000,1999,2009,,0,,,Car_Models,honda s2000
+386,Hyundai,Accent,2019,2021,,0,,,Car_Models|Cars_Datasets_2025,hyundai accent
+387,Hyundai,Azera,,,,0,,,Cars_Datasets_2025,hyundai azera
+388,Hyundai,Creta,,,,1,hyundai_creta,2016 Creta,3d_registry,hyundai creta
+389,Hyundai,Elantra,2017,2022,,0,,,Car_Models|Cars_Datasets_2025,hyundai elantra
+390,Hyundai,Elantra GT,,,,0,,,Cars_Datasets_2025,hyundai elantra gt
+391,Hyundai,Elantra N,,,,1,hyundai_elantra,2022 Elantra N,3d_registry,hyundai elantra n
+392,Hyundai,Equus,,,,0,,,Cars_Datasets_2025,hyundai equus
+393,Hyundai,Genesis,,,,0,,,Cars_Datasets_2025,hyundai genesis
+394,Hyundai,I10,,,,0,,,Cars_Datasets_2025,hyundai i10
+395,Hyundai,I20,,,,0,,,Cars_Datasets_2025,hyundai i20
+396,Hyundai,Ioniq,,,,0,,,Cars_Datasets_2025,hyundai ioniq
+397,Hyundai,Ioniq 5,,,,0,,,Cars_Datasets_2025,hyundai ioniq 5
+398,Hyundai,Ioniq 6,,,,0,,,Cars_Datasets_2025,hyundai ioniq 6
+399,Hyundai,Kona,2018,2022,,0,,,Car_Models|Cars_Datasets_2025,hyundai kona
+400,Hyundai,KONA Electric,,,,0,,,Cars_Datasets_2025,hyundai kona electric
+401,Hyundai,Nexo,,,,0,,,Cars_Datasets_2025,hyundai nexo
+402,Hyundai,Palisade,2022,,,0,,,Car_Models|Cars_Datasets_2025,hyundai palisade
+403,Hyundai,Santa Cruz,,,,0,,,Cars_Datasets_2025,hyundai santa cruz
+404,Hyundai,Santa Fe,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,hyundai santa fe
+405,Hyundai,Sonata,2018,2022,,1,hyundai_sonata,2009 Sonata,3d_registry|Car_Models|Cars_Datasets_2025,hyundai sonata
+406,Hyundai,Tiburon,,,,0,,,Cars_Datasets_2025,hyundai tiburon
+407,Hyundai,Tucson,2016,2022,,1,hyundai_tucson,2015 Tucson,3d_registry|Car_Models|Cars_Datasets_2025,hyundai tucson
+408,Hyundai,Veloster,,,,1,hyundai_veloster,2021 Veloster N,3d_registry|Cars_Datasets_2025,hyundai veloster
+409,Hyundai,Venue,,,,0,,,Cars_Datasets_2025,hyundai venue
+410,Infiniti,FX50,,,,0,,,Cars_Datasets_2025,infiniti fx50
+411,Infiniti,G37,,,,0,,,Cars_Datasets_2025,infiniti g37
+412,Infiniti,M45,,,,0,,,Cars_Datasets_2025,infiniti m45
+413,Infiniti,Q45,,,,0,,,Cars_Datasets_2025,infiniti q45
+414,Infiniti,Q50,2023,,,0,,,Car_Models,infiniti q50
+415,Infiniti,Q60,2023,,,0,,,Car_Models|Cars_Datasets_2025,infiniti q60
+416,Infiniti,QX50,2023,,,0,,,Car_Models,infiniti qx50
+417,Infiniti,QX55,,,,0,,,Cars_Datasets_2025,infiniti qx55
+418,Infiniti,QX60,2023,,,0,,,Car_Models,infiniti qx60
+419,Infiniti,QX70,2023,,,0,,,Car_Models,infiniti qx70
+420,Infiniti,QX70 Hybrid,2023,,,0,,,Car_Models,infiniti qx70 hybrid
+421,Infiniti,QX80,2023,,,0,,,Car_Models|Cars_Datasets_2025,infiniti qx80
+422,Isuzu,Ascender,2016,,,0,,,Car_Models,isuzu ascender
+423,Isuzu,D-Max,2016,,,0,,,Car_Models,isuzu d-max
+424,Isuzu,Ftr,2016,,,0,,,Car_Models,isuzu ftr
+425,Isuzu,Mu-x,2016,,,0,,,Car_Models,isuzu mu-x
+426,Isuzu,Npr,2016,,,0,,,Car_Models,isuzu npr
+427,Isuzu,Nqr,2016,,,0,,,Car_Models,isuzu nqr
+428,Jaguar,E-pace,,,,0,,,Cars_Datasets_2025,jaguar e-pace
+429,Jaguar,E-PACE R-Dynamic,,,,0,,,Cars_Datasets_2025,jaguar e-pace r-dynamic
+430,Jaguar,E-pace S,,,,0,,,Cars_Datasets_2025,jaguar e-pace s
+431,Jaguar,F-pace,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,jaguar f-pace
+432,Jaguar,F-PACE P400e Plug-in Hybrid,,,,0,,,Cars_Datasets_2025,jaguar f-pace p400e plug-in hybrid
+433,Jaguar,F-PACE Prestige AWD,,,,0,,,Cars_Datasets_2025,jaguar f-pace prestige awd
+434,Jaguar,F-PACE R-Dynamic,,,,0,,,Cars_Datasets_2025,jaguar f-pace r-dynamic
+435,Jaguar,F-PACE S 30t AWD,,,,0,,,Cars_Datasets_2025,jaguar f-pace s 30t awd
+436,Jaguar,F-pace S Awd,,,,0,,,Cars_Datasets_2025,jaguar f-pace s awd
+437,Jaguar,F-pace SVR,,,,0,,,Cars_Datasets_2025,jaguar f-pace svr
+438,Jaguar,F-type,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,jaguar f-type
+439,Jaguar,F-Type 75th Anniversary Edition,,,,0,,,Cars_Datasets_2025,jaguar f-type 75th anniversary edition
+440,Jaguar,F-Type Coupe R,,,,0,,,Cars_Datasets_2025,jaguar f-type coupe r
+441,Jaguar,F-Type Heritage Edition,,,,0,,,Cars_Datasets_2025,jaguar f-type heritage edition
+442,Jaguar,F-Type P300 Coupe,,,,0,,,Cars_Datasets_2025,jaguar f-type p300 coupe
+443,Jaguar,F-Type P450 AWD,,,,0,,,Cars_Datasets_2025,jaguar f-type p450 awd
+444,Jaguar,F-Type R-Dynamic,,,,0,,,Cars_Datasets_2025,jaguar f-type r-dynamic
+445,Jaguar,F-Type SVR,,,,0,,,Cars_Datasets_2025,jaguar f-type svr
+446,Jaguar,F-Type V6 S Convertible,,,,0,,,Cars_Datasets_2025,jaguar f-type v6 s convertible
+447,Jaguar,F-Type V8 R,,,,0,,,Cars_Datasets_2025,jaguar f-type v8 r
+448,Jaguar,I-pace,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,jaguar i-pace
+449,Jaguar,I-PACE Electric Performance,,,,0,,,Cars_Datasets_2025,jaguar i-pace electric performance
+450,Jaguar,I-pace EV400 Hse,,,,0,,,Cars_Datasets_2025,jaguar i-pace ev400 hse
+451,Jaguar,I-PACE First Edition,,,,0,,,Cars_Datasets_2025,jaguar i-pace first edition
+452,Jaguar,I-pace Hse,,,,0,,,Cars_Datasets_2025,jaguar i-pace hse
+453,Jaguar,X-type,,,,0,,,Cars_Datasets_2025,jaguar x-type
+454,Jaguar,XE,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,jaguar xe
+455,Jaguar,XE P300 R-Dynamic,,,,0,,,Cars_Datasets_2025,jaguar xe p300 r-dynamic
+456,Jaguar,XE R-Dynamic,,,,0,,,Cars_Datasets_2025,jaguar xe r-dynamic
+457,Jaguar,XE R-Sport AWD,,,,0,,,Cars_Datasets_2025,jaguar xe r-sport awd
+458,Jaguar,XE S,,,,0,,,Cars_Datasets_2025,jaguar xe s
+459,Jaguar,XE SE,,,,0,,,Cars_Datasets_2025,jaguar xe se
+460,Jaguar,XF,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,jaguar xf
+461,Jaguar,XF Portfolio AWD,,,,0,,,Cars_Datasets_2025,jaguar xf portfolio awd
+462,Jaguar,XF R-Dynamic,,,,0,,,Cars_Datasets_2025,jaguar xf r-dynamic
+463,Jaguar,XF Sportbrake,,,,0,,,Cars_Datasets_2025,jaguar xf sportbrake
+464,Jaguar,XJ,,,,0,,,Cars_Datasets_2025,jaguar xj
+465,Jaguar,XJ LWB (Long Wheelbase),,,,0,,,Cars_Datasets_2025,jaguar xj lwb (long wheelbase)
+466,Jaguar,XJ Supercharged,,,,0,,,Cars_Datasets_2025,jaguar xj supercharged
+467,Jaguar,XJ50,,,,0,,,Cars_Datasets_2025,jaguar xj50
+468,Jeep,Cherokee,,,,0,,,Cars_Datasets_2025,jeep cherokee
+469,Jeep,Cherokee X Edition,,,,0,,,Cars_Datasets_2025,jeep cherokee x edition
+470,Jeep,Compass,,,,0,,,Cars_Datasets_2025,jeep compass
+471,Jeep,Compass 4xe,,,,0,,,Cars_Datasets_2025,jeep compass 4xe
+472,Jeep,Gladiator,,,,0,,,Cars_Datasets_2025,jeep gladiator
+473,Jeep,Gladiator Mojave Edition,,,,0,,,Cars_Datasets_2025,jeep gladiator mojave edition
+474,Jeep,Grand Cherokee,,,,0,,,Cars_Datasets_2025,jeep grand cherokee
+475,Jeep,Grand Cherokee 4xe,,,,0,,,Cars_Datasets_2025,jeep grand cherokee 4xe
+476,Jeep,Grand Cherokee L,,,,0,,,Cars_Datasets_2025,jeep grand cherokee l
+477,Jeep,Grand Cherokee Summit Reserve,,,,0,,,Cars_Datasets_2025,jeep grand cherokee summit reserve
+478,Jeep,Grand Wagoneer,,,,0,,,Cars_Datasets_2025,jeep grand wagoneer
+479,Jeep,Renegade,,,,0,,,Cars_Datasets_2025,jeep renegade
+480,Jeep,Renegade 4xe,,,,0,,,Cars_Datasets_2025,jeep renegade 4xe
+481,Jeep,Wagoneer,,,,0,,,Cars_Datasets_2025,jeep wagoneer
+482,Jeep,Wagoneer S (Electric),,,,0,,,Cars_Datasets_2025,jeep wagoneer s (electric)
+483,Jeep,Wrangler,,,,0,,,Cars_Datasets_2025,jeep wrangler
+484,Jeep,Wrangler 392,,,,0,,,Cars_Datasets_2025,jeep wrangler 392
+485,Jeep,Wrangler 4xe,,,,0,,,Cars_Datasets_2025,jeep wrangler 4xe
+486,Jeep,Wrangler Rubicon,,,,0,,,Cars_Datasets_2025,jeep wrangler rubicon
+487,Kia,Carnival EX,,,,0,,,Cars_Datasets_2025,kia carnival ex
+488,Kia,Carnival LXS,,,,0,,,Cars_Datasets_2025,kia carnival lxs
+489,Kia,Carnival MPV EX,,,,0,,,Cars_Datasets_2025,kia carnival mpv ex
+490,Kia,Carnival Special Edition,,,,0,,,Cars_Datasets_2025,kia carnival special edition
+491,Kia,Carnival SX Prestige,,,,0,,,Cars_Datasets_2025,kia carnival sx prestige
+492,Kia,EV6 AWD GT-Line,,,,0,,,Cars_Datasets_2025,kia ev6 awd gt-line
+493,Kia,EV6 First Edition,,,,0,,,Cars_Datasets_2025,kia ev6 first edition
+494,Kia,EV6 First Edition AWD,,,,0,,,Cars_Datasets_2025,kia ev6 first edition awd
+495,Kia,EV6 GT Performance,,,,0,,,Cars_Datasets_2025,kia ev6 gt performance
+496,Kia,EV6 Light,,,,0,,,Cars_Datasets_2025,kia ev6 light
+497,Kia,EV6 Wind,,,,0,,,Cars_Datasets_2025,kia ev6 wind
+498,Kia,Forte,2019,2022,,0,,,Car_Models,kia forte
+499,Kia,Forte EX Premium,,,,0,,,Cars_Datasets_2025,kia forte ex premium
+500,Kia,Forte FE,,,,0,,,Cars_Datasets_2025,kia forte fe
+501,Kia,Forte GT Turbo,,,,0,,,Cars_Datasets_2025,kia forte gt turbo
+502,Kia,Forte GT-Line,,,,0,,,Cars_Datasets_2025,kia forte gt-line
+503,Kia,Forte Limited Edition,,,,0,,,Cars_Datasets_2025,kia forte limited edition
+504,Kia,Forte LXS,,,,0,,,Cars_Datasets_2025,kia forte lxs
+505,Kia,K5 EX,,,,0,,,Cars_Datasets_2025,kia k5 ex
+506,Kia,K5 GT-Line,,,,0,,,Cars_Datasets_2025,kia k5 gt-line
+507,Kia,Niro EX,,,,0,,,Cars_Datasets_2025,kia niro ex
+508,Kia,Niro Plug-In Hybrid,,,,0,,,Cars_Datasets_2025,kia niro plug-in hybrid
+509,Kia,Niro SX Hybrid,,,,0,,,Cars_Datasets_2025,kia niro sx hybrid
+510,Kia,Niro SX Touring,,,,0,,,Cars_Datasets_2025,kia niro sx touring
+511,Kia,Niro Touring,,,,0,,,Cars_Datasets_2025,kia niro touring
+512,Kia,Optima,2019,2021,,0,,,Car_Models,kia optima
+513,Kia,Rio,,,,0,,,Cars_Datasets_2025,kia rio
+514,Kia,Rio 5-Door,,,,0,,,Cars_Datasets_2025,kia rio 5-door
+515,Kia,Rio 5-Door S,,,,0,,,Cars_Datasets_2025,kia rio 5-door s
+516,Kia,Rio S,,,,0,,,Cars_Datasets_2025,kia rio s
+517,Kia,Seltos EX,,,,0,,,Cars_Datasets_2025,kia seltos ex
+518,Kia,Seltos LX,,,,0,,,Cars_Datasets_2025,kia seltos lx
+519,Kia,Seltos Nightfall Edition,,,,0,,,Cars_Datasets_2025,kia seltos nightfall edition
+520,Kia,Seltos SX,,,,0,,,Cars_Datasets_2025,kia seltos sx
+521,Kia,Seltos SX Turbo,,,,0,,,Cars_Datasets_2025,kia seltos sx turbo
+522,Kia,Seltos X-Line Turbo,,,,0,,,Cars_Datasets_2025,kia seltos x-line turbo
+523,Kia,Sorento,2019,2022,,0,,,Car_Models,kia sorento
+524,Kia,Sorento Hybrid EX,,,,0,,,Cars_Datasets_2025,kia sorento hybrid ex
+525,Kia,Sorento Hybrid SX Prestige,,,,0,,,Cars_Datasets_2025,kia sorento hybrid sx prestige
+526,Kia,Sorento LX,,,,0,,,Cars_Datasets_2025,kia sorento lx
+527,Kia,Sorento SX Prestige,,,,0,,,Cars_Datasets_2025,kia sorento sx prestige
+528,Kia,Sorento X-Line,,,,0,,,Cars_Datasets_2025,kia sorento x-line
+529,Kia,Sorento X-Pro Hybrid,,,,0,,,Cars_Datasets_2025,kia sorento x-pro hybrid
+530,Kia,Soul,2020,2022,,0,,,Car_Models,kia soul
+531,Kia,Soul EX,,,,0,,,Cars_Datasets_2025,kia soul ex
+532,Kia,Soul EX Designer Edition,,,,0,,,Cars_Datasets_2025,kia soul ex designer edition
+533,Kia,Soul GT Designer Edition,,,,0,,,Cars_Datasets_2025,kia soul gt designer edition
+534,Kia,Soul S,,,,0,,,Cars_Datasets_2025,kia soul s
+535,Kia,Soul Turbo,,,,0,,,Cars_Datasets_2025,kia soul turbo
+536,Kia,Sportage 2024(BASE Awd),,,,0,,,Cars_Datasets_2025,kia sportage 2024(base awd)
+537,Kia,Sportage 2024(BASE Fwd),,,,0,,,Cars_Datasets_2025,kia sportage 2024(base fwd)
+538,Kia,Sportage 2024(BASE Model),,,,0,,,Cars_Datasets_2025,kia sportage 2024(base model)
+539,Kia,Sportage 2024(HYBRID Awd),,,,0,,,Cars_Datasets_2025,kia sportage 2024(hybrid awd)
+540,Kia,Sportage 2024(PLUG-IN Hybrid Awd),,,,0,,,Cars_Datasets_2025,kia sportage 2024(plug-in hybrid awd)
+541,Kia,Sportage 2024(S Trim),,,,0,,,Cars_Datasets_2025,kia sportage 2024(s trim)
+542,Kia,Sportage 2024(SX Turbo Awd),,,,0,,,Cars_Datasets_2025,kia sportage 2024(sx turbo awd)
+543,Kia,Sportage 2024(TOP Trim),,,,0,,,Cars_Datasets_2025,kia sportage 2024(top trim)
+544,Kia,Sportage 2024(X-PRO Prestige),,,,0,,,Cars_Datasets_2025,kia sportage 2024(x-pro prestige)
+545,Kia,Sportage 2024(X-PRO),,,,0,,,Cars_Datasets_2025,kia sportage 2024(x-pro)
+546,Kia,Sportage EX,,,,0,,,Cars_Datasets_2025,kia sportage ex
+547,Kia,Sportage GT-line,,,,0,,,Cars_Datasets_2025,kia sportage gt-line
+548,Kia,Sportage LX,,,,0,,,Cars_Datasets_2025,kia sportage lx
+549,Kia,Sportage Nightfall Edition,,,,0,,,Cars_Datasets_2025,kia sportage nightfall edition
+550,Kia,Sportage Phev,,,,0,,,Cars_Datasets_2025,kia sportage phev
+551,Kia,Sportage SX Turbo,,,,0,,,Cars_Datasets_2025,kia sportage sx turbo
+552,Kia,Sportage X-line,,,,0,,,Cars_Datasets_2025,kia sportage x-line
+553,Kia,Stinger,2018,2022,,0,,,Car_Models,kia stinger
+554,Kia,Stinger GT,,,,0,,,Cars_Datasets_2025,kia stinger gt
+555,Kia,Stinger GT-Line,,,,0,,,Cars_Datasets_2025,kia stinger gt-line
+556,Kia,Stinger Scorpion Edition,,,,0,,,Cars_Datasets_2025,kia stinger scorpion edition
+557,Kia,Telluride,2020,2022,,0,,,Car_Models,kia telluride
+558,Kia,Telluride EX,,,,0,,,Cars_Datasets_2025,kia telluride ex
+559,Kia,Telluride Limited Edition,,,,0,,,Cars_Datasets_2025,kia telluride limited edition
+560,Kia,Telluride LX,,,,0,,,Cars_Datasets_2025,kia telluride lx
+561,Kia,Telluride Nightfall Edition,,,,0,,,Cars_Datasets_2025,kia telluride nightfall edition
+562,Kia,Telluride SX,,,,0,,,Cars_Datasets_2025,kia telluride sx
+563,Kia,Telluride SX Prestige,,,,0,,,Cars_Datasets_2025,kia telluride sx prestige
+564,Koenigsegg,Agera R,2011,2013,,0,,,Car_Models,koenigsegg agera r
+565,Koenigsegg,Agera RS,2015,2018,,0,,,Car_Models,koenigsegg agera rs
+566,Koenigsegg,Agera S,2013,2014,,0,,,Car_Models,koenigsegg agera s
+567,Koenigsegg,CC,2002,2004,,0,,,Car_Models,koenigsegg cc
+568,Koenigsegg,CC8S,2004,2006,,0,,,Car_Models,koenigsegg cc8s
+569,Koenigsegg,Ccx,2006,2007,,0,,,Car_Models,koenigsegg ccx
+570,Koenigsegg,Ccxr,2007,2008,,0,,,Car_Models,koenigsegg ccxr
+571,Koenigsegg,CCXR Trevita,2007,2008,,0,,,Car_Models,koenigsegg ccxr trevita
+572,Koenigsegg,Gemera,2022,,,0,,,Car_Models,koenigsegg gemera
+573,Koenigsegg,Jesko,2022,,,0,,,Car_Models,koenigsegg jesko
+574,Koenigsegg,One:1,2014,2016,,0,,,Car_Models,koenigsegg one:1
+575,Koenigsegg,Regera,2016,,,0,,,Car_Models,koenigsegg regera
+576,Lamborghini,Aventador,2011,2023,,0,,,Car_Models,lamborghini aventador
+577,Lamborghini,Aventador LP 780-4 Ultimate,,,,0,,,Cars_Datasets_2025,lamborghini aventador lp 780-4 ultimate
+578,Lamborghini,Aventador LP 780-4 Ultimate Roadster,,,,0,,,Cars_Datasets_2025,lamborghini aventador lp 780-4 ultimate roadster
+579,Lamborghini,Aventador Roadster,,,,0,,,Cars_Datasets_2025,lamborghini aventador roadster
+580,Lamborghini,Aventador S,,,,0,,,Cars_Datasets_2025,lamborghini aventador s
+581,Lamborghini,Aventador SV,,,,0,,,Cars_Datasets_2025,lamborghini aventador sv
+582,Lamborghini,Aventador SVJ,,,,0,,,Cars_Datasets_2025,lamborghini aventador svj
+583,Lamborghini,Aventador SVJ Roadster,,,,1,lambo_ave,Aventador SVJ 63,3d_registry|Cars_Datasets_2025,lamborghini aventador svj roadster
+584,Lamborghini,Aventador SVJ Xago,,,,0,,,Cars_Datasets_2025,lamborghini aventador svj xago
+585,Lamborghini,Aventador Ultimae,,,,0,,,Cars_Datasets_2025,lamborghini aventador ultimae
+586,Lamborghini,Countach,1974,1990,,0,,,Car_Models,lamborghini countach
+587,Lamborghini,Diablo,1990,2001,,0,,,Car_Models,lamborghini diablo
+588,Lamborghini,Espada,1968,1978,,0,,,Car_Models,lamborghini espada
+589,Lamborghini,Gallardo,2003,2013,,0,,,Car_Models,lamborghini gallardo
+590,Lamborghini,Huracan,2014,,,1,lambo_hur,2019 Huracan GT,3d_registry|Car_Models,lamborghini huracan
+591,Lamborghini,Huracan EVO,,,,0,,,Cars_Datasets_2025,lamborghini huracan evo
+592,Lamborghini,Huracan EVO Rwd,,,,0,,,Cars_Datasets_2025,lamborghini huracan evo rwd
+593,Lamborghini,Huracan EVO Rwd Spyder,,,,0,,,Cars_Datasets_2025,lamborghini huracan evo rwd spyder
+594,Lamborghini,Huracan EVO Spyder,,,,0,,,Cars_Datasets_2025,lamborghini huracan evo spyder
+595,Lamborghini,Huracan Performante,,,,0,,,Cars_Datasets_2025,lamborghini huracan performante
+596,Lamborghini,Huracan Performante Spyder,,,,0,,,Cars_Datasets_2025,lamborghini huracan performante spyder
+597,Lamborghini,Huracan Spyder,,,,0,,,Cars_Datasets_2025,lamborghini huracan spyder
+598,Lamborghini,Huracan STO,,,,0,,,Cars_Datasets_2025,lamborghini huracan sto
+599,Lamborghini,Huracan STO EVO,,,,0,,,Cars_Datasets_2025,lamborghini huracan sto evo
+600,Lamborghini,Miura,1966,1972,,0,,,Car_Models,lamborghini miura
+601,Lamborghini,Murciélago,2001,2010,,0,,,Car_Models,lamborghini murciélago
+602,Lamborghini,Sian,2020,,,0,,,Car_Models|Cars_Datasets_2025,lamborghini sian
+603,Lamborghini,Urus,2018,,,0,,,Car_Models|Cars_Datasets_2025,lamborghini urus
+604,Lamborghini,Urus Graphite Capsule,,,,0,,,Cars_Datasets_2025,lamborghini urus graphite capsule
+605,Lamborghini,Urus Performante,,,,0,,,Cars_Datasets_2025,lamborghini urus performante
+606,Lamborghini,Urus S,,,,0,,,Cars_Datasets_2025,lamborghini urus s
+607,Lamborghini,Veneno Roadster,,,,0,,,Cars_Datasets_2025,lamborghini veneno roadster
+608,Lancia,Aurelia B24,1954,1955,,0,,,Car_Models,lancia aurelia b24
+609,Lancia,Delta Integrale,1987,1994,,0,,,Car_Models,lancia delta integrale
+610,Lancia,Fulvia,1963,1976,,0,,,Car_Models,lancia fulvia
+611,Lancia,Stratos HF,1973,1978,,0,,,Car_Models,lancia stratos hf
+612,Lancia,Thema 8.32,1986,1994,,0,,,Car_Models,lancia thema 8.32
+613,Land Rover,Defender,2023,2024,,0,,,Car_Models,land rover defender
+614,Land Rover,Discovery,2023,2024,,0,,,Car_Models,land rover discovery
+615,Land Rover,Discovery Sport,2023,2024,,0,,,Car_Models,land rover discovery sport
+616,Land Rover,Range Rover,2023,2024,,0,,,Car_Models,land rover range rover
+617,Land Rover,Range Rover Evoque,2023,2024,,0,,,Car_Models,land rover range rover evoque
+618,Land Rover,Range Rover Sport,2023,2024,,0,,,Car_Models,land rover range rover sport
+619,Lexus,ES,1989,,,0,,,Car_Models,lexus es
+620,Lexus,GS,1993,2020,,0,,,Car_Models,lexus gs
+621,Lexus,GX,2003,,,0,,,Car_Models,lexus gx
+622,Lexus,IS,1998,,,0,,,Car_Models,lexus is
+623,Lexus,LS,1989,,,0,,,Car_Models,lexus ls
+624,Lexus,LX,1996,,,0,,,Car_Models,lexus lx
+625,Lexus,NX,2015,,,0,,,Car_Models,lexus nx
+626,Lexus,RX,1998,,,0,,,Car_Models,lexus rx
+627,Lexus,UX,2019,,,0,,,Car_Models,lexus ux
+628,Lotus,Elise,2023,,,0,,,Car_Models,lotus elise
+629,Lotus,Emira,2023,,,0,,,Car_Models,lotus emira
+630,Lotus,Evija,2023,,,0,,,Car_Models,lotus evija
+631,Lotus,Exige,2023,,,0,,,Car_Models,lotus exige
+632,Lucid,Air,2022,,,0,,,Car_Models,lucid air
+633,Lucid,Air Dream Edition Performance,2022,,,0,,,Car_Models,lucid air dream edition performance
+634,Mahindra,Alturas G4,2018,,,0,,,Car_Models,mahindra alturas g4
+635,Mahindra,Bolero,2001,,,0,,,Car_Models,mahindra bolero
+636,Mahindra,Marazzo,2018,,,0,,,Car_Models,mahindra marazzo
+637,Mahindra,Scorpio,2020,,,0,,,Car_Models|Cars_Datasets_2025,mahindra scorpio
+638,Mahindra,Thar,2020,,,0,,,Car_Models|Cars_Datasets_2025,mahindra thar
+639,Mahindra,XUV300,2019,,,0,,,Car_Models,mahindra xuv300
+640,Mahindra,XUV500,,,,0,,,Cars_Datasets_2025,mahindra xuv500
+641,Maruti Suzuki,Brezza,,,,0,,,Cars_Datasets_2025,maruti suzuki brezza
+642,Maruti Suzuki,Dzire,,,,0,,,Cars_Datasets_2025,maruti suzuki dzire
+643,Maruti Suzuki,Swift,,,,0,,,Cars_Datasets_2025,maruti suzuki swift
+644,Maserati,Ghibli,2014,,,0,,,Car_Models,maserati ghibli
+645,Maserati,GranTurismo,2008,,,1,maserati,GranTurismo Stradale,3d_registry|Car_Models,maserati granturismo
+646,Maserati,Levante,2017,,,0,,,Car_Models,maserati levante
+647,Maserati,Quattroporte,2013,,,0,,,Car_Models,maserati quattroporte
+648,Mazda,1200,,,,0,,,Cars_Datasets_2025,mazda 1200
+649,Mazda,121,,,,0,,,Cars_Datasets_2025,mazda 121
+650,Mazda,1500,,,,0,,,Cars_Datasets_2025,mazda 1500
+651,Mazda,323F,,,,0,,,Cars_Datasets_2025,mazda 323f
+652,Mazda,626,,,,0,,,Cars_Datasets_2025,mazda 626
+653,Mazda,787B (Race Car),,,,0,,,Cars_Datasets_2025,mazda 787b (race car)
+654,Mazda,818,,,,0,,,Cars_Datasets_2025,mazda 818
+655,Mazda,929,,,,0,,,Cars_Datasets_2025,mazda 929
+656,Mazda,Astina,,,,0,,,Cars_Datasets_2025,mazda astina
+657,Mazda,Atenza,,,,0,,,Cars_Datasets_2025,mazda atenza
+658,Mazda,Autozam AZ-1,,,,0,,,Cars_Datasets_2025,mazda autozam az-1
+659,Mazda,AZ-Offroad,,,,0,,,Cars_Datasets_2025,mazda az-offroad
+660,Mazda,B-Series Pickup,,,,0,,,Cars_Datasets_2025,mazda b-series pickup
+661,Mazda,Biante,,,,0,,,Cars_Datasets_2025,mazda biante
+662,Mazda,Bongo Friendee,,,,0,,,Cars_Datasets_2025,mazda bongo friendee
+663,Mazda,Bongo Truck,,,,0,,,Cars_Datasets_2025,mazda bongo truck
+664,Mazda,Bongo Van,,,,0,,,Cars_Datasets_2025,mazda bongo van
+665,Mazda,BT-50,,,,0,,,Cars_Datasets_2025,mazda bt-50
+666,Mazda,Capella,,,,0,,,Cars_Datasets_2025,mazda capella
+667,Mazda,Capella Cargo,,,,0,,,Cars_Datasets_2025,mazda capella cargo
+668,Mazda,Carol,,,,0,,,Cars_Datasets_2025,mazda carol
+669,Mazda,Carol P360,,,,0,,,Cars_Datasets_2025,mazda carol p360
+670,Mazda,Cosmo Sport (110S),,,,0,,,Cars_Datasets_2025,mazda cosmo sport (110s)
+671,Mazda,Cronos,,,,0,,,Cars_Datasets_2025,mazda cronos
+672,Mazda,CX-3,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,mazda cx-3
+673,Mazda,CX-30,,,,0,,,Cars_Datasets_2025,mazda cx-30
+674,Mazda,CX-4,,,,0,,,Cars_Datasets_2025,mazda cx-4
+675,Mazda,CX-5,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,mazda cx-5
+676,Mazda,CX-50,,,,0,,,Cars_Datasets_2025,mazda cx-50
+677,Mazda,CX-60,,,,0,,,Cars_Datasets_2025,mazda cx-60
+678,Mazda,CX-7,,,,0,,,Cars_Datasets_2025,mazda cx-7
+679,Mazda,CX-8,,,,0,,,Cars_Datasets_2025,mazda cx-8
+680,Mazda,CX-80,,,,0,,,Cars_Datasets_2025,mazda cx-80
+681,Mazda,CX-9,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,mazda cx-9
+682,Mazda,CX-90,,,,0,,,Cars_Datasets_2025,mazda cx-90
+683,Mazda,Demio,,,,0,,,Cars_Datasets_2025,mazda demio
+684,Mazda,Etude,,,,0,,,Cars_Datasets_2025,mazda etude
+685,Mazda,Eunos 500,,,,0,,,Cars_Datasets_2025,mazda eunos 500
+686,Mazda,Eunos Cosmo,,,,0,,,Cars_Datasets_2025,mazda eunos cosmo
+687,Mazda,Eunos Roadster,,,,0,,,Cars_Datasets_2025,mazda eunos roadster
+688,Mazda,Familia Astina,,,,0,,,Cars_Datasets_2025,mazda familia astina
+689,Mazda,Familia Sedan,,,,0,,,Cars_Datasets_2025,mazda familia sedan
+690,Mazda,Luce,,,,0,,,Cars_Datasets_2025,mazda luce
+691,Mazda,Luce Rotary Coupe,,,,0,,,Cars_Datasets_2025,mazda luce rotary coupe
+692,Mazda,Mazda2,,,,0,,,Cars_Datasets_2025,mazda mazda2
+693,Mazda,Mazda3,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,mazda mazda3
+694,Mazda,Mazda3 Hatchback,,,,0,,,Cars_Datasets_2025,mazda mazda3 hatchback
+695,Mazda,Mazda6,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,mazda mazda6
+696,Mazda,Millenia,,,,0,,,Cars_Datasets_2025,mazda millenia
+697,Mazda,Millenia S,,,,0,,,Cars_Datasets_2025,mazda millenia s
+698,Mazda,Mpv,,,,0,,,Cars_Datasets_2025,mazda mpv
+699,Mazda,MX-3,,,,0,,,Cars_Datasets_2025,mazda mx-3
+700,Mazda,MX-30 Electric,,,,0,,,Cars_Datasets_2025,mazda mx-30 electric
+701,Mazda,MX-5,2019,2022,,0,,,Car_Models,mazda mx-5
+702,Mazda,MX-5 Miata,,,,0,,,Cars_Datasets_2025,mazda mx-5 miata
+703,Mazda,MX-5 Miata RF,,,,0,,,Cars_Datasets_2025,mazda mx-5 miata rf
+704,Mazda,MX-5 Superlight Concept,,,,0,,,Cars_Datasets_2025,mazda mx-5 superlight concept
+705,Mazda,MX-6,,,,0,,,Cars_Datasets_2025,mazda mx-6
+706,Mazda,Parkway,,,,0,,,Cars_Datasets_2025,mazda parkway
+707,Mazda,Persona,,,,0,,,Cars_Datasets_2025,mazda persona
+708,Mazda,Porter,,,,0,,,Cars_Datasets_2025,mazda porter
+709,Mazda,Premacy,,,,0,,,Cars_Datasets_2025,mazda premacy
+710,Mazda,Premacy Hydrogen RE,,,,0,,,Cars_Datasets_2025,mazda premacy hydrogen re
+711,Mazda,Premacy Hydrogen RE Hybrid,,,,0,,,Cars_Datasets_2025,mazda premacy hydrogen re hybrid
+712,Mazda,Proceed Marvie,,,,0,,,Cars_Datasets_2025,mazda proceed marvie
+713,Mazda,Protegé,,,,0,,,Cars_Datasets_2025,mazda protegé
+714,Mazda,Revue,,,,0,,,Cars_Datasets_2025,mazda revue
+715,Mazda,Roadpacer AP,,,,0,,,Cars_Datasets_2025,mazda roadpacer ap
+716,Mazda,Rotary Pickup,,,,0,,,Cars_Datasets_2025,mazda rotary pickup
+717,Mazda,RX-2,,,,0,,,Cars_Datasets_2025,mazda rx-2
+718,Mazda,RX-3,,,,0,,,Cars_Datasets_2025,mazda rx-3
+719,Mazda,RX-5,,,,0,,,Cars_Datasets_2025,mazda rx-5
+720,Mazda,RX-7,,,,1,rx7,Mazda RX-7,3d_registry|Cars_Datasets_2025,mazda rx-7
+721,Mazda,RX-7 Spirit R,,,,0,,,Cars_Datasets_2025,mazda rx-7 spirit r
+722,Mazda,Savanna RX-7,,,,0,,,Cars_Datasets_2025,mazda savanna rx-7
+723,Mazda,Scrum,,,,0,,,Cars_Datasets_2025,mazda scrum
+724,Mazda,Scrum Wagon,,,,0,,,Cars_Datasets_2025,mazda scrum wagon
+725,Mazda,Sentia,,,,0,,,Cars_Datasets_2025,mazda sentia
+726,Mazda,Sentia Hardtop Coupe,,,,0,,,Cars_Datasets_2025,mazda sentia hardtop coupe
+727,Mazda,Spiano,,,,0,,,Cars_Datasets_2025,mazda spiano
+728,Mazda,T1500,,,,0,,,Cars_Datasets_2025,mazda t1500
+729,Mazda,T2000,,,,0,,,Cars_Datasets_2025,mazda t2000
+730,Mazda,Titan (Truck),,,,0,,,Cars_Datasets_2025,mazda titan (truck)
+731,Mazda,Tribute,,,,0,,,Cars_Datasets_2025,mazda tribute
+732,Mazda,Verisa,,,,0,,,Cars_Datasets_2025,mazda verisa
+733,Mazda,Xedos 6,,,,0,,,Cars_Datasets_2025,mazda xedos 6
+734,Mazda,Xedos 9,,,,0,,,Cars_Datasets_2025,mazda xedos 9
+735,McLaren,540C,2016,2018,,0,,,Car_Models,mclaren 540c
+736,McLaren,570GT,2017,2018,,0,,,Car_Models,mclaren 570gt
+737,McLaren,570S,2016,2018,,0,,,Car_Models,mclaren 570s
+738,McLaren,600LT,2019,,,0,,,Car_Models,mclaren 600lt
+739,McLaren,720S,2018,2020,,1,mclaren,2017 McLaren 720s,3d_registry|Car_Models|Cars_Datasets_2025,mclaren 720s
+740,McLaren,Artura,2022,,,0,,,Car_Models,mclaren artura
+741,Mercedes-Benz,AMG GT,,,,1,mercedes_amg,Mercedes AMG GT,3d_registry,mercedes-benz amg gt
+742,Mercedes-Benz,Benz A-class A 45 S,,,,0,,,Cars_Datasets_2025,mercedes-benz benz a-class a 45 s
+743,Mercedes-Benz,Benz C-class C 43,,,,0,,,Cars_Datasets_2025,mercedes-benz benz c-class c 43
+744,Mercedes-Benz,Benz CLA 45 AMG,,,,0,,,Cars_Datasets_2025,mercedes-benz benz cla 45 amg
+745,Mercedes-Benz,Benz CLS 450,,,,0,,,Cars_Datasets_2025,mercedes-benz benz cls 450
+746,Mercedes-Benz,Benz E-class E 350,,,,0,,,Cars_Datasets_2025,mercedes-benz benz e-class e 350
+747,Mercedes-Benz,Benz E-class E 450,,,,0,,,Cars_Datasets_2025,mercedes-benz benz e-class e 450
+748,Mercedes-Benz,Benz E-class E 63 S,,,,0,,,Cars_Datasets_2025,mercedes-benz benz e-class e 63 s
+749,Mercedes-Benz,Benz EQS 53,,,,0,,,Cars_Datasets_2025,mercedes-benz benz eqs 53
+750,Mercedes-Benz,Benz GLA 45,,,,0,,,Cars_Datasets_2025,mercedes-benz benz gla 45
+751,Mercedes-Benz,Benz GLC 350,,,,0,,,Cars_Datasets_2025,mercedes-benz benz glc 350
+752,Mercedes-Benz,Benz GLC 43,,,,0,,,Cars_Datasets_2025,mercedes-benz benz glc 43
+753,Mercedes-Benz,Benz GLE 350,,,,0,,,Cars_Datasets_2025,mercedes-benz benz gle 350
+754,Mercedes-Benz,Benz GLE 450,,,,0,,,Cars_Datasets_2025,mercedes-benz benz gle 450
+755,Mercedes-Benz,Benz GLE 53,,,,0,,,Cars_Datasets_2025,mercedes-benz benz gle 53
+756,Mercedes-Benz,Benz GLE 63 S,,,,0,,,Cars_Datasets_2025,mercedes-benz benz gle 63 s
+757,Mercedes-Benz,Benz GT 53,,,,0,,,Cars_Datasets_2025,mercedes-benz benz gt 53
+758,Mercedes-Benz,Benz Maybach S 680,,,,0,,,Cars_Datasets_2025,mercedes-benz benz maybach s 680
+759,Mercedes-Benz,Benz S-class S 350,,,,0,,,Cars_Datasets_2025,mercedes-benz benz s-class s 350
+760,Mercedes-Benz,Benz S-class S 500,,,,0,,,Cars_Datasets_2025,mercedes-benz benz s-class s 500
+761,Mercedes-Benz,Benz S-class S 580,,,,0,,,Cars_Datasets_2025,mercedes-benz benz s-class s 580
+762,Mercedes-Benz,C-Class,2022,,,0,,,Car_Models,mercedes-benz c-class
+763,Mercedes-Benz,E-Class,2022,,,0,,,Car_Models,mercedes-benz e-class
+764,Mercedes-Benz,G-Class,2022,,,0,,,Car_Models,mercedes-benz g-class
+765,Mercedes-Benz,GLC-Class,2022,,,0,,,Car_Models,mercedes-benz glc-class
+766,Mercedes-Benz,GT 63 S,,,,0,,,Cars_Datasets_2025,mercedes-benz gt 63 s
+767,Mercedes-Benz,S-Class,2022,,,0,,,Car_Models,mercedes-benz s-class
+768,MINI,Clubman,2023,2024,,0,,,Car_Models,mini clubman
+769,MINI,Cooper,2023,2024,,0,,,Car_Models,mini cooper
+770,MINI,Cooper S,2023,2024,,0,,,Car_Models,mini cooper s
+771,MINI,Cooper SE,2023,2024,,0,,,Car_Models,mini cooper se
+772,MINI,Countryman,2023,2024,,0,,,Car_Models,mini countryman
+773,MINI,Countryman John Cooper Works,2023,2024,,0,,,Car_Models,mini countryman john cooper works
+774,MINI,John Cooper Works,2023,2024,,0,,,Car_Models,mini john cooper works
+775,MINI,Paceman,2023,2024,,0,,,Car_Models,mini paceman
+776,Mitsubishi,Airtrek,,,,0,,,Cars_Datasets_2025,mitsubishi airtrek
+777,Mitsubishi,ASX (Outlander Sport),,,,0,,,Cars_Datasets_2025,mitsubishi asx (outlander sport)
+778,Mitsubishi,ASX Dynamic,,,,0,,,Cars_Datasets_2025,mitsubishi asx dynamic
+779,Mitsubishi,ASX Exceed,,,,0,,,Cars_Datasets_2025,mitsubishi asx exceed
+780,Mitsubishi,Attrage,,,,0,,,Cars_Datasets_2025,mitsubishi attrage
+781,Mitsubishi,Canter (Truck),,,,0,,,Cars_Datasets_2025,mitsubishi canter (truck)
+782,Mitsubishi,Chariot,,,,0,,,Cars_Datasets_2025,mitsubishi chariot
+783,Mitsubishi,Colt,,,,0,,,Cars_Datasets_2025,mitsubishi colt
+784,Mitsubishi,Colt CZC Convertible,,,,0,,,Cars_Datasets_2025,mitsubishi colt czc convertible
+785,Mitsubishi,Delica D:5,,,,0,,,Cars_Datasets_2025,mitsubishi delica d:5
+786,Mitsubishi,Delica Space Gear,,,,0,,,Cars_Datasets_2025,mitsubishi delica space gear
+787,Mitsubishi,Delica Van,,,,0,,,Cars_Datasets_2025,mitsubishi delica van
+788,Mitsubishi,Dion,,,,0,,,Cars_Datasets_2025,mitsubishi dion
+789,Mitsubishi,Eclipse Cross,2018,,,0,,,Car_Models|Cars_Datasets_2025,mitsubishi eclipse cross
+790,Mitsubishi,Eclipse Cross Black Edition,,,,0,,,Cars_Datasets_2025,mitsubishi eclipse cross black edition
+791,Mitsubishi,Eclipse Cross PHEV,,,,0,,,Cars_Datasets_2025,mitsubishi eclipse cross phev
+792,Mitsubishi,eK Space,,,,0,,,Cars_Datasets_2025,mitsubishi ek space
+793,Mitsubishi,eK X,,,,0,,,Cars_Datasets_2025,mitsubishi ek x
+794,Mitsubishi,Endeavor,,,,0,,,Cars_Datasets_2025,mitsubishi endeavor
+795,Mitsubishi,Fuso Canter Eco Hybrid,,,,0,,,Cars_Datasets_2025,mitsubishi fuso canter eco hybrid
+796,Mitsubishi,Fuso Fighter (Truck),,,,0,,,Cars_Datasets_2025,mitsubishi fuso fighter (truck)
+797,Mitsubishi,Galant Fortis,,,,0,,,Cars_Datasets_2025,mitsubishi galant fortis
+798,Mitsubishi,Grand Lancer,,,,0,,,Cars_Datasets_2025,mitsubishi grand lancer
+799,Mitsubishi,Grandis,,,,0,,,Cars_Datasets_2025,mitsubishi grandis
+800,Mitsubishi,i (Kei Car),,,,0,,,Cars_Datasets_2025,mitsubishi i (kei car)
+801,Mitsubishi,i-MiEV (Electric),,,,0,,,Cars_Datasets_2025,mitsubishi i-miev (electric)
+802,Mitsubishi,L200 Barbarian X,,,,0,,,Cars_Datasets_2025,mitsubishi l200 barbarian x
+803,Mitsubishi,Lancer Evolution X,,,,0,,,Cars_Datasets_2025,mitsubishi lancer evolution x
+804,Mitsubishi,Lancer EX,,,,0,,,Cars_Datasets_2025,mitsubishi lancer ex
+805,Mitsubishi,Lancer GLX,,,,0,,,Cars_Datasets_2025,mitsubishi lancer glx
+806,Mitsubishi,Lancer SE Limited,,,,0,,,Cars_Datasets_2025,mitsubishi lancer se limited
+807,Mitsubishi,Minicab MiEV,,,,0,,,Cars_Datasets_2025,mitsubishi minicab miev
+808,Mitsubishi,Mirage,2014,,,0,,,Car_Models|Cars_Datasets_2025,mitsubishi mirage
+809,Mitsubishi,Mirage ES,,,,0,,,Cars_Datasets_2025,mitsubishi mirage es
+810,Mitsubishi,Mirage G4,2017,,,0,,,Car_Models|Cars_Datasets_2025,mitsubishi mirage g4
+811,Mitsubishi,Montero GLX,,,,0,,,Cars_Datasets_2025,mitsubishi montero glx
+812,Mitsubishi,Montero Sport,,,,0,,,Cars_Datasets_2025,mitsubishi montero sport
+813,Mitsubishi,Outlander,2014,,,0,,,Car_Models|Cars_Datasets_2025,mitsubishi outlander
+814,Mitsubishi,Outlander Black Edition,,,,0,,,Cars_Datasets_2025,mitsubishi outlander black edition
+815,Mitsubishi,Outlander ES,,,,0,,,Cars_Datasets_2025,mitsubishi outlander es
+816,Mitsubishi,Outlander LE,,,,0,,,Cars_Datasets_2025,mitsubishi outlander le
+817,Mitsubishi,Outlander PHEV,,,,0,,,Cars_Datasets_2025,mitsubishi outlander phev
+818,Mitsubishi,Outlander SE,,,,0,,,Cars_Datasets_2025,mitsubishi outlander se
+819,Mitsubishi,Outlander SEL,,,,0,,,Cars_Datasets_2025,mitsubishi outlander sel
+820,Mitsubishi,Outlander Sport,2011,,,0,,,Car_Models,mitsubishi outlander sport
+821,Mitsubishi,Pajero,,,,0,,,Cars_Datasets_2025,mitsubishi pajero
+822,Mitsubishi,Pajero Final Edition,,,,0,,,Cars_Datasets_2025,mitsubishi pajero final edition
+823,Mitsubishi,Pajero GLS,,,,0,,,Cars_Datasets_2025,mitsubishi pajero gls
+824,Mitsubishi,Pajero Sport,,,,0,,,Cars_Datasets_2025,mitsubishi pajero sport
+825,Mitsubishi,Pajero SWB (Short Wheel Base),,,,0,,,Cars_Datasets_2025,mitsubishi pajero swb (short wheel base)
+826,Mitsubishi,Rvr SE,,,,0,,,Cars_Datasets_2025,mitsubishi rvr se
+827,Mitsubishi,Sigma,,,,0,,,Cars_Datasets_2025,mitsubishi sigma
+828,Mitsubishi,Space Runner,,,,0,,,Cars_Datasets_2025,mitsubishi space runner
+829,Mitsubishi,Space Star,,,,0,,,Cars_Datasets_2025,mitsubishi space star
+830,Mitsubishi,Toppo BJ,,,,0,,,Cars_Datasets_2025,mitsubishi toppo bj
+831,Mitsubishi,Town Box,,,,0,,,Cars_Datasets_2025,mitsubishi town box
+832,Mitsubishi,Triton (L200),,,,0,,,Cars_Datasets_2025,mitsubishi triton (l200)
+833,Mitsubishi,Triton Athlete,,,,0,,,Cars_Datasets_2025,mitsubishi triton athlete
+834,Mitsubishi,Triton GLX-R,,,,0,,,Cars_Datasets_2025,mitsubishi triton glx-r
+835,Mitsubishi,Xpander,,,,0,,,Cars_Datasets_2025,mitsubishi xpander
+836,Mitsubishi,Xpander Cross,,,,0,,,Cars_Datasets_2025,mitsubishi xpander cross
+837,Morgan,Aero 8,2023,,,0,,,Car_Models,morgan aero 8
+838,Morgan,Plus 4,2023,,,0,,,Car_Models,morgan plus 4
+839,Morgan,Plus 6,2023,,,0,,,Car_Models,morgan plus 6
+840,Morgan,Roadster,2023,,,0,,,Car_Models,morgan roadster
+841,Morgan,Super 3,2023,,,0,,,Car_Models,morgan super 3
+842,Nissan,100NX,,,,0,,,Cars_Datasets_2025,nissan 100nx
+843,Nissan,180SX,,,,0,,,Cars_Datasets_2025,nissan 180sx
+844,Nissan,200SX,,,,0,,,Cars_Datasets_2025,nissan 200sx
+845,Nissan,280ZX,,,,0,,,Cars_Datasets_2025,nissan 280zx
+846,Nissan,300ZX,,,,0,,,Cars_Datasets_2025,nissan 300zx
+847,Nissan,300ZX Turbo,,,,0,,,Cars_Datasets_2025,nissan 300zx turbo
+848,Nissan,370Z,,,,1,nissan_370z,Nissan 370Z Z34,3d_registry|Cars_Datasets_2025,nissan 370z
+849,Nissan,370Z Nismo,,,,0,,,Cars_Datasets_2025,nissan 370z nismo
+850,Nissan,370Z Roadster,,,,0,,,Cars_Datasets_2025,nissan 370z roadster
+851,Nissan,AD Wagon,,,,0,,,Cars_Datasets_2025,nissan ad wagon
+852,Nissan,Almera,,,,0,,,Cars_Datasets_2025,nissan almera
+853,Nissan,Almera Tino,,,,0,,,Cars_Datasets_2025,nissan almera tino
+854,Nissan,Altima,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,nissan altima
+855,Nissan,Ariya,,,,0,,,Cars_Datasets_2025,nissan ariya
+856,Nissan,Ariya Dual Motor AWD,,,,0,,,Cars_Datasets_2025,nissan ariya dual motor awd
+857,Nissan,Ariya E-4ORCE,,,,0,,,Cars_Datasets_2025,nissan ariya e-4orce
+858,Nissan,Ariya Empower+,,,,0,,,Cars_Datasets_2025,nissan ariya empower+
+859,Nissan,Ariya Lounge Edition,,,,0,,,Cars_Datasets_2025,nissan ariya lounge edition
+860,Nissan,Ariya Premiere,,,,0,,,Cars_Datasets_2025,nissan ariya premiere
+861,Nissan,Armada,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,nissan armada
+862,Nissan,Armada Platinum,,,,0,,,Cars_Datasets_2025,nissan armada platinum
+863,Nissan,Atlas,,,,0,,,Cars_Datasets_2025,nissan atlas
+864,Nissan,Avenir,,,,0,,,Cars_Datasets_2025,nissan avenir
+865,Nissan,Bluebird Sylphy,,,,0,,,Cars_Datasets_2025,nissan bluebird sylphy
+866,Nissan,Bluebird Z,,,,0,,,Cars_Datasets_2025,nissan bluebird z
+867,Nissan,Cabstar,,,,0,,,Cars_Datasets_2025,nissan cabstar
+868,Nissan,Caravan Coach,,,,0,,,Cars_Datasets_2025,nissan caravan coach
+869,Nissan,Cedric,,,,0,,,Cars_Datasets_2025,nissan cedric
+870,Nissan,Cedric Special Edition,,,,0,,,Cars_Datasets_2025,nissan cedric special edition
+871,Nissan,Cherry,,,,0,,,Cars_Datasets_2025,nissan cherry
+872,Nissan,Cima,,,,0,,,Cars_Datasets_2025,nissan cima
+873,Nissan,Clipper,,,,0,,,Cars_Datasets_2025,nissan clipper
+874,Nissan,Cube,,,,0,,,Cars_Datasets_2025,nissan cube
+875,Nissan,Datsun 240Z,,,,0,,,Cars_Datasets_2025,nissan datsun 240z
+876,Nissan,Datsun 240Z (Classic),,,,0,,,Cars_Datasets_2025,nissan datsun 240z (classic)
+877,Nissan,Datsun 510,,,,0,,,Cars_Datasets_2025,nissan datsun 510
+878,Nissan,Datsun 510 (Classic),,,,0,,,Cars_Datasets_2025,nissan datsun 510 (classic)
+879,Nissan,Elgrand,,,,0,,,Cars_Datasets_2025,nissan elgrand
+880,Nissan,Evalia,,,,0,,,Cars_Datasets_2025,nissan evalia
+881,Nissan,Fairlady Z Heritage,,,,0,,,Cars_Datasets_2025,nissan fairlady z heritage
+882,Nissan,Figaro,,,,0,,,Cars_Datasets_2025,nissan figaro
+883,Nissan,Frontier,,,,0,,,Cars_Datasets_2025,nissan frontier
+884,Nissan,Gloria,,,,0,,,Cars_Datasets_2025,nissan gloria
+885,Nissan,Gloria Gran Turismo,,,,0,,,Cars_Datasets_2025,nissan gloria gran turismo
+886,Nissan,GT-R,2019,2022,,1,nissan_gtr,Aimgain GT R35,3d_registry|Car_Models|Cars_Datasets_2025,nissan gt-r
+887,Nissan,GT-R Black Edition,,,,0,,,Cars_Datasets_2025,nissan gt-r black edition
+888,Nissan,GT-R Egoist,,,,0,,,Cars_Datasets_2025,nissan gt-r egoist
+889,Nissan,GT-R LM Nismo,,,,0,,,Cars_Datasets_2025,nissan gt-r lm nismo
+890,Nissan,GT-R Nismo,,,,0,,,Cars_Datasets_2025,nissan gt-r nismo
+891,Nissan,GT-R V-Spec,,,,0,,,Cars_Datasets_2025,nissan gt-r v-spec
+892,Nissan,GT-R50 by Italdesign,,,,0,,,Cars_Datasets_2025,nissan gt-r50 by italdesign
+893,Nissan,Hardbody SUV,,,,0,,,Cars_Datasets_2025,nissan hardbody suv
+894,Nissan,Hardbody Truck,,,,0,,,Cars_Datasets_2025,nissan hardbody truck
+895,Nissan,Juke,,,,0,,,Cars_Datasets_2025,nissan juke
+896,Nissan,Kicks,,,,0,,,Cars_Datasets_2025,nissan kicks
+897,Nissan,Latio,,,,0,,,Cars_Datasets_2025,nissan latio
+898,Nissan,Laurel,,,,0,,,Cars_Datasets_2025,nissan laurel
+899,Nissan,Leopard,,,,0,,,Cars_Datasets_2025,nissan leopard
+900,Nissan,Leopard J. Ferie,,,,0,,,Cars_Datasets_2025,nissan leopard j. ferie
+901,Nissan,Lucino,,,,0,,,Cars_Datasets_2025,nissan lucino
+902,Nissan,Magnite,,,,0,,,Cars_Datasets_2025,nissan magnite
+903,Nissan,March,,,,0,,,Cars_Datasets_2025,nissan march
+904,Nissan,Maxima,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,nissan maxima
+905,Nissan,Maxima Platinum,,,,0,,,Cars_Datasets_2025,nissan maxima platinum
+906,Nissan,Micra,,,,0,,,Cars_Datasets_2025,nissan micra
+907,Nissan,Mistral,,,,0,,,Cars_Datasets_2025,nissan mistral
+908,Nissan,Murano,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,nissan murano
+909,Nissan,Murano CrossCabriolet,,,,0,,,Cars_Datasets_2025,nissan murano crosscabriolet
+910,Nissan,Navara,,,,0,,,Cars_Datasets_2025,nissan navara
+911,Nissan,Note,,,,0,,,Cars_Datasets_2025,nissan note
+912,Nissan,NT400 Cabstar,,,,0,,,Cars_Datasets_2025,nissan nt400 cabstar
+913,Nissan,NV1500,,,,0,,,Cars_Datasets_2025,nissan nv1500
+914,Nissan,NV200,,,,0,,,Cars_Datasets_2025,nissan nv200
+915,Nissan,NV2500,,,,0,,,Cars_Datasets_2025,nissan nv2500
+916,Nissan,NV350 Caravan,,,,0,,,Cars_Datasets_2025,nissan nv350 caravan
+917,Nissan,NV3500,,,,0,,,Cars_Datasets_2025,nissan nv3500
+918,Nissan,NV400,,,,0,,,Cars_Datasets_2025,nissan nv400
+919,Nissan,NX Coupe,,,,0,,,Cars_Datasets_2025,nissan nx coupe
+920,Nissan,Paladin,,,,0,,,Cars_Datasets_2025,nissan paladin
+921,Nissan,Pathfinder,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,nissan pathfinder
+922,Nissan,Pathfinder Armada,,,,0,,,Cars_Datasets_2025,nissan pathfinder armada
+923,Nissan,Pathfinder Armada Platinum,,,,0,,,Cars_Datasets_2025,nissan pathfinder armada platinum
+924,Nissan,Pathfinder Hybrid,,,,0,,,Cars_Datasets_2025,nissan pathfinder hybrid
+925,Nissan,Pathfinder Rock Creek,,,,0,,,Cars_Datasets_2025,nissan pathfinder rock creek
+926,Nissan,Pathfinder Rock Creek Edition,,,,0,,,Cars_Datasets_2025,nissan pathfinder rock creek edition
+927,Nissan,Patrol,,,,0,,,Cars_Datasets_2025,nissan patrol
+928,Nissan,Patrol Black Edition,,,,0,,,Cars_Datasets_2025,nissan patrol black edition
+929,Nissan,Patrol Desert Edition,,,,0,,,Cars_Datasets_2025,nissan patrol desert edition
+930,Nissan,Patrol Legend Edition,,,,0,,,Cars_Datasets_2025,nissan patrol legend edition
+931,Nissan,Patrol NISMO,,,,0,,,Cars_Datasets_2025,nissan patrol nismo
+932,Nissan,Patrol Platinum,,,,0,,,Cars_Datasets_2025,nissan patrol platinum
+933,Nissan,Patrol Royale,,,,0,,,Cars_Datasets_2025,nissan patrol royale
+934,Nissan,Patrol Super Safari,,,,0,,,Cars_Datasets_2025,nissan patrol super safari
+935,Nissan,Patrol Super Safari Y61,,,,0,,,Cars_Datasets_2025,nissan patrol super safari y61
+936,Nissan,Patrol Titanium,,,,0,,,Cars_Datasets_2025,nissan patrol titanium
+937,Nissan,Patrol Warrior,,,,0,,,Cars_Datasets_2025,nissan patrol warrior
+938,Nissan,Patrol Y60,,,,0,,,Cars_Datasets_2025,nissan patrol y60
+939,Nissan,Prairie,,,,0,,,Cars_Datasets_2025,nissan prairie
+940,Nissan,Presea,,,,0,,,Cars_Datasets_2025,nissan presea
+941,Nissan,President,,,,0,,,Cars_Datasets_2025,nissan president
+942,Nissan,Primera,,,,0,,,Cars_Datasets_2025,nissan primera
+943,Nissan,Pulsar,,,,0,,,Cars_Datasets_2025,nissan pulsar
+944,Nissan,Pulsar GTI-R,,,,0,,,Cars_Datasets_2025,nissan pulsar gti-r
+945,Nissan,Qashqai,,,,0,,,Cars_Datasets_2025,nissan qashqai
+946,Nissan,Qashqai e-Power,,,,0,,,Cars_Datasets_2025,nissan qashqai e-power
+947,Nissan,Qashqai Tekna,,,,0,,,Cars_Datasets_2025,nissan qashqai tekna
+948,Nissan,R390 GT1 Road Car,,,,0,,,Cars_Datasets_2025,nissan r390 gt1 road car
+949,Nissan,Rasheen,,,,0,,,Cars_Datasets_2025,nissan rasheen
+950,Nissan,Rogue,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,nissan rogue
+951,Nissan,Rogue Midnight Edition,,,,0,,,Cars_Datasets_2025,nissan rogue midnight edition
+952,Nissan,Rogue Platinum,,,,0,,,Cars_Datasets_2025,nissan rogue platinum
+953,Nissan,Rogue Sport,,,,0,,,Cars_Datasets_2025,nissan rogue sport
+954,Nissan,Rogue Sport SL,,,,0,,,Cars_Datasets_2025,nissan rogue sport sl
+955,Nissan,Sentra,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,nissan sentra
+956,Nissan,Serena e-Power,,,,0,,,Cars_Datasets_2025,nissan serena e-power
+957,Nissan,Silvia,,,,0,,,Cars_Datasets_2025,nissan silvia
+958,Nissan,Silvia S13,,,,0,,,Cars_Datasets_2025,nissan silvia s13
+959,Nissan,Silvia S15 Spec-R,,,,0,,,Cars_Datasets_2025,nissan silvia s15 spec-r
+960,Nissan,Skyline,,,,0,,,Cars_Datasets_2025,nissan skyline
+961,Nissan,Skyline 400R,,,,0,,,Cars_Datasets_2025,nissan skyline 400r
+962,Nissan,Skyline 50th Anniversary,,,,0,,,Cars_Datasets_2025,nissan skyline 50th anniversary
+963,Nissan,Skyline GT-R R34,,,,0,,,Cars_Datasets_2025,nissan skyline gt-r r34
+964,Nissan,Skyline NISMO,,,,0,,,Cars_Datasets_2025,nissan skyline nismo
+965,Nissan,Stanza,,,,0,,,Cars_Datasets_2025,nissan stanza
+966,Nissan,Stanza Wagon,,,,0,,,Cars_Datasets_2025,nissan stanza wagon
+967,Nissan,Sunny,,,,0,,,Cars_Datasets_2025,nissan sunny
+968,Nissan,Sunny California,,,,0,,,Cars_Datasets_2025,nissan sunny california
+969,Nissan,Sunny NISMO Edition,,,,0,,,Cars_Datasets_2025,nissan sunny nismo edition
+970,Nissan,Sylphy,,,,0,,,Cars_Datasets_2025,nissan sylphy
+971,Nissan,Terrano,,,,0,,,Cars_Datasets_2025,nissan terrano
+972,Nissan,Terrano II,,,,0,,,Cars_Datasets_2025,nissan terrano ii
+973,Nissan,Terrano Regulus,,,,0,,,Cars_Datasets_2025,nissan terrano regulus
+974,Nissan,Terrano XL,,,,0,,,Cars_Datasets_2025,nissan terrano xl
+975,Nissan,Tiida,,,,0,,,Cars_Datasets_2025,nissan tiida
+976,Nissan,Titan,,,,0,,,Cars_Datasets_2025,nissan titan
+977,Nissan,Titan Warrior,,,,0,,,Cars_Datasets_2025,nissan titan warrior
+978,Nissan,Titan XD,,,,0,,,Cars_Datasets_2025,nissan titan xd
+979,Nissan,Urvan,,,,0,,,Cars_Datasets_2025,nissan urvan
+980,Nissan,Versa,2019,2022,,0,,,Car_Models|Cars_Datasets_2025,nissan versa
+981,Nissan,Violet,,,,0,,,Cars_Datasets_2025,nissan violet
+982,Nissan,Wingroad,,,,0,,,Cars_Datasets_2025,nissan wingroad
+983,Nissan,X-Terra Pro-4X,,,,0,,,Cars_Datasets_2025,nissan x-terra pro-4x
+984,Nissan,X-Trail,,,,0,,,Cars_Datasets_2025,nissan x-trail
+985,Nissan,X-Trail GT,,,,0,,,Cars_Datasets_2025,nissan x-trail gt
+986,Nissan,X-Trail Hybrid,,,,0,,,Cars_Datasets_2025,nissan x-trail hybrid
+987,Nissan,X-Trail Platinum Edition,,,,0,,,Cars_Datasets_2025,nissan x-trail platinum edition
+988,Nissan,X-Trail Tekna,,,,0,,,Cars_Datasets_2025,nissan x-trail tekna
+989,Nissan,Xterra,,,,0,,,Cars_Datasets_2025,nissan xterra
+990,Nissan,Z (Fairlady Z),,,,0,,,Cars_Datasets_2025,nissan z (fairlady z)
+991,Nissan,Z Proto,,,,0,,,Cars_Datasets_2025,nissan z proto
+992,Opel/Vauxhall,Adam,2023,2024,,0,,,Car_Models,opel/vauxhall adam
+993,Opel/Vauxhall,Astra,2023,2024,,0,,,Car_Models,opel/vauxhall astra
+994,Opel/Vauxhall,Combo,2023,2024,,0,,,Car_Models,opel/vauxhall combo
+995,Opel/Vauxhall,Corsa,2023,2024,,0,,,Car_Models,opel/vauxhall corsa
+996,Opel/Vauxhall,Crossland,2023,2024,,0,,,Car_Models,opel/vauxhall crossland
+997,Opel/Vauxhall,Grandland,2023,2024,,0,,,Car_Models,opel/vauxhall grandland
+998,Opel/Vauxhall,Insignia,2023,2024,,0,,,Car_Models,opel/vauxhall insignia
+999,Opel/Vauxhall,Mokka,2023,2024,,0,,,Car_Models,opel/vauxhall mokka
+1000,Opel/Vauxhall,Movano,2023,2024,,0,,,Car_Models,opel/vauxhall movano
+1001,Opel/Vauxhall,Vivaro,2023,2024,,0,,,Car_Models,opel/vauxhall vivaro
+1002,Pagani,Huayra,2011,,,0,,,Car_Models,pagani huayra
+1003,Pagani,Huayra BC,2016,2018,,0,,,Car_Models,pagani huayra bc
+1004,Pagani,Huayra Imola,2020,,,0,,,Car_Models,pagani huayra imola
+1005,Pagani,Huayra R,2017,,,0,,,Car_Models,pagani huayra r
+1006,Pagani,Zonda,1999,2015,,0,,,Car_Models,pagani zonda
+1007,Peugeot,2008,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,peugeot 2008
+1008,Peugeot,2008 Active,,,,0,,,Cars_Datasets_2025,peugeot 2008 active
+1009,Peugeot,2008 Allure,,,,0,,,Cars_Datasets_2025,peugeot 2008 allure
+1010,Peugeot,2008 GT,,,,0,,,Cars_Datasets_2025,peugeot 2008 gt
+1011,Peugeot,208,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,peugeot 208
+1012,Peugeot,208 Allure Premium,,,,0,,,Cars_Datasets_2025,peugeot 208 allure premium
+1013,Peugeot,208 GTI,,,,0,,,Cars_Datasets_2025,peugeot 208 gti
+1014,Peugeot,208 PSE (Peugeot Sport Engineered),,,,0,,,Cars_Datasets_2025,peugeot 208 pse (peugeot sport engineered)
+1015,Peugeot,208 Sedan,,,,0,,,Cars_Datasets_2025,peugeot 208 sedan
+1016,Peugeot,3008,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,peugeot 3008
+1017,Peugeot,3008 Active,,,,0,,,Cars_Datasets_2025,peugeot 3008 active
+1018,Peugeot,3008 Allure,,,,0,,,Cars_Datasets_2025,peugeot 3008 allure
+1019,Peugeot,3008 Allure Premium,,,,0,,,Cars_Datasets_2025,peugeot 3008 allure premium
+1020,Peugeot,3008 GT,,,,0,,,Cars_Datasets_2025,peugeot 3008 gt
+1021,Peugeot,3008 GT Hybrid,,,,0,,,Cars_Datasets_2025,peugeot 3008 gt hybrid
+1022,Peugeot,3008 GT Line,,,,0,,,Cars_Datasets_2025,peugeot 3008 gt line
+1023,Peugeot,3008 Hybrid4,,,,0,,,Cars_Datasets_2025,peugeot 3008 hybrid4
+1024,Peugeot,3008 Plug-In Hybrid,,,,0,,,Cars_Datasets_2025,peugeot 3008 plug-in hybrid
+1025,Peugeot,3008 Pse,,,,0,,,Cars_Datasets_2025,peugeot 3008 pse
+1026,Peugeot,301,,,,0,,,Cars_Datasets_2025,peugeot 301
+1027,Peugeot,301 Sedan,,,,0,,,Cars_Datasets_2025,peugeot 301 sedan
+1028,Peugeot,308,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,peugeot 308
+1029,Peugeot,308 Allure,,,,0,,,Cars_Datasets_2025,peugeot 308 allure
+1030,Peugeot,308 GTI,,,,0,,,Cars_Datasets_2025,peugeot 308 gti
+1031,Peugeot,308 Pse,,,,0,,,Cars_Datasets_2025,peugeot 308 pse
+1032,Peugeot,308 Saloon,,,,0,,,Cars_Datasets_2025,peugeot 308 saloon
+1033,Peugeot,5008,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,peugeot 5008
+1034,Peugeot,5008 Active,,,,0,,,Cars_Datasets_2025,peugeot 5008 active
+1035,Peugeot,5008 Allure,,,,0,,,Cars_Datasets_2025,peugeot 5008 allure
+1036,Peugeot,5008 Allure Premium,,,,0,,,Cars_Datasets_2025,peugeot 5008 allure premium
+1037,Peugeot,5008 GT,,,,0,,,Cars_Datasets_2025,peugeot 5008 gt
+1038,Peugeot,5008 GT Hybrid,,,,0,,,Cars_Datasets_2025,peugeot 5008 gt hybrid
+1039,Peugeot,5008 GT Line,,,,0,,,Cars_Datasets_2025,peugeot 5008 gt line
+1040,Peugeot,508,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,peugeot 508
+1041,Peugeot,508 Allure,,,,0,,,Cars_Datasets_2025,peugeot 508 allure
+1042,Peugeot,508 GT,,,,0,,,Cars_Datasets_2025,peugeot 508 gt
+1043,Peugeot,508 Hybrid4,,,,0,,,Cars_Datasets_2025,peugeot 508 hybrid4
+1044,Peugeot,508 Plug-In Hybrid,,,,0,,,Cars_Datasets_2025,peugeot 508 plug-in hybrid
+1045,Peugeot,508 Pse,,,,0,,,Cars_Datasets_2025,peugeot 508 pse
+1046,Peugeot,508 PSE (Peugeot Sport Engineered),,,,0,,,Cars_Datasets_2025,peugeot 508 pse (peugeot sport engineered)
+1047,Peugeot,508 Saloon,,,,0,,,Cars_Datasets_2025,peugeot 508 saloon
+1048,Peugeot,508 SW (Station Wagon),,,,0,,,Cars_Datasets_2025,peugeot 508 sw (station wagon)
+1049,Peugeot,Boxer,,,,0,,,Cars_Datasets_2025,peugeot boxer
+1050,Peugeot,Boxer L2H2,,,,0,,,Cars_Datasets_2025,peugeot boxer l2h2
+1051,Peugeot,e-2008,,,,0,,,Cars_Datasets_2025,peugeot e-2008
+1052,Peugeot,e-2008 GT,,,,0,,,Cars_Datasets_2025,peugeot e-2008 gt
+1053,Peugeot,e-208,,,,0,,,Cars_Datasets_2025,peugeot e-208
+1054,Peugeot,Expert,,,,0,,,Cars_Datasets_2025,peugeot expert
+1055,Peugeot,Expert Electric,,,,0,,,Cars_Datasets_2025,peugeot expert electric
+1056,Peugeot,Expert L2H1,,,,0,,,Cars_Datasets_2025,peugeot expert l2h1
+1057,Peugeot,Partner,,,,0,,,Cars_Datasets_2025,peugeot partner
+1058,Peugeot,Partner Electric,,,,0,,,Cars_Datasets_2025,peugeot partner electric
+1059,Peugeot,Partner Tepee,,,,0,,,Cars_Datasets_2025,peugeot partner tepee
+1060,Polestar,1,2021,2022,,0,,,Car_Models,polestar 1
+1061,Polestar,2,2023,2024,,0,,,Car_Models,polestar 2
+1062,Polestar,3,2022,,,0,,,Car_Models,polestar 3
+1063,Porsche,718 Boxster,2017,2021,,0,,,Car_Models|Cars_Datasets_2025,porsche 718 boxster
+1064,Porsche,718 Boxster GTS,,,,0,,,Cars_Datasets_2025,porsche 718 boxster gts
+1065,Porsche,718 Boxster T,,,,0,,,Cars_Datasets_2025,porsche 718 boxster t
+1066,Porsche,718 Cayman,2017,2021,,0,,,Car_Models|Cars_Datasets_2025,porsche 718 cayman
+1067,Porsche,718 Cayman GT4,,,,0,,,Cars_Datasets_2025,porsche 718 cayman gt4
+1068,Porsche,718 Cayman GT4 RS,,,,0,,,Cars_Datasets_2025,porsche 718 cayman gt4 rs
+1069,Porsche,718 Cayman S,,,,0,,,Cars_Datasets_2025,porsche 718 cayman s
+1070,Porsche,718 Spyder,,,,0,,,Cars_Datasets_2025,porsche 718 spyder
+1071,Porsche,911,2020,2021,,0,,,Car_Models,porsche 911
+1072,Porsche,911 Carrera,,,,0,,,Cars_Datasets_2025,porsche 911 carrera
+1073,Porsche,911 Carrera 4,,,,0,,,Cars_Datasets_2025,porsche 911 carrera 4
+1074,Porsche,911 Carrera 4 GTS,,,,0,,,Cars_Datasets_2025,porsche 911 carrera 4 gts
+1075,Porsche,911 Carrera 4S,,,,0,,,Cars_Datasets_2025,porsche 911 carrera 4s
+1076,Porsche,911 Carrera Base,,,,0,,,Cars_Datasets_2025,porsche 911 carrera base
+1077,Porsche,911 Carrera GTS Lightweight,,,,0,,,Cars_Datasets_2025,porsche 911 carrera gts lightweight
+1078,Porsche,911 Carrera S,,,,0,,,Cars_Datasets_2025,porsche 911 carrera s
+1079,Porsche,911 Carrera S Cabriolet,,,,0,,,Cars_Datasets_2025,porsche 911 carrera s cabriolet
+1080,Porsche,911 Dakar,,,,0,,,Cars_Datasets_2025,porsche 911 dakar
+1081,Porsche,911 Dakar Limited Edition,,,,0,,,Cars_Datasets_2025,porsche 911 dakar limited edition
+1082,Porsche,911 Dakar Sport,,,,0,,,Cars_Datasets_2025,porsche 911 dakar sport
+1083,Porsche,911 GT2 RS,,,,0,,,Cars_Datasets_2025,porsche 911 gt2 rs
+1084,Porsche,911 GT3,,,,0,,,Cars_Datasets_2025,porsche 911 gt3
+1085,Porsche,911 GT3 Cup,,,,0,,,Cars_Datasets_2025,porsche 911 gt3 cup
+1086,Porsche,911 GT3 RS,,,,0,,,Cars_Datasets_2025,porsche 911 gt3 rs
+1087,Porsche,911 GT3 RS Clubsport,,,,0,,,Cars_Datasets_2025,porsche 911 gt3 rs clubsport
+1088,Porsche,911 GT3 Touring,,,,0,,,Cars_Datasets_2025,porsche 911 gt3 touring
+1089,Porsche,911 GT4 RS,,,,0,,,Cars_Datasets_2025,porsche 911 gt4 rs
+1090,Porsche,911 RSR (Motorsport Edition),,,,0,,,Cars_Datasets_2025,porsche 911 rsr (motorsport edition)
+1091,Porsche,911 Sport Turismo,,,,0,,,Cars_Datasets_2025,porsche 911 sport turismo
+1092,Porsche,911 Targa 4,,,,0,,,Cars_Datasets_2025,porsche 911 targa 4
+1093,Porsche,911 Targa 4 GTS,,,,0,,,Cars_Datasets_2025,porsche 911 targa 4 gts
+1094,Porsche,911 Targa 4 Lightweight,,,,0,,,Cars_Datasets_2025,porsche 911 targa 4 lightweight
+1095,Porsche,911 Turbo,,,,0,,,Cars_Datasets_2025,porsche 911 turbo
+1096,Porsche,911 Turbo Cabriolet,,,,0,,,Cars_Datasets_2025,porsche 911 turbo cabriolet
+1097,Porsche,911 Turbo Cabriolet Lightweight,,,,0,,,Cars_Datasets_2025,porsche 911 turbo cabriolet lightweight
+1098,Porsche,911 Turbo Exclusive Series,,,,0,,,Cars_Datasets_2025,porsche 911 turbo exclusive series
+1099,Porsche,911 Turbo S,,,,0,,,Cars_Datasets_2025,porsche 911 turbo s
+1100,Porsche,911 Turbo S Coupe,,,,0,,,Cars_Datasets_2025,porsche 911 turbo s coupe
+1101,Porsche,Cayenne,2020,2021,,0,,,Car_Models|Cars_Datasets_2025,porsche cayenne
+1102,Porsche,Cayenne Base,,,,0,,,Cars_Datasets_2025,porsche cayenne base
+1103,Porsche,Cayenne Coupe,,,,0,,,Cars_Datasets_2025,porsche cayenne coupe
+1104,Porsche,Cayenne Coupe Turbo E-Hybrid,,,,0,,,Cars_Datasets_2025,porsche cayenne coupe turbo e-hybrid
+1105,Porsche,Cayenne Diesel (Regional Markets),,,,0,,,Cars_Datasets_2025,porsche cayenne diesel (regional markets)
+1106,Porsche,Cayenne E-Hybrid,,,,0,,,Cars_Datasets_2025,porsche cayenne e-hybrid
+1107,Porsche,Cayenne GTS,,,,0,,,Cars_Datasets_2025,porsche cayenne gts
+1108,Porsche,Cayenne GTS Coupe,,,,0,,,Cars_Datasets_2025,porsche cayenne gts coupe
+1109,Porsche,Cayenne Platinum Edition,,,,0,,,Cars_Datasets_2025,porsche cayenne platinum edition
+1110,Porsche,Cayenne S,,,,0,,,Cars_Datasets_2025,porsche cayenne s
+1111,Porsche,Cayenne S Coupe,,,,0,,,Cars_Datasets_2025,porsche cayenne s coupe
+1112,Porsche,Cayenne S Hybrid,,,,0,,,Cars_Datasets_2025,porsche cayenne s hybrid
+1113,Porsche,Cayenne Turbo,,,,0,,,Cars_Datasets_2025,porsche cayenne turbo
+1114,Porsche,Cayenne Turbo GT,,,,0,,,Cars_Datasets_2025,porsche cayenne turbo gt
+1115,Porsche,Cayenne Turbo S E-Hybrid,,,,0,,,Cars_Datasets_2025,porsche cayenne turbo s e-hybrid
+1116,Porsche,Cayenne Turbo S E-Hybrid Coupe,,,,0,,,Cars_Datasets_2025,porsche cayenne turbo s e-hybrid coupe
+1117,Porsche,Cayman S,,,,1,porsche_cay,2014 Cayman S,3d_registry,porsche cayman s
+1118,Porsche,Macan,2020,2021,,0,,,Car_Models|Cars_Datasets_2025,porsche macan
+1119,Porsche,Macan Base,,,,0,,,Cars_Datasets_2025,porsche macan base
+1120,Porsche,Macan EV,,,,0,,,Cars_Datasets_2025,porsche macan ev
+1121,Porsche,Macan GTS,,,,0,,,Cars_Datasets_2025,porsche macan gts
+1122,Porsche,Macan S,,,,0,,,Cars_Datasets_2025,porsche macan s
+1123,Porsche,Macan T,,,,0,,,Cars_Datasets_2025,porsche macan t
+1124,Porsche,Panamera,2020,2021,,0,,,Car_Models|Cars_Datasets_2025,porsche panamera
+1125,Porsche,Panamera 4,,,,0,,,Cars_Datasets_2025,porsche panamera 4
+1126,Porsche,Panamera 4 E-Hybrid,,,,0,,,Cars_Datasets_2025,porsche panamera 4 e-hybrid
+1127,Porsche,Panamera 4 E-Hybrid Sport Turismo,,,,0,,,Cars_Datasets_2025,porsche panamera 4 e-hybrid sport turismo
+1128,Porsche,Panamera 4 Executive,,,,0,,,Cars_Datasets_2025,porsche panamera 4 executive
+1129,Porsche,Panamera 4 Sport Turismo,,,,0,,,Cars_Datasets_2025,porsche panamera 4 sport turismo
+1130,Porsche,Panamera 4S,,,,0,,,Cars_Datasets_2025,porsche panamera 4s
+1131,Porsche,Panamera 4S E-Hybrid Executive,,,,0,,,Cars_Datasets_2025,porsche panamera 4s e-hybrid executive
+1132,Porsche,Panamera Base,,,,0,,,Cars_Datasets_2025,porsche panamera base
+1133,Porsche,Panamera E-Hybrid,,,,0,,,Cars_Datasets_2025,porsche panamera e-hybrid
+1134,Porsche,Panamera GTS,,,,0,,,Cars_Datasets_2025,porsche panamera gts
+1135,Porsche,Panamera GTS Sport Turismo,,,,0,,,Cars_Datasets_2025,porsche panamera gts sport turismo
+1136,Porsche,Panamera Platinum Edition,,,,0,,,Cars_Datasets_2025,porsche panamera platinum edition
+1137,Porsche,Panamera Turbo Executive,,,,0,,,Cars_Datasets_2025,porsche panamera turbo executive
+1138,Porsche,Panamera Turbo S,,,,1,porsche_pan,2021 Panamera Turbo,3d_registry|Cars_Datasets_2025,porsche panamera turbo s
+1139,Porsche,Panamera Turbo S E-Hybrid,,,,0,,,Cars_Datasets_2025,porsche panamera turbo s e-hybrid
+1140,Porsche,Panamera Turbo S E-Hybrid Sport Turismo,,,,0,,,Cars_Datasets_2025,porsche panamera turbo s e-hybrid sport turismo
+1141,Porsche,Panamera Turbo S Exclusive Series,,,,0,,,Cars_Datasets_2025,porsche panamera turbo s exclusive series
+1142,Porsche,Taycan,,,,0,,,Cars_Datasets_2025,porsche taycan
+1143,Porsche,Taycan 4S,,,,0,,,Cars_Datasets_2025,porsche taycan 4s
+1144,Porsche,Taycan Base,,,,0,,,Cars_Datasets_2025,porsche taycan base
+1145,Porsche,Taycan Cross Turismo,,,,0,,,Cars_Datasets_2025,porsche taycan cross turismo
+1146,Porsche,Taycan Cross Turismo 4,,,,0,,,Cars_Datasets_2025,porsche taycan cross turismo 4
+1147,Porsche,Taycan Cross Turismo GTS,,,,0,,,Cars_Datasets_2025,porsche taycan cross turismo gts
+1148,Porsche,Taycan GTS,,,,0,,,Cars_Datasets_2025,porsche taycan gts
+1149,Porsche,Taycan Sport Turismo,,,,0,,,Cars_Datasets_2025,porsche taycan sport turismo
+1150,Porsche,Taycan Sport Turismo Base,,,,0,,,Cars_Datasets_2025,porsche taycan sport turismo base
+1151,Porsche,Taycan Sport Turismo GTS,,,,0,,,Cars_Datasets_2025,porsche taycan sport turismo gts
+1152,Porsche,Taycan Turbo,,,,0,,,Cars_Datasets_2025,porsche taycan turbo
+1153,Porsche,Taycan Turbo S,,,,1,porsche_tay,Taycan Turbo S,3d_registry|Cars_Datasets_2025,porsche taycan turbo s
+1154,Porsche,Taycan Turbo S Cross Turismo,,,,0,,,Cars_Datasets_2025,porsche taycan turbo s cross turismo
+1155,Ram,1500,2023,2024,,0,,,Car_Models,ram 1500
+1156,Ram,2500,2023,2024,,0,,,Car_Models,ram 2500
+1157,Ram,3500,2023,2024,,0,,,Car_Models,ram 3500
+1158,Ram,TRX,2023,2024,,0,,,Car_Models,ram trx
+1159,Renault,Arkana,2023,2024,,0,,,Car_Models,renault arkana
+1160,Renault,Captur,2023,2024,,0,,,Car_Models,renault captur
+1161,Renault,Clio,2023,2024,,0,,,Car_Models,renault clio
+1162,Renault,Koleos,2017,,,0,,,Car_Models,renault koleos
+1163,Renault,Megane,2023,2024,,0,,,Car_Models,renault megane
+1164,Renault,Zoe,2023,2024,,0,,,Car_Models,renault zoe
+1165,Rivian,R1S,2022,,,0,,,Car_Models,rivian r1s
+1166,Rivian,R1T,2022,,,0,,,Car_Models,rivian r1t
+1167,Rolls-Royce,Cullinan,2019,2021,,0,,,Car_Models|Cars_Datasets_2025,rolls-royce cullinan
+1168,Rolls-Royce,Cullinan Black Badge,,,,0,,,Cars_Datasets_2025,rolls-royce cullinan black badge
+1169,Rolls-Royce,Cullinan Black Badge SUV,,,,0,,,Cars_Datasets_2025,rolls-royce cullinan black badge suv
+1170,Rolls-Royce,Cullinan Fux Orange,,,,0,,,Cars_Datasets_2025,rolls-royce cullinan fux orange
+1171,Rolls-Royce,Cullinan Red Diamond,,,,0,,,Cars_Datasets_2025,rolls-royce cullinan red diamond
+1172,Rolls-Royce,Cullinan SUV,,,,0,,,Cars_Datasets_2025,rolls-royce cullinan suv
+1173,Rolls-Royce,Dawn,2016,2021,,0,,,Car_Models|Cars_Datasets_2025,rolls-royce dawn
+1174,Rolls-Royce,Dawn Black Badge,,,,0,,,Cars_Datasets_2025,rolls-royce dawn black badge
+1175,Rolls-Royce,Dawn Black Badge Adamas,,,,0,,,Cars_Datasets_2025,rolls-royce dawn black badge adamas
+1176,Rolls-Royce,Dawn Black Badge Volante,,,,0,,,Cars_Datasets_2025,rolls-royce dawn black badge volante
+1177,Rolls-Royce,Dawn Convertible,,,,0,,,Cars_Datasets_2025,rolls-royce dawn convertible
+1178,Rolls-Royce,Dawn Silver Bullet,,,,0,,,Cars_Datasets_2025,rolls-royce dawn silver bullet
+1179,Rolls-Royce,Ghost,2010,2021,,0,,,Car_Models|Cars_Datasets_2025,rolls-royce ghost
+1180,Rolls-Royce,Ghost Azure,,,,0,,,Cars_Datasets_2025,rolls-royce ghost azure
+1181,Rolls-Royce,Ghost Coupe,,,,0,,,Cars_Datasets_2025,rolls-royce ghost coupe
+1182,Rolls-Royce,Ghost Extended,,,,0,,,Cars_Datasets_2025,rolls-royce ghost extended
+1183,Rolls-Royce,Ghost Mysore,,,,0,,,Cars_Datasets_2025,rolls-royce ghost mysore
+1184,Rolls-Royce,Ghost Zenith,,,,0,,,Cars_Datasets_2025,rolls-royce ghost zenith
+1185,Rolls-Royce,Phantom,2004,2021,,0,,,Car_Models|Cars_Datasets_2025,rolls-royce phantom
+1186,Rolls-Royce,Phantom Celestial,,,,0,,,Cars_Datasets_2025,rolls-royce phantom celestial
+1187,Rolls-Royce,Phantom Coupe,,,,0,,,Cars_Datasets_2025,rolls-royce phantom coupe
+1188,Rolls-Royce,Phantom Extended,,,,0,,,Cars_Datasets_2025,rolls-royce phantom extended
+1189,Rolls-Royce,Phatom Orchid,,,,0,,,Cars_Datasets_2025,rolls-royce phatom orchid
+1190,Rolls-Royce,Phatom Tranquility,,,,0,,,Cars_Datasets_2025,rolls-royce phatom tranquility
+1191,Rolls-Royce,Wraith,2014,2021,,0,,,Car_Models|Cars_Datasets_2025,rolls-royce wraith
+1192,Rolls-Royce,Wraith Black Badge,,,,0,,,Cars_Datasets_2025,rolls-royce wraith black badge
+1193,Rolls-Royce,Wraith Coupe,,,,0,,,Cars_Datasets_2025,rolls-royce wraith coupe
+1194,Rolls-Royce,Wraith Eagle Viii,,,,0,,,Cars_Datasets_2025,rolls-royce wraith eagle viii
+1195,Rolls-Royce,Wraith Kryptos,,,,0,,,Cars_Datasets_2025,rolls-royce wraith kryptos
+1196,Rolls-Royce,Wraith Luminary,,,,0,,,Cars_Datasets_2025,rolls-royce wraith luminary
+1197,Saab,9-3,2011,,,0,,,Car_Models,saab 9-3
+1198,Saab,9-3 Convertible,2011,,,0,,,Car_Models,saab 9-3 convertible
+1199,Saab,9-5,2011,,,0,,,Car_Models,saab 9-5
+1200,Saab,9-5 SportCombi,2011,,,0,,,Car_Models,saab 9-5 sportcombi
+1201,SEAT,Arona,2023,2024,,0,,,Car_Models,seat arona
+1202,SEAT,Born,2023,2024,,0,,,Car_Models,seat born
+1203,SEAT,Ibiza,2023,2024,,0,,,Car_Models,seat ibiza
+1204,SEAT,Leon,2023,2024,,0,,,Car_Models,seat leon
+1205,SEAT,Leon Sportstourer,2023,2024,,0,,,Car_Models,seat leon sportstourer
+1206,SEAT,Mii,2023,2024,,0,,,Car_Models,seat mii
+1207,SEAT,Tarraco,2023,2024,,0,,,Car_Models,seat tarraco
+1208,Skoda,Enyaq iV,2023,2024,,0,,,Car_Models,skoda enyaq iv
+1209,Skoda,Fabia,2023,2024,,0,,,Car_Models,skoda fabia
+1210,Skoda,Karoq,2023,2024,,0,,,Car_Models,skoda karoq
+1211,Skoda,Kodiaq,2023,2024,,0,,,Car_Models,skoda kodiaq
+1212,Skoda,Octavia,2023,2024,,0,,,Car_Models,skoda octavia
+1213,Skoda,Scala,2023,2024,,0,,,Car_Models,skoda scala
+1214,Skoda,Superb,2023,2024,,0,,,Car_Models,skoda superb
+1215,Smart,Forfour,2023,,,0,,,Car_Models,smart forfour
+1216,Smart,Fortwo,2023,,,0,,,Car_Models,smart fortwo
+1217,Subaru,Ascent,2019,2022,,0,,,Car_Models,subaru ascent
+1218,Subaru,Brz,2019,2022,,0,,,Car_Models,subaru brz
+1219,Subaru,Crosstrek,2019,2022,,0,,,Car_Models,subaru crosstrek
+1220,Subaru,Crosstrek Hybrid,2019,2022,,0,,,Car_Models,subaru crosstrek hybrid
+1221,Subaru,Impreza,2019,2022,,1,subaru,Impreza WRX,3d_registry|Car_Models,subaru impreza
+1222,Subaru,Legacy,2019,2022,,0,,,Car_Models,subaru legacy
+1223,Subaru,Outback,2019,2022,,0,,,Car_Models,subaru outback
+1224,Subaru,WRX,2019,2022,,0,,,Car_Models,subaru wrx
+1225,Suzuki,Across,2023,,,0,,,Car_Models,suzuki across
+1226,Suzuki,Alto,2020,,,0,,,Car_Models,suzuki alto
+1227,Suzuki,Baleno,2023,,,0,,,Car_Models,suzuki baleno
+1228,Suzuki,Celerio,2023,,,0,,,Car_Models,suzuki celerio
+1229,Suzuki,Ciaz,2023,,,0,,,Car_Models,suzuki ciaz
+1230,Suzuki,Ertiga,2018,,,0,,,Car_Models,suzuki ertiga
+1231,Suzuki,Jimny,2023,,,0,,,Car_Models,suzuki jimny
+1232,Suzuki,S-Cross,2023,,,0,,,Car_Models,suzuki s-cross
+1233,Suzuki,Swift,2023,,,0,,,Car_Models,suzuki swift
+1234,Suzuki,Vitara,2023,,,0,,,Car_Models,suzuki vitara
+1235,Suzuki,XL7,2023,,,0,,,Car_Models,suzuki xl7
+1236,Tata,Altroz,2020,,,0,,,Car_Models|Cars_Datasets_2025,tata altroz
+1237,Tata,Altroz CNG,,,,0,,,Cars_Datasets_2025,tata altroz cng
+1238,Tata,Altroz DCA,,,,0,,,Cars_Datasets_2025,tata altroz dca
+1239,Tata,Altroz iTurbo,,,,0,,,Cars_Datasets_2025,tata altroz iturbo
+1240,Tata,Aria,,,,0,,,Cars_Datasets_2025,tata aria
+1241,Tata,Harrier,2019,,,0,,,Car_Models|Cars_Datasets_2025,tata harrier
+1242,Tata,Hexa,,,,0,,,Cars_Datasets_2025,tata hexa
+1243,Tata,Indica eV2,,,,0,,,Cars_Datasets_2025,tata indica ev2
+1244,Tata,Indica V2 Xeta,,,,0,,,Cars_Datasets_2025,tata indica v2 xeta
+1245,Tata,Indigo eCS,,,,0,,,Cars_Datasets_2025,tata indigo ecs
+1246,Tata,Indigo GLX,,,,0,,,Cars_Datasets_2025,tata indigo glx
+1247,Tata,Indigo LX,,,,0,,,Cars_Datasets_2025,tata indigo lx
+1248,Tata,Indigo Marina,,,,0,,,Cars_Datasets_2025,tata indigo marina
+1249,Tata,Manza,,,,0,,,Cars_Datasets_2025,tata manza
+1250,Tata,Nano GenX,,,,0,,,Cars_Datasets_2025,tata nano genx
+1251,Tata,Nexon,2017,,,0,,,Car_Models|Cars_Datasets_2025,tata nexon
+1252,Tata,Nexon EV Max,,,,0,,,Cars_Datasets_2025,tata nexon ev max
+1253,Tata,Nexon EV Prime,,,,0,,,Cars_Datasets_2025,tata nexon ev prime
+1254,Tata,Punch,2020,,,0,,,Car_Models|Cars_Datasets_2025,tata punch
+1255,Tata,Safari,2021,,,0,,,Car_Models|Cars_Datasets_2025,tata safari
+1256,Tata,Sumo Gold,,,,0,,,Cars_Datasets_2025,tata sumo gold
+1257,Tata,Sumo Grande,,,,0,,,Cars_Datasets_2025,tata sumo grande
+1258,Tata,Thar,2020,,,0,,,Car_Models,tata thar
+1259,Tata,Tiago,2016,,,0,,,Car_Models|Cars_Datasets_2025,tata tiago
+1260,Tata,Tiago EV,,,,0,,,Cars_Datasets_2025,tata tiago ev
+1261,Tata,Tiago NRG,,,,0,,,Cars_Datasets_2025,tata tiago nrg
+1262,Tata,Tigor,2017,,,0,,,Car_Models|Cars_Datasets_2025,tata tigor
+1263,Tata,Tigor EV,,,,0,,,Cars_Datasets_2025,tata tigor ev
+1264,Tata,Zest,,,,0,,,Cars_Datasets_2025,tata zest
+1265,Tesla,Cybertruck,,,,1,tesla_cyber,Cybertruck Modified,3d_registry|Cars_Datasets_2025,tesla cybertruck
+1266,Tesla,Model 3,2017,2023,,0,,,Car_Models|Cars_Datasets_2025,tesla model 3
+1267,Tesla,Model 3 Performance,,,,0,,,Cars_Datasets_2025,tesla model 3 performance
+1268,Tesla,Model S,2012,2023,,0,,,Car_Models|Cars_Datasets_2025,tesla model s
+1269,Tesla,Model S Plaid,,,,0,,,Cars_Datasets_2025,tesla model s plaid
+1270,Tesla,Model X,2015,2023,,0,,,Car_Models|Cars_Datasets_2025,tesla model x
+1271,Tesla,Model X Plaid,,,,0,,,Cars_Datasets_2025,tesla model x plaid
+1272,Tesla,Model Y,2020,2023,,0,,,Car_Models|Cars_Datasets_2025,tesla model y
+1273,Tesla,Model Y Long Range,,,,0,,,Cars_Datasets_2025,tesla model y long range
+1274,Tesla,Roadster 2,,,,0,,,Cars_Datasets_2025,tesla roadster 2
+1275,Toyota,4Runner,2018,2021,,0,,,Car_Models|Cars_Datasets_2025,toyota 4runner
+1276,Toyota,4Runner (6th Gen),,,,0,,,Cars_Datasets_2025,toyota 4runner (6th gen)
+1277,Toyota,86,2020,,,0,,,Car_Models|Cars_Datasets_2025,toyota 86
+1278,Toyota,Alphard Executive Lounge,,,,0,,,Cars_Datasets_2025,toyota alphard executive lounge
+1279,Toyota,Avalon,,,,0,,,Cars_Datasets_2025,toyota avalon
+1280,Toyota,Aygo X,,,,0,,,Cars_Datasets_2025,toyota aygo x
+1281,Toyota,BZ3,,,,0,,,Cars_Datasets_2025,toyota bz3
+1282,Toyota,BZ4X,,,,0,,,Cars_Datasets_2025,toyota bz4x
+1283,Toyota,C-hr,,,,0,,,Cars_Datasets_2025,toyota c-hr
+1284,Toyota,Camry,2018,2021,,0,,,Car_Models|Cars_Datasets_2025,toyota camry
+1285,Toyota,Celica,,,,0,,,Cars_Datasets_2025,toyota celica
+1286,Toyota,Century SUV,,,,0,,,Cars_Datasets_2025,toyota century suv
+1287,Toyota,Coaster,,,,0,,,Cars_Datasets_2025,toyota coaster
+1288,Toyota,Corolla,2019,2021,,0,,,Car_Models|Cars_Datasets_2025,toyota corolla
+1289,Toyota,Corolla Cross,,,,0,,,Cars_Datasets_2025,toyota corolla cross
+1290,Toyota,Corolla Hatchback Xse,,,,0,,,Cars_Datasets_2025,toyota corolla hatchback xse
+1291,Toyota,Corolla Sedan Hybrid,,,,0,,,Cars_Datasets_2025,toyota corolla sedan hybrid
+1292,Toyota,Crown,,,,0,,,Cars_Datasets_2025,toyota crown
+1293,Toyota,Crown Signia,,,,0,,,Cars_Datasets_2025,toyota crown signia
+1294,Toyota,Fortuner GR Sport,,,,0,,,Cars_Datasets_2025,toyota fortuner gr sport
+1295,Toyota,GR Corolla,,,,0,,,Cars_Datasets_2025,toyota gr corolla
+1296,Toyota,GR Supra,2020,,,1,toyota_supra,Supra MK5 A90,3d_registry|Car_Models|Cars_Datasets_2025,toyota gr supra
+1297,Toyota,GR Yaris,,,,0,,,Cars_Datasets_2025,toyota gr yaris
+1298,Toyota,GR86,,,,0,,,Cars_Datasets_2025,toyota gr86
+1299,Toyota,Highlander,2019,2021,,0,,,Car_Models|Cars_Datasets_2025,toyota highlander
+1300,Toyota,Highlander Hybrid,,,,0,,,Cars_Datasets_2025,toyota highlander hybrid
+1301,Toyota,Hilux GR Sport,,,,0,,,Cars_Datasets_2025,toyota hilux gr sport
+1302,Toyota,Hilux Revo Rocco,,,,0,,,Cars_Datasets_2025,toyota hilux revo rocco
+1303,Toyota,Innova Hycross,,,,0,,,Cars_Datasets_2025,toyota innova hycross
+1304,Toyota,Land Cruiser,,,,1,toyota_land,2022 Land Cruiser,3d_registry|Cars_Datasets_2025,toyota land cruiser
+1305,Toyota,Land Cruiser 300,,,,0,,,Cars_Datasets_2025,toyota land cruiser 300
+1306,Toyota,Land Cruiser Prado,,,,0,,,Cars_Datasets_2025,toyota land cruiser prado
+1307,Toyota,Mirai,2020,,,0,,,Car_Models|Cars_Datasets_2025,toyota mirai
+1308,Toyota,MR2,,,,0,,,Cars_Datasets_2025,toyota mr2
+1309,Toyota,Prius,2020,,,0,,,Car_Models|Cars_Datasets_2025,toyota prius
+1310,Toyota,Prius Prime,,,,0,,,Cars_Datasets_2025,toyota prius prime
+1311,Toyota,Proace Verso Electric,,,,0,,,Cars_Datasets_2025,toyota proace verso electric
+1312,Toyota,RAV4,2019,2021,,0,,,Car_Models|Cars_Datasets_2025,toyota rav4
+1313,Toyota,RAV4 (6th Gen),,,,0,,,Cars_Datasets_2025,toyota rav4 (6th gen)
+1314,Toyota,Sequoia,,,,0,,,Cars_Datasets_2025,toyota sequoia
+1315,Toyota,Sienna,,,,0,,,Cars_Datasets_2025,toyota sienna
+1316,Toyota,Tacoma,2019,2021,,0,,,Car_Models|Cars_Datasets_2025,toyota tacoma
+1317,Toyota,Tundra,2018,2021,,0,,,Car_Models|Cars_Datasets_2025,toyota tundra
+1318,Toyota,Tundra Hybrid,,,,0,,,Cars_Datasets_2025,toyota tundra hybrid
+1319,Toyota,Tundra I-force Max,,,,0,,,Cars_Datasets_2025,toyota tundra i-force max
+1320,Toyota,Urban Cruiser Taisor,,,,0,,,Cars_Datasets_2025,toyota urban cruiser taisor
+1321,Toyota,Venza,,,,0,,,Cars_Datasets_2025,toyota venza
+1322,Toyota,Yaris,,,,0,,,Cars_Datasets_2025,toyota yaris
+1323,Vauxhall,Combo-Life,2023,,,0,,,Car_Models,vauxhall combo-life
+1324,Vauxhall,Corsa,2023,,,0,,,Car_Models,vauxhall corsa
+1325,Vauxhall,Crossland,2023,,,0,,,Car_Models,vauxhall crossland
+1326,Vauxhall,Grandland,2023,,,0,,,Car_Models,vauxhall grandland
+1327,Vauxhall,Insignia,2023,,,0,,,Car_Models,vauxhall insignia
+1328,Vauxhall,Mokka,2023,,,0,,,Car_Models,vauxhall mokka
+1329,Vauxhall,Vivaro,2023,,,0,,,Car_Models,vauxhall vivaro
+1330,Volkswagen,Amarok,,,,0,,,Cars_Datasets_2025,volkswagen amarok
+1331,Volkswagen,Amarok V6,,,,0,,,Cars_Datasets_2025,volkswagen amarok v6
+1332,Volkswagen,Amarok V8,,,,0,,,Cars_Datasets_2025,volkswagen amarok v8
+1333,Volkswagen,Arteon,,,,0,,,Cars_Datasets_2025,volkswagen arteon
+1334,Volkswagen,Arteon 280 TSI,,,,0,,,Cars_Datasets_2025,volkswagen arteon 280 tsi
+1335,Volkswagen,Arteon 4MOTION,,,,0,,,Cars_Datasets_2025,volkswagen arteon 4motion
+1336,Volkswagen,Arteon R-Line,,,,0,,,Cars_Datasets_2025,volkswagen arteon r-line
+1337,Volkswagen,Arteon Shooting Brake,,,,0,,,Cars_Datasets_2025,volkswagen arteon shooting brake
+1338,Volkswagen,Atlas,2018,2022,,0,,,Car_Models,volkswagen atlas
+1339,Volkswagen,Beetle,,,,0,,,Cars_Datasets_2025,volkswagen beetle
+1340,Volkswagen,Beetle Dune,,,,0,,,Cars_Datasets_2025,volkswagen beetle dune
+1341,Volkswagen,Beetle Final Edition,,,,0,,,Cars_Datasets_2025,volkswagen beetle final edition
+1342,Volkswagen,Bora,,,,0,,,Cars_Datasets_2025,volkswagen bora
+1343,Volkswagen,Caddy,,,,0,,,Cars_Datasets_2025,volkswagen caddy
+1344,Volkswagen,Caddy Maxi,,,,0,,,Cars_Datasets_2025,volkswagen caddy maxi
+1345,Volkswagen,California,,,,0,,,Cars_Datasets_2025,volkswagen california
+1346,Volkswagen,Corrado,,,,0,,,Cars_Datasets_2025,volkswagen corrado
+1347,Volkswagen,Crafter,,,,0,,,Cars_Datasets_2025,volkswagen crafter
+1348,Volkswagen,Fox,,,,0,,,Cars_Datasets_2025,volkswagen fox
+1349,Volkswagen,Golf,1974,2022,,1,vw_golf,VW Golf II,3d_registry|Car_Models|Cars_Datasets_2025,volkswagen golf
+1350,Volkswagen,Golf 4MOTION,,,,0,,,Cars_Datasets_2025,volkswagen golf 4motion
+1351,Volkswagen,Golf Alltrack,,,,0,,,Cars_Datasets_2025,volkswagen golf alltrack
+1352,Volkswagen,Golf Cabriolet,,,,0,,,Cars_Datasets_2025,volkswagen golf cabriolet
+1353,Volkswagen,Golf Country,,,,0,,,Cars_Datasets_2025,volkswagen golf country
+1354,Volkswagen,Golf Electric,,,,0,,,Cars_Datasets_2025,volkswagen golf electric
+1355,Volkswagen,Golf GTE,,,,0,,,Cars_Datasets_2025,volkswagen golf gte
+1356,Volkswagen,Golf GTI,,,,0,,,Cars_Datasets_2025,volkswagen golf gti
+1357,Volkswagen,Golf R,,,,0,,,Cars_Datasets_2025,volkswagen golf r
+1358,Volkswagen,Golf R Cabriolet,,,,0,,,Cars_Datasets_2025,volkswagen golf r cabriolet
+1359,Volkswagen,Golf R32,,,,0,,,Cars_Datasets_2025,volkswagen golf r32
+1360,Volkswagen,Golf Sportsvan,,,,0,,,Cars_Datasets_2025,volkswagen golf sportsvan
+1361,Volkswagen,Golf TCR,,,,0,,,Cars_Datasets_2025,volkswagen golf tcr
+1362,Volkswagen,Golf TDI,,,,0,,,Cars_Datasets_2025,volkswagen golf tdi
+1363,Volkswagen,Golf TGI,,,,0,,,Cars_Datasets_2025,volkswagen golf tgi
+1364,Volkswagen,Golf Variant,,,,0,,,Cars_Datasets_2025,volkswagen golf variant
+1365,Volkswagen,Golf Variant Alltrack,,,,0,,,Cars_Datasets_2025,volkswagen golf variant alltrack
+1366,Volkswagen,Golf Variant GTD,,,,0,,,Cars_Datasets_2025,volkswagen golf variant gtd
+1367,Volkswagen,Golf Variant TDI,,,,0,,,Cars_Datasets_2025,volkswagen golf variant tdi
+1368,Volkswagen,ID. Buzz,,,,0,,,Cars_Datasets_2025,volkswagen id. buzz
+1369,Volkswagen,ID. Buzz Cargo,,,,0,,,Cars_Datasets_2025,volkswagen id. buzz cargo
+1370,Volkswagen,ID. Buzz Cargo EV,,,,0,,,Cars_Datasets_2025,volkswagen id. buzz cargo ev
+1371,Volkswagen,ID. Buzz Cargo Pro,,,,0,,,Cars_Datasets_2025,volkswagen id. buzz cargo pro
+1372,Volkswagen,ID. Buzz Pro,,,,0,,,Cars_Datasets_2025,volkswagen id. buzz pro
+1373,Volkswagen,ID.2,,,,0,,,Cars_Datasets_2025,volkswagen id.2
+1374,Volkswagen,ID.3,,,,0,,,Cars_Datasets_2025,volkswagen id.3
+1375,Volkswagen,ID.3 Gtx,,,,0,,,Cars_Datasets_2025,volkswagen id.3 gtx
+1376,Volkswagen,ID.3 Pro,,,,0,,,Cars_Datasets_2025,volkswagen id.3 pro
+1377,Volkswagen,ID.4,,,,0,,,Cars_Datasets_2025,volkswagen id.4
+1378,Volkswagen,ID.4 Gtx,,,,0,,,Cars_Datasets_2025,volkswagen id.4 gtx
+1379,Volkswagen,ID.4 Pro S,,,,0,,,Cars_Datasets_2025,volkswagen id.4 pro s
+1380,Volkswagen,ID.5,,,,0,,,Cars_Datasets_2025,volkswagen id.5
+1381,Volkswagen,Jetta,1980,2022,,0,,,Car_Models|Cars_Datasets_2025,volkswagen jetta
+1382,Volkswagen,Jetta GLI,,,,0,,,Cars_Datasets_2025,volkswagen jetta gli
+1383,Volkswagen,Jetta GLI 35th,,,,0,,,Cars_Datasets_2025,volkswagen jetta gli 35th
+1384,Volkswagen,Jetta Hybrid,,,,0,,,Cars_Datasets_2025,volkswagen jetta hybrid
+1385,Volkswagen,Jetta SportWagen,,,,0,,,Cars_Datasets_2025,volkswagen jetta sportwagen
+1386,Volkswagen,Karmann Ghia,,,,0,,,Cars_Datasets_2025,volkswagen karmann ghia
+1387,Volkswagen,Lupo,,,,0,,,Cars_Datasets_2025,volkswagen lupo
+1388,Volkswagen,Lupo 3L,,,,0,,,Cars_Datasets_2025,volkswagen lupo 3l
+1389,Volkswagen,Multivan,,,,0,,,Cars_Datasets_2025,volkswagen multivan
+1390,Volkswagen,Passat,1973,2022,,0,,,Car_Models|Cars_Datasets_2025,volkswagen passat
+1391,Volkswagen,Passat Alltrack,,,,0,,,Cars_Datasets_2025,volkswagen passat alltrack
+1392,Volkswagen,Passat Alltrack TDI,,,,0,,,Cars_Datasets_2025,volkswagen passat alltrack tdi
+1393,Volkswagen,Passat B7,,,,0,,,Cars_Datasets_2025,volkswagen passat b7
+1394,Volkswagen,Passat B8,,,,0,,,Cars_Datasets_2025,volkswagen passat b8
+1395,Volkswagen,Passat CC,,,,0,,,Cars_Datasets_2025,volkswagen passat cc
+1396,Volkswagen,Passat Hybrid,,,,0,,,Cars_Datasets_2025,volkswagen passat hybrid
+1397,Volkswagen,Passat Variant,,,,0,,,Cars_Datasets_2025,volkswagen passat variant
+1398,Volkswagen,Phaeton,,,,0,,,Cars_Datasets_2025,volkswagen phaeton
+1399,Volkswagen,Polo,,,,0,,,Cars_Datasets_2025,volkswagen polo
+1400,Volkswagen,Polo Beats,,,,0,,,Cars_Datasets_2025,volkswagen polo beats
+1401,Volkswagen,Polo BlueMotion,,,,0,,,Cars_Datasets_2025,volkswagen polo bluemotion
+1402,Volkswagen,Polo GTI,,,,0,,,Cars_Datasets_2025,volkswagen polo gti
+1403,Volkswagen,Polo GTI Clubsport,,,,0,,,Cars_Datasets_2025,volkswagen polo gti clubsport
+1404,Volkswagen,Polo GTI Plus,,,,0,,,Cars_Datasets_2025,volkswagen polo gti plus
+1405,Volkswagen,Polo GTI R5,,,,0,,,Cars_Datasets_2025,volkswagen polo gti r5
+1406,Volkswagen,Polo TDI,,,,0,,,Cars_Datasets_2025,volkswagen polo tdi
+1407,Volkswagen,Polo Vivo,,,,0,,,Cars_Datasets_2025,volkswagen polo vivo
+1408,Volkswagen,Santana,,,,0,,,Cars_Datasets_2025,volkswagen santana
+1409,Volkswagen,Scirocco,,,,0,,,Cars_Datasets_2025,volkswagen scirocco
+1410,Volkswagen,Scirocco 16V,,,,0,,,Cars_Datasets_2025,volkswagen scirocco 16v
+1411,Volkswagen,Scirocco GTS,,,,0,,,Cars_Datasets_2025,volkswagen scirocco gts
+1412,Volkswagen,Scirocco R,,,,0,,,Cars_Datasets_2025,volkswagen scirocco r
+1413,Volkswagen,Sharan,,,,0,,,Cars_Datasets_2025,volkswagen sharan
+1414,Volkswagen,Sharan Business,,,,0,,,Cars_Datasets_2025,volkswagen sharan business
+1415,Volkswagen,T-Cross,,,,0,,,Cars_Datasets_2025,volkswagen t-cross
+1416,Volkswagen,T-Cross R-Line,,,,0,,,Cars_Datasets_2025,volkswagen t-cross r-line
+1417,Volkswagen,T-Roc,,,,0,,,Cars_Datasets_2025,volkswagen t-roc
+1418,Volkswagen,T-Roc Cabriolet,,,,0,,,Cars_Datasets_2025,volkswagen t-roc cabriolet
+1419,Volkswagen,Taigo,,,,0,,,Cars_Datasets_2025,volkswagen taigo
+1420,Volkswagen,Taos,,,,0,,,Cars_Datasets_2025,volkswagen taos
+1421,Volkswagen,Teramont,,,,0,,,Cars_Datasets_2025,volkswagen teramont
+1422,Volkswagen,Tiguan,2007,2022,,0,,,Car_Models|Cars_Datasets_2025,volkswagen tiguan
+1423,Volkswagen,Tiguan Allspace,,,,0,,,Cars_Datasets_2025,volkswagen tiguan allspace
+1424,Volkswagen,Tiguan eHybrid,,,,0,,,Cars_Datasets_2025,volkswagen tiguan ehybrid
+1425,Volkswagen,Tiguan R-Line,,,,0,,,Cars_Datasets_2025,volkswagen tiguan r-line
+1426,Volkswagen,Touareg,,,,0,,,Cars_Datasets_2025,volkswagen touareg
+1427,Volkswagen,Touareg R,,,,0,,,Cars_Datasets_2025,volkswagen touareg r
+1428,Volkswagen,Touareg V6,,,,0,,,Cars_Datasets_2025,volkswagen touareg v6
+1429,Volkswagen,Touareg V8,,,,0,,,Cars_Datasets_2025,volkswagen touareg v8
+1430,Volkswagen,Transporter,,,,0,,,Cars_Datasets_2025,volkswagen transporter
+1431,Volkswagen,Up!,,,,0,,,Cars_Datasets_2025,volkswagen up!
+1432,Volkswagen,Up! Cabriolet,,,,0,,,Cars_Datasets_2025,volkswagen up! cabriolet
+1433,Volkswagen,Up! e-up!,,,,0,,,Cars_Datasets_2025,volkswagen up! e-up!
+1434,Volkswagen,Up! GTI,,,,0,,,Cars_Datasets_2025,volkswagen up! gti
+1435,Volkswagen,Vento,,,,0,,,Cars_Datasets_2025,volkswagen vento
+1436,Volkswagen,XL1,,,,0,,,Cars_Datasets_2025,volkswagen xl1
+1437,Volvo,C40 Recharge,2023,2024,,0,,,Car_Models,volvo c40 recharge
+1438,Volvo,FE,,,,0,,,Cars_Datasets_2025,volvo fe
+1439,Volvo,FH,,,,0,,,Cars_Datasets_2025,volvo fh
+1440,Volvo,FH16,,,,0,,,Cars_Datasets_2025,volvo fh16
+1441,Volvo,FL,,,,0,,,Cars_Datasets_2025,volvo fl
+1442,Volvo,FM,,,,0,,,Cars_Datasets_2025,volvo fm
+1443,Volvo,FMX,,,,0,,,Cars_Datasets_2025,volvo fmx
+1444,Volvo,S60,2023,2024,,0,,,Car_Models,volvo s60
+1445,Volvo,S90,,,,0,,,Cars_Datasets_2025,volvo s90
+1446,Volvo,V60,2023,2024,,0,,,Car_Models,volvo v60
+1447,Volvo,VHD,,,,0,,,Cars_Datasets_2025,volvo vhd
+1448,Volvo,VNL,,,,0,,,Cars_Datasets_2025,volvo vnl
+1449,Volvo,VNR,,,,0,,,Cars_Datasets_2025,volvo vnr
+1450,Volvo,XC40,2023,2024,,0,,,Car_Models,volvo xc40
+1451,Volvo,XC40 Recharge,2023,2024,,0,,,Car_Models,volvo xc40 recharge
+1452,Volvo,XC60,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,volvo xc60
+1453,Volvo,XC90,2023,2024,,0,,,Car_Models|Cars_Datasets_2025,volvo xc90
+1454,Wiesmann,GT MF4,2009,2013,,0,,,Car_Models,wiesmann gt mf4
+1455,Wiesmann,MF5,2005,2013,,0,,,Car_Models,wiesmann mf5
+1456,Wiesmann,Roadster MF4,2009,2014,,0,,,Car_Models,wiesmann roadster mf4
+1457,Zagato,Alfa Romeo TZ3 Stradale,2011,2013,,0,,,Car_Models,zagato alfa romeo tz3 stradale
+1458,Zagato,Aston Martin DB4 GT Zagato,1961,1962,,0,,,Car_Models,zagato aston martin db4 gt zagato
+1459,Zagato,Aston Martin V12 Zagato,2011,2012,,0,,,Car_Models,zagato aston martin v12 zagato
+1460,Zagato,Bentley Flying Spur Zagato,2012,2014,,0,,,Car_Models,zagato bentley flying spur zagato
+1461,Zagato,Fiat 124 Spider Zagato,2011,2014,,0,,,Car_Models,zagato fiat 124 spider zagato
+1462,Zagato,Jaguar C-Type,1951,1953,,0,,,Car_Models,zagato jaguar c-type

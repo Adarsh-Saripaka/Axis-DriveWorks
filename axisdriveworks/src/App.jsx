@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, lazy, Suspense } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import "./App.css";
 
@@ -6,11 +6,11 @@ import Hero from "./sections/Hero";
 import Footer from "./sections/Footer";
 import Search from "./sections/Search";
 import Showcase from "./sections/Showcase";
-import BrandCard from "./sections/BrandCard";
 import BrandPage from "./sections/BrandPage";
-import ModelsLibrary from "./viewer/ModelsLibrary";
-import ViewerPage from "./viewer/ViewerPage";
 import BookingsPage from "./sections/BookingsPage";
+
+const ModelsLibrary = lazy(() => import("./viewer/ModelsLibrary"));
+const ViewerPage = lazy(() => import("./viewer/ViewerPage"));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -20,7 +20,7 @@ const ScrollToTop = () => {
   return null;
 };
 
-const Home = ({ onSearch }) => {
+const Home = () => {
   const navigate = useNavigate();
 
   const popularBrands = [
@@ -41,7 +41,7 @@ const Home = ({ onSearch }) => {
           <h1 className="title">Axis DriveWorks</h1>
         </div>
 
-        <Search onSearch={onSearch} />
+        <Search />
 
         <div className="nav_right">
           <div className="navlinks">
@@ -114,32 +114,23 @@ export default function App() {
   const location = useLocation();
   const { pathname } = location;
 
-  const handleSearch = (results, query) => {
-    if (!Array.isArray(results) || results.length === 0) {
-      alert("No cars found matching your search.");
-      return;
-    }
-
-    // Direct to showcase with the first result
-    navigate("/showcase", {
-      state: { hero: results[0], brand: results[0].brand }
-    });
-  };
-
   const hideMobileNav = pathname === '/viewer';
 
   return (
     <>
       <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Home onSearch={handleSearch} />} />
-        <Route path="/showcase" element={<Showcase />} />
-        <Route path="/brand/:brand" element={<BrandPage />} />
-        <Route path="/models" element={<ModelsLibrary />} />
-        <Route path="/viewer" element={<ViewerPage />} />
-        <Route path="/bookings" element={<BookingsPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", color: "#00ffff" }}>Loading 3D Showroom...</div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/showcase" element={<Showcase />} />
+          <Route path="/car/:brandSlug/:modelSlug" element={<Showcase />} />
+          <Route path="/brand/:brand" element={<BrandPage />} />
+          <Route path="/models" element={<ModelsLibrary />} />
+          <Route path="/viewer" element={<ViewerPage />} />
+          <Route path="/bookings" element={<BookingsPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
 
       {!hideMobileNav && (
         <nav className="mobile-nav-bar">

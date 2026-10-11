@@ -1,7 +1,6 @@
-const PEXELS_BASE = "https://api.pexels.com/v1/search";
-const PEXELS_KEY = (typeof import.meta !== "undefined" && import.meta.env) 
-  ? (import.meta.env.VITE_PEXELS_API_KEY || import.meta.env.VITE_PEXELS_ACCESS_KEY) 
-  : "";
+// ============================================================================
+// SECTION 1: CLIENT & CONFIGURATION
+// ============================================================================
 
 // Automatically switch between production and development API endpoints
 const RAW_BASE = (typeof import.meta !== "undefined" && import.meta.env)
@@ -9,30 +8,65 @@ const RAW_BASE = (typeof import.meta !== "undefined" && import.meta.env)
   : "http://localhost:5000";
 const BASE_URL = `${RAW_BASE.replace(/\/+$/, "")}/api`;
 
-// =============================================
-// SESSION MANAGEMENT
-// =============================================
+// ============================================================================
+// SECTION 2: SESSION MANAGEMENT
+// ============================================================================
 
 const SESSION_KEY = "adw_session_token";
 const SESSION_EMAIL_KEY = "adw_session_email";
+const SESSION_TS_KEY = "adw_session_ts";
+const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
 
+/**
+ * Retrieves the current session token, automatically expiring sessions older than 24 hours.
+ * @returns {string|null} Session token or null if missing/expired.
+ */
 export function getSessionToken() {
-  return sessionStorage.getItem(SESSION_KEY);
+  const token = sessionStorage.getItem(SESSION_KEY);
+  if (!token) return null;
+
+  const tsStr = sessionStorage.getItem(SESSION_TS_KEY);
+  if (tsStr) {
+    const timestamp = parseInt(tsStr, 10);
+    if (Date.now() - timestamp > SESSION_MAX_AGE_MS) {
+      clearSession();
+      return null;
+    }
+  }
+  return token;
 }
 
+/**
+ * Retrieves the active session user email.
+ * @returns {string|null} Session email or null.
+ */
 export function getSessionEmail() {
+  if (!getSessionToken()) return null;
   return sessionStorage.getItem(SESSION_EMAIL_KEY);
 }
 
+/**
+ * Clears all active session storage items.
+ */
 export function clearSession() {
   sessionStorage.removeItem(SESSION_KEY);
   sessionStorage.removeItem(SESSION_EMAIL_KEY);
+  sessionStorage.removeItem(SESSION_TS_KEY);
 }
 
+/**
+ * Checks if a valid non-expired session exists.
+ * @returns {boolean} True if active session exists.
+ */
 export function hasSession() {
   return !!getSessionToken();
 }
 
+/**
+ * Creates a new session with backend authentication token.
+ * @param {string} email User email address.
+ * @returns {Promise<Object>} Session data.
+ */
 export async function createSession(email) {
   try {
     const res = await fetch(`${BASE_URL}/auth/session`, {
@@ -49,6 +83,7 @@ export async function createSession(email) {
     const data = await res.json();
     sessionStorage.setItem(SESSION_KEY, data.token);
     sessionStorage.setItem(SESSION_EMAIL_KEY, data.email);
+    sessionStorage.setItem(SESSION_TS_KEY, Date.now().toString());
     return data;
   } catch (err) {
     console.error("Session creation failed:", err);
@@ -65,68 +100,116 @@ function getAuthHeaders() {
   return headers;
 }
 
-// =============================================
-// IMAGE FETCHING — DEDUPLICATED + CACHED
-// =============================================
+// ============================================================================
+// SECTION 3: IMAGE ENGINE (QUEUE, LRU CACHE, PROVIDERS)
+// ============================================================================
 
-// Persistent image cache: brand-model → URL (prevents re-randomization and deduplication)
-const imageCache = new Map();
-// Track all used image URLs within a brand to avoid repeats
-const usedImagesByBrand = new Map();
+// --- 3.1 LRU CACHE WITH LOCALSTORAGE PERSISTENCE ---
 
-// Deterministic hash for consistent image selection per model
+class LRUCache {
+  constructor(limit = 200) {
+    this.limit = limit;
+    this.cache = new Map();
+  }
+
+  get(key) {
+    if (!this.cache.has(key)) return undefined;
+    const value = this.cache.get(key);
+    this.cache.delete(key);
+    this.cache.set(key, value);
+    return value;
+  }
+
+  set(key, value) {
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    } else if (this.cache.size >= this.limit) {
+      const oldestKey = this.cache.keys().next().value;
+      this.cache.delete(oldestKey);
+    }
+    this.cache.set(key, value);
+  }
+
+  has(key) {
+    return this.cache.has(key);
+  }
+}
+
+const LOCAL_STORAGE_CACHE_KEY = "adw_image_cache_v1";
+const imageCache = new LRUCache(200);
+const inFlightRequests = new Map(); // Map<cacheKey, Promise<string>>
+
+// Load persisted non-SVG image cache from localStorage on module init
+(function initPersistedCache() {
+  try {
+    const saved = localStorage.getItem(LOCAL_STORAGE_CACHE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        for (const [k, v] of parsed) {
+          if (typeof v === "string" && !v.startsWith("data:image/svg+xml")) {
+            imageCache.set(k, v);
+          }
+        }
+      }
+    }
+  } catch {
+    // Ignore storage read failures
+  }
+})();
+
+let saveTimeout = null;
+function scheduleCacheSave() {
+  if (saveTimeout) clearTimeout(saveTimeout);
+  saveTimeout = setTimeout(() => {
+    try {
+      // Filter out SVG placeholders before saving
+      const entriesToSave = [];
+      for (const [k, v] of imageCache.cache.entries()) {
+        if (typeof v === "string" && !v.startsWith("data:image/svg+xml")) {
+          entriesToSave.push([k, v]);
+        }
+      }
+      localStorage.setItem(LOCAL_STORAGE_CACHE_KEY, JSON.stringify(entriesToSave));
+    } catch {
+      // Ignore storage write failures
+    }
+  }, 1000);
+}
+
 function hashString(str) {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // Convert to 32-bit integer
+    hash = hash & hash;
   }
   return Math.abs(hash);
 }
 
-// Pexels request throttle — max 1 request per 200ms
-let lastPexelsRequest = 0;
-const PEXELS_THROTTLE_MS = 200;
-
-async function throttledFetch(url, options) {
-  const now = Date.now();
-  const waitTime = Math.max(0, PEXELS_THROTTLE_MS - (now - lastPexelsRequest));
-  if (waitTime > 0) {
-    await new Promise(resolve => setTimeout(resolve, waitTime));
-  }
-  lastPexelsRequest = Date.now();
-  return fetch(url, options);
+function escapeXml(str = "") {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
 
-// Exponential backoff retry for rate-limited responses
-async function fetchWithRetry(url, options, maxRetries = 3) {
-  for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    const response = await throttledFetch(url, options);
-
-    if (response.status === 429) {
-      if (attempt < maxRetries) {
-        const retryAfter = parseInt(response.headers.get("Retry-After") || "2", 10);
-        const backoffMs = Math.min(retryAfter * 1000, (2 ** attempt) * 1000);
-        console.warn(`Rate limited (Pexels). Retrying in ${backoffMs}ms...`);
-        await new Promise(resolve => setTimeout(resolve, backoffMs));
-        continue;
-      }
-      return null; // Exhausted retries
-    }
-
-    if (!response.ok) return null;
-    return response;
-  }
-  return null;
-}
-
-// Dynamic SVG banner generator for high-tech cyberpunk placeholder when no web photo is available
+/**
+ * Dynamic SVG banner generator for high-tech cyberpunk placeholder when no web photo is available.
+ * @param {string} carName Vehicle full name.
+ * @param {string} [brand=""] Brand name.
+ * @returns {string} Encoded SVG data URL.
+ */
 export function getCarPlaceholderSvg(carName, brand = "") {
-  const brandName = brand || carName.split(" ")[0] || "Axis";
-  const modelName = carName.replace(brandName, "").trim() || carName;
+  const brandNameRaw = brand || carName.split(" ")[0] || "Axis";
+  const modelNameRaw = carName.replace(brandNameRaw, "").trim() || carName;
+
+  const safeBrandName = escapeXml(brandNameRaw.toUpperCase());
+  const safeModelName = escapeXml(modelNameRaw);
   const hash = hashString(carName);
-  
+
   const accents = [
     { c1: "#00f2fe", c2: "#4facfe" },
     { c1: "#ff0844", c2: "#ffb199" },
@@ -162,255 +245,341 @@ export function getCarPlaceholderSvg(carName, brand = "") {
     </defs>
     <rect width="800" height="500" fill="url(#bgGrad)" />
     <rect width="800" height="500" fill="url(#grid)" />
-    
-    <!-- Horizon Glow -->
     <ellipse cx="400" cy="270" rx="320" ry="80" fill="${accent.c1}" opacity="0.08" filter="url(#neon)" />
-    
-    <!-- Cyber Car Silhouette -->
     <path d="M 180 320 L 220 280 L 310 240 L 490 240 L 580 280 L 620 320 L 590 325 L 560 300 L 470 300 L 440 325 L 360 325 L 330 300 L 240 300 L 210 325 Z" fill="none" stroke="url(#glowGrad)" stroke-width="2.5" filter="url(#neon)" />
     <circle cx="285" cy="315" r="28" fill="#0d1117" stroke="${accent.c1}" stroke-width="2" />
     <circle cx="285" cy="315" r="14" fill="none" stroke="${accent.c2}" stroke-width="1.5" />
     <circle cx="515" cy="315" r="28" fill="#0d1117" stroke="${accent.c1}" stroke-width="2" />
     <circle cx="515" cy="315" r="14" fill="none" stroke="${accent.c2}" stroke-width="1.5" />
-    
-    <!-- Sleek Neon Ground Line -->
     <line x1="120" y1="343" x2="680" y2="343" stroke="url(#glowGrad)" stroke-width="1.5" filter="url(#neon)" opacity="0.7"/>
-    
-    <!-- Brand / Model Text -->
-    <text x="400" y="140" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" letter-spacing="6" fill="${accent.c1}" text-anchor="middle" text-transform="uppercase" opacity="0.9">${brandName}</text>
-    <text x="400" y="195" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="800" letter-spacing="2" fill="#ffffff" text-anchor="middle">${modelName}</text>
+    <text x="400" y="140" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" letter-spacing="6" fill="${accent.c1}" text-anchor="middle" opacity="0.9">${safeBrandName}</text>
+    <text x="400" y="195" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="800" letter-spacing="2" fill="#ffffff" text-anchor="middle">${safeModelName}</text>
     <text x="400" y="420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" letter-spacing="4" fill="rgba(255,255,255,0.4)" text-anchor="middle">AXIS DRIVEWORKS EDITION</text>
   </svg>`;
 
   return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 }
 
-// Fetch automotive image from Wikimedia Commons API (Free, open CORS, unblocked)
-async function fetchWikimediaImage(query) {
-  try {
-    const url = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query + " car")}&gsrnamespace=6&prop=imageinfo&iiprop=url&iiurlwidth=800&format=json&origin=*`;
-    const res = await fetch(url);
-    if (!res.ok) return null;
-    const data = await res.json();
-    if (!data.query || !data.query.pages) return null;
-
-    const pages = Object.values(data.query.pages);
-    for (const page of pages) {
-      const info = page.imageinfo?.[0];
-      const imgUrl = info?.thumburl || info?.url;
-      // Filter out non-photo / svg / small icons
-      if (imgUrl && !imgUrl.endsWith(".svg") && !imgUrl.endsWith(".ogg") && !imgUrl.endsWith(".pdf")) {
-        return imgUrl;
-      }
-    }
-    return null;
-  } catch (err) {
-    return null;
-  }
-}
-
-export async function getCarImage(carName) {
-  // Check cache first — same car always gets the same image
+/**
+ * Fetches an optimal car photo using priority providers (Pexels -> Unsplash -> Pixabay -> Wikimedia).
+ * Features in-flight deduplication, race-safe URL reservation, LRU caching, and abort signal support.
+ * @param {string} carName Vehicle name.
+ * @param {AbortSignal} [signal=null] Optional AbortSignal.
+ * @returns {Promise<string>} Image URL or SVG data URL fallback.
+ */
+export async function getCarImage(carName, signal = null) {
   const cacheKey = carName.trim().toLowerCase();
+
+  // 1. Check LRU Cache
   if (imageCache.has(cacheKey)) {
     return imageCache.get(cacheKey);
   }
 
-  const brand = carName.split(" ")[0];
-  if (!usedImagesByBrand.has(brand)) {
-    usedImagesByBrand.set(brand, new Set());
-  }
-  const usedUrls = usedImagesByBrand.get(brand);
-
-  // 1. Try Wikimedia Commons Open API first (High quality, reliable across networks)
-  try {
-    const wikiImg = await fetchWikimediaImage(carName);
-    if (wikiImg && !usedUrls.has(wikiImg)) {
-      usedUrls.add(wikiImg);
-      imageCache.set(cacheKey, wikiImg);
-      return wikiImg;
-    }
-  } catch (e) {
-    // Ignore and proceed
+  // 2. In-flight Deduplication
+  if (inFlightRequests.has(cacheKey)) {
+    return inFlightRequests.get(cacheKey);
   }
 
-  // 2. If PEXELS_KEY is configured, try Pexels API
-  if (PEXELS_KEY && PEXELS_KEY !== "undefined") {
-    const fetchPexels = async (query, pickIndex) => {
-      try {
-        const url = `${PEXELS_BASE}?query=${encodeURIComponent(query)}&per_page=10`;
-        const response = await fetchWithRetry(url, {
-          headers: { Authorization: PEXELS_KEY }
-        });
-        if (!response) return null;
-        const data = await response.json();
-        if (!data.photos || data.photos.length === 0) return null;
-
-        const results = data.photos;
-        const startIdx = pickIndex % results.length;
-        for (let offset = 0; offset < results.length; offset++) {
-          const idx = (startIdx + offset) % results.length;
-          const candidateUrl = results[idx]?.src?.large2x || results[idx]?.src?.large;
-          if (candidateUrl && !usedUrls.has(candidateUrl)) {
-            usedUrls.add(candidateUrl);
-            return candidateUrl;
-          }
+  const fetchPromise = (async () => {
+    try {
+      const res = await apiRequest(`${BASE_URL}/images?q=${encodeURIComponent(carName)}`, {}, signal);
+      if (res && res.ok) {
+        const data = await res.json();
+        if (data?.url) {
+          imageCache.set(cacheKey, data.url);
+          scheduleCacheSave();
+          return data.url;
         }
-        return results[startIdx]?.src?.large2x || results[startIdx]?.src?.large || null;
-      } catch {
-        return null;
       }
-    };
-
-    const hash = hashString(cacheKey);
-    const pexelsImg = await fetchPexels(`${carName} car`, hash);
-    if (pexelsImg) {
-      imageCache.set(cacheKey, pexelsImg);
-      return pexelsImg;
+    } catch {
+      // Quiet fail to fallback
     }
-  }
 
-  // 3. Fallback to Wikimedia brand search if specific model had no result
+    // Fallback: Cyberpunk SVG
+    const brand = carName.split(" ")[0] || "Car";
+    const fallbackSvg = getCarPlaceholderSvg(carName, brand);
+    imageCache.set(cacheKey, fallbackSvg);
+    return fallbackSvg;
+  })();
+
+  inFlightRequests.set(cacheKey, fetchPromise);
+
   try {
-    const brandImg = await fetchWikimediaImage(brand);
-    if (brandImg) {
-      imageCache.set(cacheKey, brandImg);
-      return brandImg;
-    }
-  } catch (e) {
-    // Ignore and proceed
+    return await fetchPromise;
+  } finally {
+    inFlightRequests.delete(cacheKey);
   }
-
-  // 4. Return custom Cyberpunk SVG card graphic tailored for this vehicle
-  const fallbackSvg = getCarPlaceholderSvg(carName, brand);
-  imageCache.set(cacheKey, fallbackSvg);
-  return fallbackSvg;
 }
 
+// ============================================================================
+// SECTION 4: CAR DATA API (PUBLIC)
+// ============================================================================
 
-// =============================================
-// CAR DATA API (Public)
-// =============================================
-
-async function apiRequest(url, options = {}) {
+async function apiRequest(url, options = {}, signal = null) {
+  const fetchOpts = signal ? { ...options, signal } : options;
   try {
-    const res = await fetch(url, options);
+    let res = await fetch(url, fetchOpts);
 
     if (res.status === 429) {
       const data = await res.json().catch(() => ({}));
       const retryAfter = data.retryAfter || 5;
-      console.warn(`Backend rate limited. Retry after ${retryAfter}s`);
-      // Return a special object so callers can handle it
-      return { rateLimited: true, retryAfter };
+      console.warn(`Backend rate limited. Retrying after ${retryAfter}s once...`);
+
+      await new Promise(r => setTimeout(r, retryAfter * 1000));
+      res = await fetch(url, fetchOpts);
+
+      if (res.status === 429) {
+        return { rateLimited: true, retryAfter };
+      }
     }
 
     if (res.status === 401) {
-      // Session expired — clear it
       clearSession();
       return { authError: true };
     }
 
     return res;
   } catch (err) {
+    if (err.name === "AbortError") {
+      return { aborted: true };
+    }
     console.error("API request failed:", err);
     return null;
   }
 }
 
-export async function searchCars(query) {
+/**
+ * Fetches vehicle suggestions for autocomplete.
+ * @param {string} query Search input.
+ * @param {AbortSignal} [signal=null]
+ * @returns {Promise<Array>} List of suggestion objects.
+ */
+export async function fetchSuggestions(query, signal = null) {
   try {
+    const trimmed = String(query || "").trim();
+    if (trimmed.length < 2) return [];
+
     const res = await apiRequest(
-      `${BASE_URL}/search?q=${encodeURIComponent(query)}`
+      `${BASE_URL}/suggest?q=${encodeURIComponent(trimmed)}`,
+      {},
+      signal
     );
 
-    if (!res || res.rateLimited || res.authError) return [];
+    if (!res || res.rateLimited || res.authError || res.aborted) return [];
     if (!res.ok) return [];
 
     const data = await res.json();
     return Array.isArray(data) ? data : [];
   } catch (err) {
-    console.error("Search request failed:", err);
+    if (err?.name === "AbortError") return [];
+    console.error("Suggest request failed:", err);
     return [];
   }
 }
 
-export async function getAllBrands() {
+/**
+ * Fetches paginated cars for a specific brand.
+ * @param {string} brand Brand name.
+ * @param {number} [page=1] Page number.
+ * @param {AbortSignal} [signal=null]
+ * @returns {Promise<{brand: string, page: number, total: number, totalPages: number, cars: Array}>}
+ */
+export async function fetchBrandCars(brand, page = 1, signal = null) {
   try {
-    const res = await apiRequest(`${BASE_URL}/brands`);
-    if (!res || res.rateLimited || res.authError) return [];
-    if (!res.ok) return [];
+    const res = await apiRequest(
+      `${BASE_URL}/brand/${encodeURIComponent(brand)}/cars?page=${page}`,
+      {},
+      signal
+    );
+
+    if (!res || res.rateLimited || res.authError || res.aborted) {
+      return { brand, page: 1, total: 0, totalPages: 1, cars: [] };
+    }
+    if (!res.ok) {
+      return { brand, page: 1, total: 0, totalPages: 1, cars: [] };
+    }
+
+    const data = await res.json();
+    return data || { brand, page: 1, total: 0, totalPages: 1, cars: [] };
+  } catch (err) {
+    if (err?.name === "AbortError") {
+      return { brand, page: 1, total: 0, totalPages: 1, cars: [] };
+    }
+    console.error("Fetch brand cars failed:", err);
+    return { brand, page: 1, total: 0, totalPages: 1, cars: [] };
+  }
+}
+
+/**
+ * Fetches verified specifications for a vehicle (cached 90 days).
+ * @param {string} brand Vehicle brand.
+ * @param {string} model Vehicle model.
+ * @param {AbortSignal} [signal=null]
+ * @returns {Promise<Object|null>}
+ */
+export async function fetchCarSpecs(brand, model, signal = null) {
+  try {
+    const res = await apiRequest(
+      `${BASE_URL}/car-specs?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`,
+      {},
+      signal
+    );
+
+    if (!res || res.rateLimited || res.authError || res.aborted) return null;
+    if (!res.ok) return null;
+
     return await res.json();
   } catch (err) {
-    return [];
+    if (err?.name === "AbortError") return null;
+    console.error("Fetch car specs failed:", err);
+    return null;
   }
 }
 
-// =============================================
-// RESERVATIONS API (Authenticated)
-// =============================================
-
-export async function bookTestDrive(data) {
+/**
+ * Submits a user report for incorrect specification data.
+ * @param {string} specKey Stable spec_key.
+ * @param {string} message Description of error.
+ * @param {AbortSignal} [signal=null]
+ * @returns {Promise<{ok: boolean, message?: string}>}
+ */
+export async function reportCarSpecs(specKey, message, signal = null) {
   try {
-    // Ensure session exists
+    const res = await apiRequest(
+      `${BASE_URL}/car-specs/report`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ spec_key: specKey, message })
+      },
+      signal
+    );
+
+    if (!res || !res.ok) return { ok: false };
+    const data = await res.json();
+    return { ok: true, message: data.message };
+  } catch (err) {
+    if (err?.name === "AbortError") return { ok: false };
+    console.error("Report car specs failed:", err);
+    return { ok: false };
+  }
+}
+
+// SECTION 5: RESERVATIONS API (AUTHENTICATED)
+// ============================================================================
+
+/**
+ * Submits a test drive reservation.
+ * @param {Object} data Reservation details.
+ * @param {AbortSignal} [signal=null] Optional AbortSignal.
+ * @returns {Promise<{ok: boolean, error?: string}>} Structured result status.
+ */
+export async function bookTestDrive(data, signal = null) {
+  try {
     if (!hasSession()) {
-      throw new Error("No active session. Please authenticate first.");
+      return { ok: false, error: "auth" };
     }
 
     const res = await apiRequest(`${BASE_URL}/reserve`, {
       method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(data)
-    });
+    }, signal);
 
-    if (!res) return false;
-    if (res.rateLimited) return false;
-    if (res.authError) return false;
-    return res.ok;
+    if (!res) return { ok: false, error: "network" };
+    if (res.aborted) return { ok: false, error: "aborted" };
+    if (res.rateLimited) return { ok: false, error: "rate_limited" };
+    if (res.authError) return { ok: false, error: "auth" };
+
+    if (!res.ok) return { ok: false, error: "server" };
+    return { ok: true };
   } catch (err) {
+    if (err?.name === "AbortError") return { ok: false, error: "aborted" };
     console.error("Booking failed:", err);
-    return false;
+    return { ok: false, error: "network" };
   }
 }
 
-export async function getReservations() {
+/**
+ * Fetches user's current reservations.
+ * @param {AbortSignal} [signal=null] Optional AbortSignal.
+ * @returns {Promise<Array>} List of reservation objects.
+ */
+export async function getReservations(signal = null) {
   try {
     if (!hasSession()) return [];
 
     const res = await apiRequest(`${BASE_URL}/reservations`, {
       headers: getAuthHeaders()
-    });
+    }, signal);
 
-    if (!res || res.rateLimited || res.authError) return [];
+    if (!res || res.rateLimited || res.authError || res.aborted) return [];
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
+    if (err?.name === "AbortError") return [];
     console.error("Failed to fetch reservations:", err);
     return [];
   }
 }
 
-export async function markReservationComplete(id) {
+/**
+ * Marks a specific reservation complete.
+ * @param {string|number} id Reservation ID.
+ * @param {AbortSignal} [signal=null] Optional AbortSignal.
+ * @returns {Promise<{ok: boolean, error?: string}>} Structured result status.
+ */
+export async function markReservationComplete(id, signal = null) {
   try {
-    if (!hasSession()) return;
+    if (!hasSession()) {
+      return { ok: false, error: "auth" };
+    }
 
-    await apiRequest(`${BASE_URL}/reservations/${id}/complete`, {
+    const res = await apiRequest(`${BASE_URL}/reservations/${id}/complete`, {
       method: "PUT",
       headers: getAuthHeaders()
-    });
+    }, signal);
+
+    if (!res) return { ok: false, error: "network" };
+    if (res.aborted) return { ok: false, error: "aborted" };
+    if (res.rateLimited) return { ok: false, error: "rate_limited" };
+    if (res.authError) return { ok: false, error: "auth" };
+    if (!res.ok) return { ok: false, error: "server" };
+
+    return { ok: true };
   } catch (err) {
+    if (err?.name === "AbortError") return { ok: false, error: "aborted" };
     console.error("Failed to update reservation:", err);
+    return { ok: false, error: "network" };
   }
 }
 
-export async function clearCompletedReservations() {
+/**
+ * Clears all completed user reservations.
+ * @param {AbortSignal} [signal=null] Optional AbortSignal.
+ * @returns {Promise<{ok: boolean, error?: string}>} Structured result status.
+ */
+export async function clearCompletedReservations(signal = null) {
   try {
-    if (!hasSession()) return;
+    if (!hasSession()) {
+      return { ok: false, error: "auth" };
+    }
 
-    await apiRequest(`${BASE_URL}/reservations/completed`, {
+    const res = await apiRequest(`${BASE_URL}/reservations/completed`, {
       method: "DELETE",
       headers: getAuthHeaders()
-    });
+    }, signal);
+
+    if (!res) return { ok: false, error: "network" };
+    if (res.aborted) return { ok: false, error: "aborted" };
+    if (res.rateLimited) return { ok: false, error: "rate_limited" };
+    if (res.authError) return { ok: false, error: "auth" };
+    if (!res.ok) return { ok: false, error: "server" };
+
+    return { ok: true };
   } catch (err) {
+    if (err?.name === "AbortError") return { ok: false, error: "aborted" };
     console.error("Failed to clear reservations:", err);
+    return { ok: false, error: "network" };
   }
 }

@@ -30,7 +30,7 @@ export default function ViewerPage() {
       const dataURL = canvas.toDataURL("image/png");
       const link = document.createElement("a");
       link.href = dataURL;
-      link.download = `autovision_snapshot_${Date.now()}.png`;
+      link.download = `axisdriveworks_snapshot_${Date.now()}.png`;
       link.click();
     }
   };

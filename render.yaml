@@ -5,7 +5,7 @@ services:
     runtime: node
     plan: free
     rootDir: axisdriveworks-backend
-    buildCommand: npm install
+    buildCommand: npm install && node scripts/seedCarNames.js
     startCommand: npm start
     envVars:
       - key: PORT
@@ -23,5 +23,3 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://axis-driveworks-backend.onrender.com
-      - key: VITE_UNSPLASH_ACCESS_KEY
-        value: Z0FOl7pQ7-mLxc8UvCma-j2M3rtAYiwnGmotIMGP3uM

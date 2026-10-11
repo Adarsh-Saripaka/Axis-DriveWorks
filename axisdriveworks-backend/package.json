@@ -7,6 +7,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
+    "seed": "node scripts/seedCarNames.js",
+    "prefill": "node scripts/prefillSpecs.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -17,6 +19,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "helmet": "^8.3.0",
     "sqlite": "^5.1.1",
     "sqlite3": "^6.0.1"
   }

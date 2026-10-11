@@ -5,7 +5,6 @@ import {
   Html,
   useProgress,
   ContactShadows,
-  Center,
   Environment,
   Grid
 } from "@react-three/drei";

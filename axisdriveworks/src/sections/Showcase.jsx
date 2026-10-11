@@ -34,6 +34,7 @@ export default function Showcase() {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [bookingError, setBookingError] = useState("");
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
 
   // Report modal state
   const [showReportModal, setShowReportModal] = useState(false);
@@ -136,40 +137,47 @@ export default function Showcase() {
 
   const handleBookTestDrive = async (e) => {
     e.preventDefault();
+    if (bookingSubmitting) return;
+
     setBookingError("");
+    setBookingSubmitting(true);
 
     const data = new FormData(e.target);
-    const email = data.get("email");
-    const name = data.get("name");
-    const date = data.get("date");
+    const email = String(data.get("email") || "").trim();
+    const name = String(data.get("name") || "").trim();
+    const date = String(data.get("date") || "").trim();
 
     try {
-      if (!hasSession() || getSessionEmail() !== email.toLowerCase().trim()) {
-        await createSession(email);
+      if (!hasSession() || getSessionEmail() !== email.toLowerCase()) {
+        await createSession(email).catch(() => {});
       }
 
       const newBooking = {
         car_brand: brandName,
         car_model: modelName,
-        name: name,
-        date: date
+        name,
+        email,
+        date,
+        spec_key: specKey
       };
 
       const result = await bookTestDrive(newBooking);
-      const ok = typeof result === "object" ? result.ok : Boolean(result);
 
-      if (ok) {
+      if (result && result.ok) {
         setBookingSuccess(true);
         setTimeout(() => {
           setShowBookingModal(false);
           setBookingSuccess(false);
+          setBookingSubmitting(false);
           navigate("/bookings");
-        }, 2000);
+        }, 1800);
       } else {
-        setBookingError("Failed to book test drive. Please verify your details.");
+        setBookingError(result?.error || "Failed to book test drive. Please verify your details.");
+        setBookingSubmitting(false);
       }
     } catch (err) {
       setBookingError(err.message || "Booking failed.");
+      setBookingSubmitting(false);
     }
   };
 
@@ -285,15 +293,20 @@ export default function Showcase() {
             </p>
 
             <div className="spec-table">
-              {specs.horsepower_hp && <Spec label="Horsepower" value={`${specs.horsepower_hp} HP`} />}
-              {specs.torque_nm && <Spec label="Torque" value={`${specs.torque_nm} Nm`} />}
-              {specs.zero_to_100_kmh_s && <Spec label="0–100 km/h" value={`${specs.zero_to_100_kmh_s}s`} />}
-              {specs.top_speed_kmh && <Spec label="Top Speed" value={`${specs.top_speed_kmh} km/h`} />}
-              {specs.displacement_cc && <Spec label="Engine Displacement" value={`${specs.displacement_cc} cc`} />}
-              {specs.cylinders && <Spec label="Cylinders" value={`${specs.cylinders}`} />}
-              {specs.curb_weight_kg && <Spec label="Curb Weight" value={`${specs.curb_weight_kg} kg`} />}
-              {specs.seats && <Spec label="Seating" value={`${specs.seats} Seats`} />}
-              {specs.doors && <Spec label="Doors" value={`${specs.doors} Doors`} />}
+              {specs.horsepower_hp && <Spec label="Horsepower: " value={`${specs.horsepower_hp} HP`} />}
+              {specs.torque_nm && <Spec label="Torque: " value={`${specs.torque_nm} Nm`} />}
+              {specs.zero_to_100_kmh_s && <Spec label="0–100 km/h: " value={`${specs.zero_to_100_kmh_s}s`} />}
+              {specs.top_speed_kmh && <Spec label="Top Speed: " value={`${specs.top_speed_kmh} km/h`} />}
+              {specs.displacement_cc && <Spec label="Engine Displacement: " value={`${specs.displacement_cc} cc`} />}
+              {specs.cylinders && <Spec label="Cylinders: " value={`${specs.cylinders}`} />}
+              {specs.curb_weight_kg && <Spec label="Curb Weight: " value={`${specs.curb_weight_kg} kg`} />}
+              {specs.seats && <Spec label="Seating: " value={`${specs.seats} Seats`} />}
+              {specs.doors && <Spec label="Doors: " value={`${specs.doors} Doors`} />}
+              {!specs.horsepower_hp && !specs.torque_nm && (
+                <div className="spec-baseline-notice">
+                  <p>{specs.notes || "Baseline vehicle catalog entry. Deep specifications are actively compiling."}</p>
+                </div>
+              )}
             </div>
 
             {/* CITATIONS & SOURCES */}
@@ -365,8 +378,8 @@ export default function Showcase() {
 
                   {bookingError && <p className="booking-error">{bookingError}</p>}
 
-                  <button type="submit" className="primary-btn submit-btn">
-                    Confirm Reservation
+                  <button type="submit" className="primary-btn submit-btn" disabled={bookingSubmitting}>
+                    {bookingSubmitting ? "Confirming Reservation..." : "Confirm Reservation"}
                   </button>
                 </form>
               )}

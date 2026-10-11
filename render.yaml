@@ -7,11 +7,23 @@ services:
     rootDir: axisdriveworks-backend
     buildCommand: npm install && node scripts/seedCarNames.js
     startCommand: npm start
+    disk:
+      name: cardata
+      mountPath: /opt/render/project/src/axisdriveworks-backend/data
+      sizeGB: 1
     envVars:
       - key: PORT
         value: 10000
       - key: FRONTEND_URL
         value: https://axis-driveworks-frontend.onrender.com
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SERPER_API_KEY
+        sync: false
+      - key: UNSPLASH_ACCESS_KEY
+        sync: false
+      - key: ADMIN_TOKEN
+        sync: false
 
   # Frontend Static Site
   - type: web
@@ -20,6 +32,11 @@ services:
     rootDir: axisdriveworks
     buildCommand: npm install && npm run build
     staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: VITE_API_URL
         value: https://axis-driveworks-backend.onrender.com
+

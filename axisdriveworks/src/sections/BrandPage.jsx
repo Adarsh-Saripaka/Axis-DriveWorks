@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchBrandCars, getCarImage } from "../Api/FetchApi";
+import { fetchBrandCars, getCarImage, prefetchCarSpecs } from "../Api/FetchApi";
 import VehicleCard from "./VehicleCard";
 import "./BrandPage.css";
 
@@ -100,6 +100,7 @@ export default function BrandPage() {
                     price={car.year_start ? `${car.year_start}${car.year_end ? `–${car.year_end}` : "+"}` : "Specs"}
                     feature={car.has_3d_model ? "3D Showroom Available" : (car.body_style || "Production")}
                     image={images[key]}
+                    onMouseEnter={() => prefetchCarSpecs(car.brand, car.model)}
                     onView={() => navigate(`/car/${car.brand_slug}/${car.model_slug}`)}
                   />
                 );

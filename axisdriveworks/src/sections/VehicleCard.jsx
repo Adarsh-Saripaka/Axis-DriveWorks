@@ -2,7 +2,7 @@ import React, { useRef } from "react";
 import { getCarPlaceholderSvg } from "../Api/FetchApi";
 import "./VehicleCard.css";
 
-const VehicleCard = ({ name, brand, price, feature, image, onView }) => {
+const VehicleCard = ({ name, brand, price, feature, image, onView, onMouseEnter }) => {
   const cardRef = useRef();
 
   const handleMouseMove = (e) => {
@@ -30,10 +30,17 @@ const VehicleCard = ({ name, brand, price, feature, image, onView }) => {
 
   const placeholder = getCarPlaceholderSvg(name || "Car", brand || "Axis");
 
+  // Format price safely to avoid NaN output
+  const isNumericPrice = typeof price === "number" || (price && !isNaN(Number(price)) && !String(price).includes("–"));
+  const priceDisplay = isNumericPrice
+    ? `Price: $${Number(price).toLocaleString()}`
+    : (price ? `Years: ${price}` : "Specs on File");
+
   return (
     <div 
       className="CarCard-wrapper"
       style={{ perspective: '1000px' }}
+      onMouseEnter={onMouseEnter}
     >
       <div 
         className="CarCard"
@@ -59,11 +66,11 @@ const VehicleCard = ({ name, brand, price, feature, image, onView }) => {
             />
           </div>
 
-          <p className="brand">Brand Name: {brand}</p>
-          <p className="price">Price: ${price ? Number(price).toLocaleString() : 'N/A'}</p>
-          <p className="feature">Feature: {feature}</p>
+          <p className="brand">Brand: {brand}</p>
+          <p className="price">{priceDisplay}</p>
+          <p className="feature">{feature}</p>
 
-          <button className="details" onClick={onView}>
+          <button className="details" onClick={onView} aria-label={`View specifications for ${brand} ${name}`}>
             View Details
           </button>
         </div>

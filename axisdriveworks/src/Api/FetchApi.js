@@ -91,7 +91,7 @@ export async function createSession(email) {
   }
 }
 
-function getAuthHeaders() {
+export function getAuthHeaders() {
   const token = getSessionToken();
   const headers = { "Content-Type": "application/json" };
   if (token) {
@@ -419,14 +419,16 @@ export async function fetchBrandCars(brand, page = 1, signal = null) {
  */
 export async function fetchCarSpecs(brand, model, signal = null) {
   try {
-    const res = await apiRequest(
+    const res = await fetch(
       `${BASE_URL}/car-specs?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`,
-      {},
-      signal
+      { signal }
     );
 
-    if (!res || res.rateLimited || res.authError || res.aborted) return null;
-    if (!res.ok) return null;
+    if (!res || !res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      console.warn("Car specs fetch returned non-200:", res?.status, errData);
+      return null;
+    }
 
     return await res.json();
   } catch (err) {
@@ -445,14 +447,14 @@ export async function fetchCarSpecs(brand, model, signal = null) {
  */
 export async function reportCarSpecs(specKey, message, signal = null) {
   try {
-    const res = await apiRequest(
+    const res = await fetch(
       `${BASE_URL}/car-specs/report`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ spec_key: specKey, message })
-      },
-      signal
+        body: JSON.stringify({ spec_key: specKey, message }),
+        signal
+      }
     );
 
     if (!res || !res.ok) return { ok: false };
@@ -465,55 +467,114 @@ export async function reportCarSpecs(specKey, message, signal = null) {
   }
 }
 
-// SECTION 5: RESERVATIONS API (AUTHENTICATED)
+// ============================================================================
+// SECTION 5: RESERVATIONS API (AUTHENTICATED & TOKEN-SCOPED)
 // ============================================================================
 
+const MANAGE_TOKENS_KEY = "adw_manage_tokens";
+
 /**
- * Submits a test drive reservation.
- * @param {Object} data Reservation details.
- * @param {AbortSignal} [signal=null] Optional AbortSignal.
- * @returns {Promise<{ok: boolean, error?: string}>} Structured result status.
+ * Retrieves stored user booking manage tokens from localStorage.
+ * @returns {string[]}
  */
-export async function bookTestDrive(data, signal = null) {
+export function getManageTokens() {
   try {
-    if (!hasSession()) {
-      return { ok: false, error: "auth" };
-    }
-
-    const res = await apiRequest(`${BASE_URL}/reserve`, {
-      method: "POST",
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data)
-    }, signal);
-
-    if (!res) return { ok: false, error: "network" };
-    if (res.aborted) return { ok: false, error: "aborted" };
-    if (res.rateLimited) return { ok: false, error: "rate_limited" };
-    if (res.authError) return { ok: false, error: "auth" };
-
-    if (!res.ok) return { ok: false, error: "server" };
-    return { ok: true };
-  } catch (err) {
-    if (err?.name === "AbortError") return { ok: false, error: "aborted" };
-    console.error("Booking failed:", err);
-    return { ok: false, error: "network" };
+    const raw = localStorage.getItem(MANAGE_TOKENS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
   }
 }
 
 /**
- * Fetches user's current reservations.
+ * Persists a new booking manage token to localStorage.
+ * @param {string} token
+ */
+export function saveManageToken(token) {
+  if (!token) return;
+  try {
+    const tokens = getManageTokens();
+    if (!tokens.includes(token)) {
+      tokens.unshift(token);
+      localStorage.setItem(MANAGE_TOKENS_KEY, JSON.stringify(tokens.slice(0, 50)));
+    }
+  } catch (err) {
+    console.warn("Failed to store manage_token:", err);
+  }
+}
+
+/**
+ * Pre-fetches vehicle specs and image into server cache on card hover.
+ * @param {string} brand
+ * @param {string} model
+ */
+export function prefetchCarSpecs(brand, model) {
+  if (!brand || !model) return;
+  fetch(`${BASE_URL}/car-specs?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`).catch(() => {});
+}
+
+/**
+ * Submits a test drive reservation. Returns manage_token.
+ * @param {Object} data Reservation details.
+ * @param {AbortSignal} [signal=null] Optional AbortSignal.
+ * @returns {Promise<{ok: boolean, id?: number, manage_token?: string, error?: string}>}
+ */
+export async function bookTestDrive(data, signal = null) {
+  try {
+    const headers = { "Content-Type": "application/json" };
+    const token = getSessionToken();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(`${BASE_URL}/reserve`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(data),
+      signal
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      return { ok: false, error: errData.error || `Server responded with ${res.status}` };
+    }
+
+    const result = await res.json();
+    if (result.manage_token) {
+      saveManageToken(result.manage_token);
+    }
+
+    return {
+      ok: true,
+      id: result.id,
+      manage_token: result.manage_token,
+      message: result.message
+    };
+  } catch (err) {
+    if (err?.name === "AbortError") return { ok: false, error: "aborted" };
+    console.error("Booking failed:", err);
+    return { ok: false, error: err.message || "Network error" };
+  }
+}
+
+/**
+ * Fetches user's current reservations (scoped to session email or stored manage_tokens).
  * @param {AbortSignal} [signal=null] Optional AbortSignal.
  * @returns {Promise<Array>} List of reservation objects.
  */
 export async function getReservations(signal = null) {
   try {
-    if (!hasSession()) return [];
+    const headers = {};
+    const token = getSessionToken();
+    const manageTokens = getManageTokens();
 
-    const res = await apiRequest(`${BASE_URL}/reservations`, {
-      headers: getAuthHeaders()
-    }, signal);
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    } else if (manageTokens.length > 0) {
+      headers["x-manage-token"] = manageTokens[0];
+    } else {
+      return [];
+    }
 
-    if (!res || res.rateLimited || res.authError || res.aborted) return [];
+    const res = await fetch(`${BASE_URL}/reservations`, { headers, signal });
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
@@ -524,62 +585,116 @@ export async function getReservations(signal = null) {
 }
 
 /**
+ * Cancels a reservation by ID.
+ * @param {string|number} id
+ * @param {AbortSignal} [signal=null]
+ * @returns {Promise<{ok: boolean, error?: string}>}
+ */
+export async function cancelReservation(id, signal = null) {
+  try {
+    const headers = {};
+    const token = getSessionToken();
+    const manageTokens = getManageTokens();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    else if (manageTokens.length > 0) headers["x-manage-token"] = manageTokens[0];
+
+    const res = await fetch(`${BASE_URL}/reservations/${id}`, {
+      method: "DELETE",
+      headers,
+      signal
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { ok: false, error: err.error || "Failed to cancel reservation." };
+    }
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err.message || "Network error" };
+  }
+}
+
+/**
+ * Reschedules a reservation to a new date.
+ * @param {string|number} id
+ * @param {string} newDate YYYY-MM-DD
+ * @param {AbortSignal} [signal=null]
+ * @returns {Promise<{ok: boolean, date?: string, error?: string}>}
+ */
+export async function rescheduleReservation(id, newDate, signal = null) {
+  try {
+    const headers = { "Content-Type": "application/json" };
+    const token = getSessionToken();
+    const manageTokens = getManageTokens();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    else if (manageTokens.length > 0) headers["x-manage-token"] = manageTokens[0];
+
+    const res = await fetch(`${BASE_URL}/reservations/${id}/reschedule`, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify({ date: newDate }),
+      signal
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      return { ok: false, error: err.error || "Failed to reschedule reservation." };
+    }
+    return { ok: true, date: newDate };
+  } catch (err) {
+    return { ok: false, error: err.message || "Network error" };
+  }
+}
+
+/**
  * Marks a specific reservation complete.
  * @param {string|number} id Reservation ID.
  * @param {AbortSignal} [signal=null] Optional AbortSignal.
- * @returns {Promise<{ok: boolean, error?: string}>} Structured result status.
+ * @returns {Promise<{ok: boolean, error?: string}>}
  */
 export async function markReservationComplete(id, signal = null) {
   try {
-    if (!hasSession()) {
-      return { ok: false, error: "auth" };
-    }
+    const headers = {};
+    const token = getSessionToken();
+    const manageTokens = getManageTokens();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    else if (manageTokens.length > 0) headers["x-manage-token"] = manageTokens[0];
 
-    const res = await apiRequest(`${BASE_URL}/reservations/${id}/complete`, {
+    const res = await fetch(`${BASE_URL}/reservations/${id}/complete`, {
       method: "PUT",
-      headers: getAuthHeaders()
-    }, signal);
+      headers,
+      signal
+    });
 
-    if (!res) return { ok: false, error: "network" };
-    if (res.aborted) return { ok: false, error: "aborted" };
-    if (res.rateLimited) return { ok: false, error: "rate_limited" };
-    if (res.authError) return { ok: false, error: "auth" };
-    if (!res.ok) return { ok: false, error: "server" };
-
+    if (!res.ok) return { ok: false };
     return { ok: true };
   } catch (err) {
-    if (err?.name === "AbortError") return { ok: false, error: "aborted" };
-    console.error("Failed to update reservation:", err);
-    return { ok: false, error: "network" };
+    return { ok: false, error: err.message };
   }
 }
 
 /**
  * Clears all completed user reservations.
  * @param {AbortSignal} [signal=null] Optional AbortSignal.
- * @returns {Promise<{ok: boolean, error?: string}>} Structured result status.
+ * @returns {Promise<{ok: boolean, error?: string}>}
  */
 export async function clearCompletedReservations(signal = null) {
   try {
-    if (!hasSession()) {
-      return { ok: false, error: "auth" };
-    }
+    const headers = {};
+    const token = getSessionToken();
+    const manageTokens = getManageTokens();
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    else if (manageTokens.length > 0) headers["x-manage-token"] = manageTokens[0];
 
-    const res = await apiRequest(`${BASE_URL}/reservations/completed`, {
+    const res = await fetch(`${BASE_URL}/reservations/completed`, {
       method: "DELETE",
-      headers: getAuthHeaders()
-    }, signal);
+      headers,
+      signal
+    });
 
-    if (!res) return { ok: false, error: "network" };
-    if (res.aborted) return { ok: false, error: "aborted" };
-    if (res.rateLimited) return { ok: false, error: "rate_limited" };
-    if (res.authError) return { ok: false, error: "auth" };
-    if (!res.ok) return { ok: false, error: "server" };
-
+    if (!res.ok) return { ok: false };
     return { ok: true };
-  } catch (err) {
-    if (err?.name === "AbortError") return { ok: false, error: "aborted" };
-    console.error("Failed to clear reservations:", err);
-    return { ok: false, error: "network" };
+  } catch {
+    return { ok: false };
   }
 }

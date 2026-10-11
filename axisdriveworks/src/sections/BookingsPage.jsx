@@ -3,21 +3,26 @@ import { useNavigate } from "react-router-dom";
 import {
   getReservations,
   markReservationComplete,
+  cancelReservation,
+  rescheduleReservation,
   clearCompletedReservations,
   hasSession,
   createSession,
   getSessionEmail,
-  clearSession
+  clearSession,
+  getManageTokens
 } from "../Api/FetchApi";
 import "./BookingsPage.css";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [email, setEmail] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(hasSession());
+  const [isAuthenticated, setIsAuthenticated] = useState(hasSession() || getManageTokens().length > 0);
   const [authError, setAuthError] = useState("");
   const [loading, setLoading] = useState(false);
   const [actionError, setActionError] = useState("");
+  const [reschedulingId, setReschedulingId] = useState(null);
+  const [newDate, setNewDate] = useState("");
   const navigate = useNavigate();
 
   const getErrorMessage = (errType) => {
@@ -33,7 +38,7 @@ export default function BookingsPage() {
       setLoading(true);
       getReservations()
         .then(data => {
-          setBookings(data);
+          setBookings(data || []);
         })
         .finally(() => setLoading(false));
     }
@@ -76,6 +81,31 @@ export default function BookingsPage() {
         clearSession();
       }
       setActionError(getErrorMessage(error));
+    }
+  };
+
+  const handleCancelBooking = async (id) => {
+    if (!window.confirm("Are you sure you want to cancel this test drive?")) return;
+    setActionError("");
+    const res = await cancelReservation(id);
+    if (res.ok) {
+      setBookings(prev => prev.filter(b => b.id !== id));
+    } else {
+      setActionError(res.error || "Failed to cancel reservation.");
+    }
+  };
+
+  const handleRescheduleBooking = async (e, id) => {
+    e.preventDefault();
+    if (!newDate) return;
+    setActionError("");
+    const res = await rescheduleReservation(id, newDate);
+    if (res.ok) {
+      setBookings(prev => prev.map(b => b.id === id ? { ...b, date: newDate, completed: 0 } : b));
+      setReschedulingId(null);
+      setNewDate("");
+    } else {
+      setActionError(res.error || "Failed to reschedule reservation.");
     }
   };
 
@@ -184,12 +214,70 @@ export default function BookingsPage() {
                       <span className="tick-mark">✓</span> Test Drive Completed
                     </div>
                   ) : (
-                    <button
-                      className="test-drive-btn"
-                      onClick={() => handleTestDrive(booking)}
-                    >
-                      START 3D TEST DRIVE
-                    </button>
+                    <div className="booking-actions-group">
+                      <button
+                        className="test-drive-btn"
+                        onClick={() => handleTestDrive(booking)}
+                      >
+                        START 3D TEST DRIVE
+                      </button>
+
+                      {reschedulingId === booking.id ? (
+                        <form onSubmit={(e) => handleRescheduleBooking(e, booking.id)} className="reschedule-form">
+                          <input
+                            type="date"
+                            required
+                            min={new Date().toISOString().split("T")[0]}
+                            value={newDate}
+                            onChange={(e) => setNewDate(e.target.value)}
+                            style={{
+                              width: "100%",
+                              padding: "8px 12px",
+                              borderRadius: "6px",
+                              border: "1px solid rgba(0,255,255,0.4)",
+                              background: "rgba(0,0,0,0.6)",
+                              color: "#fff",
+                              marginTop: "8px"
+                            }}
+                          />
+                          <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
+                            <button type="submit" className="test-drive-btn" style={{ padding: "6px 12px", fontSize: "0.85rem" }}>
+                              Save Date
+                            </button>
+                            <button
+                              type="button"
+                              className="logout-btn"
+                              style={{ padding: "6px 12px", fontSize: "0.85rem" }}
+                              onClick={() => setReschedulingId(null)}
+                            >
+                              Dismiss
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+                          <button
+                            type="button"
+                            className="clear-btn"
+                            style={{ flex: 1, padding: "8px 12px", fontSize: "0.85rem" }}
+                            onClick={() => {
+                              setReschedulingId(booking.id);
+                              setNewDate(booking.date);
+                            }}
+                          >
+                            Reschedule
+                          </button>
+                          <button
+                            type="button"
+                            className="logout-btn"
+                            style={{ flex: 1, padding: "8px 12px", fontSize: "0.85rem", borderColor: "rgba(255,80,80,0.5)", color: "#ff6666" }}
+                            onClick={() => handleCancelBooking(booking.id)}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
                 <div className="card-reflection" />

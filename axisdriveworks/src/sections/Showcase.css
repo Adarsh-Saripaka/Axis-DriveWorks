@@ -720,3 +720,59 @@
   color: #8fa5ba;
   max-width: 500px;
 }
+
+/* =============================================
+   CONFIDENCE BADGES
+   ============================================= */
+.confidence-badge {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-transform: uppercase;
+  backdrop-filter: blur(8px);
+}
+
+.confidence-high {
+  background: rgba(0, 255, 170, 0.12);
+  color: #00ffaa;
+  border: 1px solid rgba(0, 255, 170, 0.35);
+}
+
+.confidence-medium {
+  background: rgba(255, 190, 0, 0.12);
+  color: #ffbe00;
+  border: 1px solid rgba(255, 190, 0, 0.35);
+}
+
+.confidence-low {
+  background: rgba(255, 80, 80, 0.12);
+  color: #ff5050;
+  border: 1px solid rgba(255, 80, 80, 0.35);
+}
+
+.confidence-baseline {
+  background: rgba(0, 200, 255, 0.12);
+  color: #00c8ff;
+  border: 1px solid rgba(0, 200, 255, 0.35);
+}
+
+.spec-baseline-notice {
+  grid-column: 1 / -1;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 10px 0;
+}
+
+.spec-baseline-notice p {
+  font-size: 0.9rem;
+  color: #8fa5ba;
+  line-height: 1.5;
+  margin: 0;
+}

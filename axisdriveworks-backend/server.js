@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import helmet from "helmet";
+import compression from "compression";
 import { registerSuggestRoute } from "./lib/suggestRoute.js";
 import { registerCarSpecsRoute } from "./lib/carSpecsRoute.js";
 import { runMigrations } from "./lib/migrations.js";
@@ -18,6 +19,12 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Enable reverse proxy support for Render / load balancers
+app.set("trust proxy", 1);
+
+// HTTP compression for all JSON / API responses
+app.use(compression());
 
 // Session secret — in production, use a strong env var
 const SESSION_SECRET = process.env.SESSION_SECRET || "axis-driveworks-secret-key-change-in-production";
@@ -151,9 +158,18 @@ setInterval(() => {
 // =============================================
 
 const assetsPath = path.join(__dirname, "data", "axisdriveworks-3d-assets");
-app.use("/assets", express.static(assetsPath));
+app.use(
+  "/assets",
+  express.static(assetsPath, {
+    maxAge: "365d",
+    immutable: true,
+    setHeaders: (res) => {
+      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    }
+  })
+);
 
-console.log("🛠️  Assets being served from:", assetsPath);
+console.log("🛠️  Assets being served with immutable cache from:", assetsPath);
 
 // Request logging (development)
 if (process.env.NODE_ENV !== "production") {
@@ -385,49 +401,139 @@ app.get("/api/brand/:brand/cars", async (req, res) => {
 
 // --- Reservations (Authenticated + Scoped by Email) ---
 
-app.post("/api/reserve", requireSession, async (req, res) => {
+// Resolves authorization from Bearer token, x-manage-token header, or query param
+function resolveUserAccess(req) {
+  const authHeader = req.headers.authorization;
+  const headerToken = req.headers["x-manage-token"];
+  const queryToken = req.query.token;
+
+  let token = null;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.slice(7).trim();
+  } else if (headerToken) {
+    token = String(headerToken).trim();
+  } else if (queryToken) {
+    token = String(queryToken).trim();
+  }
+
+  if (!token) return null;
+
+  // 1. Check ADMIN_TOKEN
+  const adminToken = process.env.ADMIN_TOKEN;
+  if (adminToken && token === adminToken) {
+    return { isAdmin: true, role: "admin" };
+  }
+
+  // 2. Check signed session token
+  const session = verifySessionToken(token);
+  if (session) {
+    return { isUser: true, email: session.email.toLowerCase().trim(), role: "user" };
+  }
+
+  // 3. Check manage_token format (alphanumeric string)
+  if (typeof token === "string" && /^[a-zA-Z0-9_-]{16,64}$/.test(token)) {
+    return { isUser: true, manageToken: token, role: "token" };
+  }
+
+  return null;
+}
+
+// =============================================
+// RESERVATIONS (Scoped by manage_token & Email)
+// =============================================
+
+app.post("/api/reserve", async (req, res) => {
   if (!dataReady) return res.status(503).json({ error: "Database Loading" });
 
-  const { car_id, car_brand, car_model, name, date } = req.body;
-  const email = req.userEmail; // From session — can't be spoofed
-
-  if (!name || !date) {
-    return res.status(400).json({ error: "Missing required fields (name, date)." });
+  if (!req.body || typeof req.body !== "object") {
+    return res.status(400).json({ error: "Missing or invalid request payload." });
   }
 
-  // Validate date format (YYYY-MM-DD)
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return res.status(400).json({ error: "Invalid date format. Use YYYY-MM-DD." });
+  const { car_id, car_brand, car_model, name, date, spec_key } = req.body;
+  let email = req.body.email;
+
+  // If session is present, prefer session email
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    const session = verifySessionToken(authHeader.slice(7).trim());
+    if (session?.email) email = session.email;
   }
 
-  // Prevent booking in the past
-  const bookingDate = new Date(date);
+  if (!email || !isValidEmail(email)) {
+    return res.status(400).json({ error: "A valid email address is required." });
+  }
+
+  if (!name || typeof name !== "string" || name.trim().length < 2 || name.trim().length > 100) {
+    return res.status(400).json({ error: "Name must be between 2 and 100 characters." });
+  }
+
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return res.status(400).json({ error: "Date must be formatted as YYYY-MM-DD." });
+  }
+
+  // Prevent bookings in the past
+  const bookingDate = new Date(`${date}T00:00:00`);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  if (bookingDate < today) {
+  if (isNaN(bookingDate.getTime()) || bookingDate < today) {
     return res.status(400).json({ error: "Cannot book a test drive in the past." });
   }
 
+  const cleanBrand = String(car_brand || "").slice(0, 100).trim();
+  const cleanModel = String(car_model || "").slice(0, 100).trim();
+  const cleanName = name.trim();
+  const cleanEmail = email.toLowerCase().trim();
+
+  // Cryptographically secure manage_token for user ownership
+  const manageToken = crypto.randomBytes(24).toString("hex");
+  const createdAt = Date.now();
+
   try {
     const result = await db.run(
-      "INSERT INTO reservations (car_id, car_brand, car_model, name, email, date) VALUES (?, ?, ?, ?, ?, ?)",
-      [car_id || null, car_brand || "", car_model || "", name, email, date]
+      `INSERT INTO reservations 
+       (car_id, car_brand, car_model, name, email, date, completed, manage_token, created_at) 
+       VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+      [car_id || null, cleanBrand, cleanModel, cleanName, cleanEmail, date, manageToken, createdAt]
     );
-    res.json({ success: true, id: result.lastID });
+
+    res.status(201).json({
+      ok: true,
+      success: true,
+      id: result.lastID,
+      manage_token: manageToken,
+      message: "Reservation confirmed successfully."
+    });
   } catch (err) {
     console.error("Reservation error:", err);
     res.status(500).json({ error: "Failed to create reservation." });
   }
 });
 
-// Get user's own reservations only
-app.get("/api/reservations", requireSession, async (req, res) => {
+// GET /api/reservations: Only returns bookings belonging to the requesting user/token (or all if ADMIN_TOKEN)
+app.get("/api/reservations", async (req, res) => {
   if (!dataReady) return res.status(503).json({ error: "Database Loading" });
+
+  const access = resolveUserAccess(req);
+  if (!access) {
+    return res.status(401).json({ error: "Authentication or booking manage token required to access reservations." });
+  }
+
   try {
-    const reservations = await db.all(
-      "SELECT * FROM reservations WHERE email = ? ORDER BY id DESC",
-      req.userEmail
-    );
+    let reservations = [];
+    if (access.isAdmin) {
+      reservations = await db.all("SELECT * FROM reservations ORDER BY id DESC");
+    } else if (access.manageToken) {
+      reservations = await db.all(
+        "SELECT id, car_id, car_brand, car_model, name, email, date, completed, manage_token, created_at FROM reservations WHERE manage_token = ? ORDER BY id DESC",
+        [access.manageToken]
+      );
+    } else if (access.email) {
+      reservations = await db.all(
+        "SELECT id, car_id, car_brand, car_model, name, email, date, completed, manage_token, created_at FROM reservations WHERE email = ? COLLATE NOCASE ORDER BY id DESC",
+        [access.email]
+      );
+    }
+
     res.json(reservations);
   } catch (err) {
     console.error("Reservations query error:", err);
@@ -435,41 +541,138 @@ app.get("/api/reservations", requireSession, async (req, res) => {
   }
 });
 
-// Mark user's own reservation as complete
-app.put("/api/reservations/:id/complete", requireSession, async (req, res) => {
+// PUT /api/reservations/:id/complete: Mark booking as completed (404 on unknown ID)
+app.put("/api/reservations/:id/complete", async (req, res) => {
   if (!dataReady) return res.status(503).json({ error: "Database Loading" });
 
+  const access = resolveUserAccess(req);
+  if (!access) {
+    return res.status(401).json({ error: "Authentication or manage token required." });
+  }
+
   const id = parseInt(req.params.id, 10);
-  if (isNaN(id) || id < 0) return res.status(400).json({ error: "Invalid reservation ID." });
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: "Invalid reservation ID." });
 
   try {
-    // Only allow completing own reservations
-    const reservation = await db.get(
-      "SELECT * FROM reservations WHERE id = ? AND email = ?",
-      [id, req.userEmail]
-    );
-
-    if (!reservation) {
-      return res.status(404).json({ error: "Reservation not found or access denied." });
+    let reservation = null;
+    if (access.isAdmin) {
+      reservation = await db.get("SELECT * FROM reservations WHERE id = ?", [id]);
+    } else if (access.manageToken) {
+      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND manage_token = ?", [id, access.manageToken]);
+    } else if (access.email) {
+      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND email = ? COLLATE NOCASE", [id, access.email]);
     }
 
-    await db.run("UPDATE reservations SET completed = 1 WHERE id = ?", id);
-    res.json({ success: true });
+    if (!reservation) {
+      return res.status(404).json({ error: "Reservation not found." });
+    }
+
+    await db.run("UPDATE reservations SET completed = 1 WHERE id = ?", [id]);
+    res.json({ ok: true, success: true, message: "Reservation marked as completed." });
   } catch (err) {
     console.error("Complete reservation error:", err);
     res.status(500).json({ error: "Failed to update reservation." });
   }
 });
 
-// Clear only user's own completed reservations
-app.delete("/api/reservations/completed", requireSession, async (req, res) => {
+// DELETE /api/reservations/:id: Cancel booking (404 on unknown ID)
+app.delete("/api/reservations/:id", async (req, res) => {
   if (!dataReady) return res.status(503).json({ error: "Database Loading" });
+
+  const access = resolveUserAccess(req);
+  if (!access) {
+    return res.status(401).json({ error: "Authentication or manage token required." });
+  }
+
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: "Invalid reservation ID." });
+
   try {
-    await db.run(
-      "DELETE FROM reservations WHERE completed = 1 AND email = ?",
-      req.userEmail
-    );
-    res.json({ success: true });
+    let reservation = null;
+    if (access.isAdmin) {
+      reservation = await db.get("SELECT * FROM reservations WHERE id = ?", [id]);
+    } else if (access.manageToken) {
+      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND manage_token = ?", [id, access.manageToken]);
+    } else if (access.email) {
+      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND email = ? COLLATE NOCASE", [id, access.email]);
+    }
+
+    if (!reservation) {
+      return res.status(404).json({ error: "Reservation not found." });
+    }
+
+    await db.run("DELETE FROM reservations WHERE id = ?", [id]);
+    res.json({ ok: true, success: true, message: "Reservation cancelled successfully." });
+  } catch (err) {
+    console.error("Cancel reservation error:", err);
+    res.status(500).json({ error: "Failed to cancel reservation." });
+  }
+});
+
+// PUT /api/reservations/:id/reschedule: Reschedule booking date (404 on unknown ID)
+app.put("/api/reservations/:id/reschedule", async (req, res) => {
+  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
+
+  const access = resolveUserAccess(req);
+  if (!access) {
+    return res.status(401).json({ error: "Authentication or manage token required." });
+  }
+
+  const id = parseInt(req.params.id, 10);
+  if (isNaN(id) || id <= 0) return res.status(400).json({ error: "Invalid reservation ID." });
+
+  const { date } = req.body || {};
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return res.status(400).json({ error: "Valid date in YYYY-MM-DD format is required." });
+  }
+
+  const bookingDate = new Date(`${date}T00:00:00`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (isNaN(bookingDate.getTime()) || bookingDate < today) {
+    return res.status(400).json({ error: "Cannot reschedule to a past date." });
+  }
+
+  try {
+    let reservation = null;
+    if (access.isAdmin) {
+      reservation = await db.get("SELECT * FROM reservations WHERE id = ?", [id]);
+    } else if (access.manageToken) {
+      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND manage_token = ?", [id, access.manageToken]);
+    } else if (access.email) {
+      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND email = ? COLLATE NOCASE", [id, access.email]);
+    }
+
+    if (!reservation) {
+      return res.status(404).json({ error: "Reservation not found." });
+    }
+
+    await db.run("UPDATE reservations SET date = ?, completed = 0 WHERE id = ?", [date, id]);
+    res.json({ ok: true, success: true, date, message: "Reservation rescheduled successfully." });
+  } catch (err) {
+    console.error("Reschedule reservation error:", err);
+    res.status(500).json({ error: "Failed to reschedule reservation." });
+  }
+});
+
+// Clear user's completed reservations
+app.delete("/api/reservations/completed", async (req, res) => {
+  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
+
+  const access = resolveUserAccess(req);
+  if (!access) {
+    return res.status(401).json({ error: "Authentication required." });
+  }
+
+  try {
+    if (access.isAdmin) {
+      await db.run("DELETE FROM reservations WHERE completed = 1");
+    } else if (access.manageToken) {
+      await db.run("DELETE FROM reservations WHERE completed = 1 AND manage_token = ?", [access.manageToken]);
+    } else if (access.email) {
+      await db.run("DELETE FROM reservations WHERE completed = 1 AND email = ? COLLATE NOCASE", [access.email]);
+    }
+    res.json({ ok: true, success: true });
   } catch (err) {
     console.error("Delete completed error:", err);
     res.status(500).json({ error: "Failed to delete completed reservations." });

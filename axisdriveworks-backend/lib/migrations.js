@@ -39,5 +39,35 @@ export async function runMigrations(db) {
       fetched_at INTEGER NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_car_images_fetched ON car_images(fetched_at);
+
+    -- Reservations table with secure management tokens
+    CREATE TABLE IF NOT EXISTS reservations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      car_id INTEGER,
+      car_brand TEXT,
+      car_model TEXT,
+      name TEXT,
+      email TEXT,
+      date TEXT,
+      completed INTEGER DEFAULT 0,
+      manage_token TEXT,
+      created_at INTEGER
+    );
+  `);
+
+  // Ensure manage_token and created_at columns exist on legacy tables
+  const columns = await db.all("PRAGMA table_info(reservations)");
+  const colNames = new Set(columns.map((c) => c.name));
+
+  if (!colNames.has("manage_token")) {
+    await db.exec("ALTER TABLE reservations ADD COLUMN manage_token TEXT;");
+  }
+  if (!colNames.has("created_at")) {
+    await db.exec("ALTER TABLE reservations ADD COLUMN created_at INTEGER;");
+  }
+
+  await db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_reservations_token ON reservations(manage_token);
+    CREATE INDEX IF NOT EXISTS idx_reservations_email ON reservations(email COLLATE NOCASE);
   `);
 }

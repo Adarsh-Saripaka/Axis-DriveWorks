@@ -5,11 +5,9 @@ import {
   fetchCarSpecs,
   reportCarSpecs,
   getCarPlaceholderSvg,
-  bookTestDrive,
-  hasSession,
-  createSession,
-  getSessionEmail
+  bookTestDrive
 } from "../Api/FetchApi";
+import { useAuth } from "../context/AuthContext";
 import { AVAILABLE_MODELS } from "../viewer/ModelRegistry";
 import "./Showcase.css";
 
@@ -23,6 +21,7 @@ export default function Showcase() {
   const { brandSlug, modelSlug } = useParams();
   const { state } = useLocation();
   const navigate = useNavigate();
+  const { user, loginWithGoogle } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -143,20 +142,15 @@ export default function Showcase() {
     setBookingSubmitting(true);
 
     const data = new FormData(e.target);
-    const email = String(data.get("email") || "").trim();
-    const name = String(data.get("name") || "").trim();
+    const name = String(data.get("name") || user?.name || "").trim();
     const date = String(data.get("date") || "").trim();
 
     try {
-      if (!hasSession() || getSessionEmail() !== email.toLowerCase()) {
-        await createSession(email).catch(() => {});
-      }
-
       const newBooking = {
         car_brand: brandName,
         car_model: modelName,
         name,
-        email,
+        email: user?.email,
         date,
         spec_key: specKey
       };
@@ -350,6 +344,36 @@ export default function Showcase() {
                   <h3>Reservation Confirmed</h3>
                   <p>Your test drive for the {brandName} {modelName} is scheduled. Redirecting...</p>
                 </div>
+              ) : !user ? (
+                <div className="booking-login-gate" style={{ textAlign: "center", padding: "10px 0" }}>
+                  <div style={{ fontSize: "2.5rem", marginBottom: "12px" }}>🔐</div>
+                  <h3>Sign In Required</h3>
+                  <p className="modal-subtitle">
+                    To prevent spam and secure your reservation, please sign in with your Google account.
+                  </p>
+                  {bookingError && <p className="booking-error" style={{ marginBottom: "15px" }}>{bookingError}</p>}
+                  <button
+                    type="button"
+                    className="primary-btn submit-btn"
+                    style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", margin: "20px auto 0" }}
+                    onClick={async () => {
+                      setBookingError("");
+                      try {
+                        await loginWithGoogle();
+                      } catch (err) {
+                        setBookingError(err.message || "Google Sign-In failed.");
+                      }
+                    }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24">
+                      <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
+                      <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
+                      <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/>
+                      <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+                    </svg>
+                    Sign in with Google
+                  </button>
+                </div>
               ) : (
                 <form className="booking-form" onSubmit={handleBookTestDrive}>
                   <h3>Book Test Drive</h3>
@@ -357,23 +381,26 @@ export default function Showcase() {
 
                   <div className="form-group">
                     <label>Full Name</label>
-                    <input name="name" type="text" required placeholder="John Doe" />
+                    <input name="name" type="text" required defaultValue={user.name || ""} placeholder="John Doe" />
                   </div>
 
                   <div className="form-group">
-                    <label>Email Address</label>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <label>Email Address</label>
+                      <span style={{ fontSize: "0.75rem", color: "#00ffff" }}>✓ Verified with Google</span>
+                    </div>
                     <input
                       name="email"
                       type="email"
-                      required
-                      placeholder="john@example.com"
-                      defaultValue={getSessionEmail() || ""}
+                      value={user.email}
+                      disabled
+                      style={{ opacity: 0.8, cursor: "not-allowed" }}
                     />
                   </div>
 
                   <div className="form-group">
                     <label>Preferred Date</label>
-                    <input name="date" type="date" required min={new Date().toISOString().split("T")[0]} />
+                    <input name="date" type="date" required min={new Date().toLocaleDateString("en-CA")} />
                   </div>
 
                   {bookingError && <p className="booking-error">{bookingError}</p>}

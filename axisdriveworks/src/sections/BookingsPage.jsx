@@ -6,102 +6,110 @@ import {
   cancelReservation,
   rescheduleReservation,
   clearCompletedReservations,
-  hasSession,
-  createSession,
-  getSessionEmail,
-  clearSession,
-  getManageTokens
+  getManageTokens,
+  saveManageToken,
+  clearAllManageTokens
 } from "../Api/FetchApi";
+import { useAuth } from "../context/AuthContext";
 import "./BookingsPage.css";
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
-  const [email, setEmail] = useState("");
-  const [isAuthenticated, setIsAuthenticated] = useState(hasSession() || getManageTokens().length > 0);
-  const [authError, setAuthError] = useState("");
+  const [tokenInput, setTokenInput] = useState("");
+  const [tokenError, setTokenError] = useState("");
   const [loading, setLoading] = useState(false);
   const [actionError, setActionError] = useState("");
   const [reschedulingId, setReschedulingId] = useState(null);
   const [newDate, setNewDate] = useState("");
   const navigate = useNavigate();
 
+  const { user, loginWithGoogle, logout, loading: authLoading } = useAuth();
+
   const getErrorMessage = (errType) => {
     if (errType === "rate_limited") return "Too many requests, try again shortly.";
-    if (errType === "auth") return "Session expired. Please sign in again.";
-    if (errType === "network") return "Check your connection.";
-    return "Server error, try later.";
+    if (errType === "auth") return "Session expired or unauthorized.";
+    if (errType === "network") return "Check your internet connection.";
+    return "Server error, please try again later.";
   };
 
-  // Load bookings when authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      setLoading(true);
-      getReservations()
-        .then(data => {
-          setBookings(data || []);
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [isAuthenticated]);
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setAuthError("");
-    try {
-      await createSession(email);
-      setIsAuthenticated(true);
-    } catch (err) {
-      setAuthError(err.message || "Failed to authenticate. Please try again.");
-    }
-  };
-
-  const handleLogout = () => {
-    clearSession();
-    setIsAuthenticated(false);
-    setBookings([]);
-    setEmail("");
+  const loadBookings = () => {
+    setLoading(true);
     setActionError("");
+    getReservations()
+      .then((data) => {
+        setBookings(data || []);
+      })
+      .catch((err) => {
+        setActionError(err.message || "Failed to load reservations.");
+      })
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    if (!authLoading) {
+      loadBookings();
+    }
+  }, [user, authLoading]);
+
+  const handleImportToken = async (e) => {
+    e.preventDefault();
+    setTokenError("");
+    const trimmed = tokenInput.trim();
+    if (!trimmed || trimmed.length < 16) {
+      setTokenError("Please enter a valid booking management token.");
+      return;
+    }
+
+    saveManageToken(trimmed);
+    setTokenInput("");
+    loadBookings();
+  };
+
+  const handleClearDevice = () => {
+    if (window.confirm("Remove all saved booking tokens from this device?")) {
+      clearAllManageTokens();
+      setBookings([]);
+      setActionError("");
+    }
   };
 
   const handleTestDrive = async (booking) => {
     setActionError("");
-    const res = await markReservationComplete(booking.id);
+    const res = await markReservationComplete(booking.id, booking.manage_token);
     const { ok, error } = typeof res === "object" ? res : { ok: Boolean(res), error: res ? null : "server" };
 
     if (ok) {
-      const updatedBookings = bookings.map(b =>
+      const updatedBookings = bookings.map((b) =>
         b.id === booking.id ? { ...b, completed: 1 } : b
       );
       setBookings(updatedBookings);
       navigate("/models", { state: { filterBrand: booking.car_brand } });
     } else {
       if (error === "aborted") return;
-      if (error === "auth") {
-        setIsAuthenticated(false);
-        clearSession();
-      }
       setActionError(getErrorMessage(error));
     }
   };
 
-  const handleCancelBooking = async (id) => {
+  const handleCancelBooking = async (booking) => {
     if (!window.confirm("Are you sure you want to cancel this test drive?")) return;
     setActionError("");
-    const res = await cancelReservation(id);
+    const res = await cancelReservation(booking.id, booking.manage_token);
     if (res.ok) {
-      setBookings(prev => prev.filter(b => b.id !== id));
+      setBookings((prev) => prev.filter((b) => b.id !== booking.id));
     } else {
       setActionError(res.error || "Failed to cancel reservation.");
     }
   };
 
-  const handleRescheduleBooking = async (e, id) => {
+  const handleRescheduleBooking = async (e, booking) => {
     e.preventDefault();
     if (!newDate) return;
     setActionError("");
-    const res = await rescheduleReservation(id, newDate);
+    const res = await rescheduleReservation(booking.id, newDate, booking.manage_token);
     if (res.ok) {
-      setBookings(prev => prev.map(b => b.id === id ? { ...b, date: newDate, completed: 0 } : b));
+      setBookings((prev) =>
+        prev.map((b) => (b.id === booking.id ? { ...b, date: newDate, completed: 0 } : b))
+      );
       setReschedulingId(null);
       setNewDate("");
     } else {
@@ -115,67 +123,125 @@ export default function BookingsPage() {
     const { ok, error } = typeof res === "object" ? res : { ok: Boolean(res), error: res ? null : "server" };
 
     if (ok) {
-      const remaining = bookings.filter(b => !b.completed);
+      const remaining = bookings.filter((b) => !b.completed);
       setBookings(remaining);
     } else {
       if (error === "aborted") return;
-      if (error === "auth") {
-        setIsAuthenticated(false);
-        clearSession();
-      }
       setActionError(getErrorMessage(error));
     }
   };
 
-  // ── Email Gate (Not Authenticated) ──
-  if (!isAuthenticated) {
+  const todayMinDate = new Date().toLocaleDateString("en-CA");
+  const hasTokens = getManageTokens().length > 0;
+
+  // ── Unauthenticated & No Local Tokens View ──
+  if (!user && !hasTokens && bookings.length === 0 && !loading) {
     return (
       <div className="bookings-page">
-        <div className="showcase-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px' }}>
+        <div className="showcase-top" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 40px" }}>
           <button className="back-btn" onClick={() => navigate(-1)}>← BACK</button>
           <h2 style={{ margin: 0 }}>My Reservations</h2>
-          <div style={{ width: '80px' }}></div>
+          <div style={{ width: "80px" }}></div>
         </div>
 
         <div className="auth-gate">
           <div className="auth-card">
             <div className="auth-icon">🔐</div>
-            <h3>Verify Your Identity</h3>
-            <p>Enter the email you used when booking your test drive to view your reservations.</p>
+            <h3>Sign In to View Reservations</h3>
+            <p>Sign in with your Google account to access all your confirmed test drive bookings.</p>
 
-            <form onSubmit={handleLogin} className="auth-form">
-              <div className="auth-input-wrapper">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your@email.com"
-                  required
-                  autoFocus
-                />
-                <div className="input-glow" />
-              </div>
-              {authError && <p className="auth-error">{authError}</p>}
-              <button type="submit" className="auth-submit-btn">Access My Bookings</button>
-            </form>
+            <button
+              className="auth-submit-btn"
+              style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", margin: "15px auto" }}
+              onClick={async () => {
+                setActionError("");
+                try {
+                  await loginWithGoogle();
+                } catch (err) {
+                  setActionError(err.message || "Google Sign-In failed.");
+                }
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
+                <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.7-.2-2.3H12v4.6h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.9z"/>
+                <path fill="#FBBC05" d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.8s.2-2.1.4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/>
+                <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+              </svg>
+              Sign in with Google
+            </button>
+
+            {actionError && <p className="auth-error">{actionError}</p>}
+
+            <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "15px", marginTop: "15px" }}>
+              <p style={{ fontSize: "0.85rem", color: "#aaa" }}>
+                Have a booking manage token?
+              </p>
+              <form onSubmit={handleImportToken} className="auth-form" style={{ marginTop: "10px" }}>
+                <div className="auth-input-wrapper">
+                  <input
+                    type="text"
+                    value={tokenInput}
+                    onChange={(e) => setTokenInput(e.target.value)}
+                    placeholder="Paste booking manage token"
+                    required
+                  />
+                  <div className="input-glow" />
+                </div>
+                {tokenError && <p className="auth-error">{tokenError}</p>}
+                <button type="submit" className="clear-btn" style={{ width: "100%", marginTop: "10px" }}>
+                  View by Token
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // ── Authenticated View ──
+  // ── Active Bookings View ──
   return (
     <div className="bookings-page">
-      <div className="showcase-top" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 40px' }}>
+      <div className="showcase-top" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 40px" }}>
         <button className="back-btn" onClick={() => navigate(-1)}>← BACK</button>
         <h2 style={{ margin: 0 }}>My Reservations</h2>
         <div className="top-actions">
-          <span className="session-email">{getSessionEmail()}</span>
-          {bookings.some(b => b.completed) && (
+          {user ? (
+            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+              {user.picture && (
+                <img
+                  src={user.picture}
+                  alt={user.name}
+                  style={{ width: "28px", height: "28px", borderRadius: "50%", border: "1px solid #00ffff" }}
+                />
+              )}
+              <span className="session-email">{user.email}</span>
+            </div>
+          ) : (
+            <button
+              className="clear-btn"
+              onClick={async () => {
+                try {
+                  await loginWithGoogle();
+                } catch (err) {
+                  setActionError(err.message || "Login failed");
+                }
+              }}
+            >
+              Sign In
+            </button>
+          )}
+
+          {bookings.some((b) => b.completed) && (
             <button className="clear-btn" onClick={clearCompleted}>Clear Completed</button>
           )}
-          <button className="logout-btn" onClick={handleLogout}>Sign Out</button>
+
+          {user ? (
+            <button className="logout-btn" onClick={logout}>Sign Out</button>
+          ) : (
+            <button className="logout-btn" onClick={handleClearDevice}>Clear Device</button>
+          )}
         </div>
       </div>
 
@@ -188,8 +254,8 @@ export default function BookingsPage() {
           </div>
         ) : bookings.length === 0 ? (
           <div className="no-bookings">
-            <h3>No Test Drives Booked</h3>
-            <p>Go to the Showcase to reserve a vehicle.</p>
+            <h3>No Active Test Drives</h3>
+            <p>You have no scheduled test drives. Explore the showcase to reserve a vehicle.</p>
             <button className="primary-btn" onClick={() => navigate("/")}>Explore Cars</button>
           </div>
         ) : (
@@ -197,7 +263,7 @@ export default function BookingsPage() {
             {bookings.map((booking, index) => (
               <div
                 key={booking.id}
-                className={`booking-card ${booking.completed ? 'completed' : ''}`}
+                className={`booking-card ${booking.completed ? "completed" : ""}`}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="booking-card-inner">
@@ -206,8 +272,9 @@ export default function BookingsPage() {
                     <span className="booking-date">{booking.date}</span>
                   </div>
                   <div className="booking-details">
-                    <p><strong>Name:</strong> {booking.name}</p>
-                    <p><strong>Booking ID:</strong> #{String(booking.id).slice(-6).padStart(6, '0')}</p>
+                    <p><strong>Driver:</strong> {booking.name}</p>
+                    <p><strong>Email:</strong> {booking.email}</p>
+                    <p><strong>Booking ID:</strong> #{String(booking.id).slice(-6).padStart(6, "0")}</p>
                   </div>
                   {booking.completed ? (
                     <div className="completed-status">
@@ -223,11 +290,11 @@ export default function BookingsPage() {
                       </button>
 
                       {reschedulingId === booking.id ? (
-                        <form onSubmit={(e) => handleRescheduleBooking(e, booking.id)} className="reschedule-form">
+                        <form onSubmit={(e) => handleRescheduleBooking(e, booking)} className="reschedule-form">
                           <input
                             type="date"
                             required
-                            min={new Date().toISOString().split("T")[0]}
+                            min={todayMinDate}
                             value={newDate}
                             onChange={(e) => setNewDate(e.target.value)}
                             style={{
@@ -271,7 +338,7 @@ export default function BookingsPage() {
                             type="button"
                             className="logout-btn"
                             style={{ flex: 1, padding: "8px 12px", fontSize: "0.85rem", borderColor: "rgba(255,80,80,0.5)", color: "#ff6666" }}
-                            onClick={() => handleCancelBooking(booking.id)}
+                            onClick={() => handleCancelBooking(booking)}
                           >
                             Cancel
                           </button>

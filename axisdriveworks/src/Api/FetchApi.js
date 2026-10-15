@@ -9,95 +9,68 @@ const RAW_BASE = (typeof import.meta !== "undefined" && import.meta.env)
 const BASE_URL = `${RAW_BASE.replace(/\/+$/, "")}/api`;
 
 // ============================================================================
-// SECTION 2: SESSION MANAGEMENT
+// SECTION 2: DEVICE-BOUND BOOKING TOKENS
 // ============================================================================
 
-const SESSION_KEY = "adw_session_token";
-const SESSION_EMAIL_KEY = "adw_session_email";
-const SESSION_TS_KEY = "adw_session_ts";
-const SESSION_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours
+const MANAGE_TOKENS_KEY = "adw_manage_tokens";
 
 /**
- * Retrieves the current session token, automatically expiring sessions older than 24 hours.
- * @returns {string|null} Session token or null if missing/expired.
+ * Retrieves stored user booking manage tokens from localStorage.
+ * @returns {string[]}
  */
-export function getSessionToken() {
-  const token = sessionStorage.getItem(SESSION_KEY);
-  if (!token) return null;
-
-  const tsStr = sessionStorage.getItem(SESSION_TS_KEY);
-  if (tsStr) {
-    const timestamp = parseInt(tsStr, 10);
-    if (Date.now() - timestamp > SESSION_MAX_AGE_MS) {
-      clearSession();
-      return null;
-    }
-  }
-  return token;
-}
-
-/**
- * Retrieves the active session user email.
- * @returns {string|null} Session email or null.
- */
-export function getSessionEmail() {
-  if (!getSessionToken()) return null;
-  return sessionStorage.getItem(SESSION_EMAIL_KEY);
-}
-
-/**
- * Clears all active session storage items.
- */
-export function clearSession() {
-  sessionStorage.removeItem(SESSION_KEY);
-  sessionStorage.removeItem(SESSION_EMAIL_KEY);
-  sessionStorage.removeItem(SESSION_TS_KEY);
-}
-
-/**
- * Checks if a valid non-expired session exists.
- * @returns {boolean} True if active session exists.
- */
-export function hasSession() {
-  return !!getSessionToken();
-}
-
-/**
- * Creates a new session with backend authentication token.
- * @param {string} email User email address.
- * @returns {Promise<Object>} Session data.
- */
-export async function createSession(email) {
+export function getManageTokens() {
   try {
-    const res = await fetch(`${BASE_URL}/auth/session`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
-    });
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error || "Failed to create session");
-    }
-
-    const data = await res.json();
-    sessionStorage.setItem(SESSION_KEY, data.token);
-    sessionStorage.setItem(SESSION_EMAIL_KEY, data.email);
-    sessionStorage.setItem(SESSION_TS_KEY, Date.now().toString());
-    return data;
-  } catch (err) {
-    console.error("Session creation failed:", err);
-    throw err;
+    const raw = localStorage.getItem(MANAGE_TOKENS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
   }
 }
 
-export function getAuthHeaders() {
-  const token = getSessionToken();
-  const headers = { "Content-Type": "application/json" };
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+/**
+ * Persists a new booking manage token to localStorage.
+ * @param {string} token
+ */
+export function saveManageToken(token) {
+  if (!token || typeof token !== "string") return;
+  try {
+    const tokens = getManageTokens();
+    if (!tokens.includes(token)) {
+      tokens.unshift(token);
+      localStorage.setItem(MANAGE_TOKENS_KEY, JSON.stringify(tokens.slice(0, 50)));
+    }
+  } catch (err) {
+    console.warn("Failed to store manage_token:", err);
   }
-  return headers;
+}
+
+/**
+ * Removes a specific booking manage token from localStorage.
+ * @param {string} token
+ */
+export function removeManageToken(token) {
+  if (!token) return;
+  try {
+    const tokens = getManageTokens().filter((t) => t !== token);
+    localStorage.setItem(MANAGE_TOKENS_KEY, JSON.stringify(tokens));
+  } catch (err) {
+    console.warn("Failed to remove manage_token:", err);
+  }
+}
+
+/**
+ * Clears all stored booking manage tokens from this device.
+ */
+export function clearAllManageTokens() {
+  localStorage.removeItem(MANAGE_TOKENS_KEY);
+}
+
+/**
+ * Checks if this device has any stored booking tokens.
+ * @returns {boolean}
+ */
+export function hasStoredTokens() {
+  return getManageTokens().length > 0;
 }
 
 // ============================================================================
@@ -334,7 +307,6 @@ async function apiRequest(url, options = {}, signal = null) {
     }
 
     if (res.status === 401) {
-      clearSession();
       return { authError: true };
     }
 
@@ -468,40 +440,8 @@ export async function reportCarSpecs(specKey, message, signal = null) {
 }
 
 // ============================================================================
-// SECTION 5: RESERVATIONS API (AUTHENTICATED & TOKEN-SCOPED)
+// SECTION 5: RESERVATIONS API (AUTHENTICATED VIA MANAGE TOKENS)
 // ============================================================================
-
-const MANAGE_TOKENS_KEY = "adw_manage_tokens";
-
-/**
- * Retrieves stored user booking manage tokens from localStorage.
- * @returns {string[]}
- */
-export function getManageTokens() {
-  try {
-    const raw = localStorage.getItem(MANAGE_TOKENS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-/**
- * Persists a new booking manage token to localStorage.
- * @param {string} token
- */
-export function saveManageToken(token) {
-  if (!token) return;
-  try {
-    const tokens = getManageTokens();
-    if (!tokens.includes(token)) {
-      tokens.unshift(token);
-      localStorage.setItem(MANAGE_TOKENS_KEY, JSON.stringify(tokens.slice(0, 50)));
-    }
-  } catch (err) {
-    console.warn("Failed to store manage_token:", err);
-  }
-}
 
 /**
  * Pre-fetches vehicle specs and image into server cache on card hover.
@@ -522,13 +462,12 @@ export function prefetchCarSpecs(brand, model) {
 export async function bookTestDrive(data, signal = null) {
   try {
     const headers = { "Content-Type": "application/json" };
-    const token = getSessionToken();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
 
     const res = await fetch(`${BASE_URL}/reserve`, {
       method: "POST",
       headers,
       body: JSON.stringify(data),
+      credentials: "include",
       signal
     });
 
@@ -556,25 +495,21 @@ export async function bookTestDrive(data, signal = null) {
 }
 
 /**
- * Fetches user's current reservations (scoped to session email or stored manage_tokens).
+ * Fetches user's current reservations stored on this device or in session.
  * @param {AbortSignal} [signal=null] Optional AbortSignal.
  * @returns {Promise<Array>} List of reservation objects.
  */
 export async function getReservations(signal = null) {
   try {
-    const headers = {};
-    const token = getSessionToken();
-    const manageTokens = getManageTokens();
+    const tokens = getManageTokens();
+    const res = await fetch(`${BASE_URL}/reservations/lookup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tokens }),
+      credentials: "include",
+      signal
+    });
 
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    } else if (manageTokens.length > 0) {
-      headers["x-manage-token"] = manageTokens[0];
-    } else {
-      return [];
-    }
-
-    const res = await fetch(`${BASE_URL}/reservations`, { headers, signal });
     if (!res.ok) return [];
     return await res.json();
   } catch (err) {
@@ -587,26 +522,31 @@ export async function getReservations(signal = null) {
 /**
  * Cancels a reservation by ID.
  * @param {string|number} id
+ * @param {string} [token=null]
  * @param {AbortSignal} [signal=null]
  * @returns {Promise<{ok: boolean, error?: string}>}
  */
-export async function cancelReservation(id, signal = null) {
+export async function cancelReservation(id, token = null, signal = null) {
   try {
+    const effectiveToken = token || getManageTokens()[0];
     const headers = {};
-    const token = getSessionToken();
-    const manageTokens = getManageTokens();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    else if (manageTokens.length > 0) headers["x-manage-token"] = manageTokens[0];
+    if (effectiveToken) {
+      headers["Authorization"] = `Bearer ${effectiveToken}`;
+    }
 
     const res = await fetch(`${BASE_URL}/reservations/${id}`, {
       method: "DELETE",
       headers,
+      credentials: "include",
       signal
     });
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       return { ok: false, error: err.error || "Failed to cancel reservation." };
+    }
+    if (effectiveToken) {
+      removeManageToken(effectiveToken);
     }
     return { ok: true };
   } catch (err) {
@@ -618,21 +558,23 @@ export async function cancelReservation(id, signal = null) {
  * Reschedules a reservation to a new date.
  * @param {string|number} id
  * @param {string} newDate YYYY-MM-DD
+ * @param {string} [token=null]
  * @param {AbortSignal} [signal=null]
  * @returns {Promise<{ok: boolean, date?: string, error?: string}>}
  */
-export async function rescheduleReservation(id, newDate, signal = null) {
+export async function rescheduleReservation(id, newDate, token = null, signal = null) {
   try {
+    const effectiveToken = token || getManageTokens()[0];
     const headers = { "Content-Type": "application/json" };
-    const token = getSessionToken();
-    const manageTokens = getManageTokens();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    else if (manageTokens.length > 0) headers["x-manage-token"] = manageTokens[0];
+    if (effectiveToken) {
+      headers["Authorization"] = `Bearer ${effectiveToken}`;
+    }
 
     const res = await fetch(`${BASE_URL}/reservations/${id}/reschedule`, {
       method: "PUT",
       headers,
       body: JSON.stringify({ date: newDate }),
+      credentials: "include",
       signal
     });
 
@@ -649,20 +591,22 @@ export async function rescheduleReservation(id, newDate, signal = null) {
 /**
  * Marks a specific reservation complete.
  * @param {string|number} id Reservation ID.
+ * @param {string} [token=null]
  * @param {AbortSignal} [signal=null] Optional AbortSignal.
  * @returns {Promise<{ok: boolean, error?: string}>}
  */
-export async function markReservationComplete(id, signal = null) {
+export async function markReservationComplete(id, token = null, signal = null) {
   try {
+    const effectiveToken = token || getManageTokens()[0];
     const headers = {};
-    const token = getSessionToken();
-    const manageTokens = getManageTokens();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    else if (manageTokens.length > 0) headers["x-manage-token"] = manageTokens[0];
+    if (effectiveToken) {
+      headers["Authorization"] = `Bearer ${effectiveToken}`;
+    }
 
     const res = await fetch(`${BASE_URL}/reservations/${id}/complete`, {
       method: "PUT",
       headers,
+      credentials: "include",
       signal
     });
 
@@ -674,21 +618,18 @@ export async function markReservationComplete(id, signal = null) {
 }
 
 /**
- * Clears all completed user reservations.
+ * Clears all completed user reservations for stored device tokens or active session.
  * @param {AbortSignal} [signal=null] Optional AbortSignal.
  * @returns {Promise<{ok: boolean, error?: string}>}
  */
 export async function clearCompletedReservations(signal = null) {
   try {
-    const headers = {};
-    const token = getSessionToken();
-    const manageTokens = getManageTokens();
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-    else if (manageTokens.length > 0) headers["x-manage-token"] = manageTokens[0];
-
-    const res = await fetch(`${BASE_URL}/reservations/completed`, {
-      method: "DELETE",
-      headers,
+    const tokens = getManageTokens();
+    const res = await fetch(`${BASE_URL}/reservations/clear-completed`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tokens }),
+      credentials: "include",
       signal
     });
 

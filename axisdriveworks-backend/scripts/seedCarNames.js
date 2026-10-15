@@ -6,6 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import sqlite3 from "sqlite3";
 import { open } from "sqlite";
+import { runMigrations } from "../lib/migrations.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const jsonPath = path.join(__dirname, "..", "data", "car_names.json");
@@ -51,15 +52,8 @@ for (const n of names) {
 await stmt.finalize();
 await db.exec("COMMIT");
 
-// Leave the reservations table untouched; make sure it exists (it was never created in code before).
-await db.exec(`
-  CREATE TABLE IF NOT EXISTS reservations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    car_id INTEGER, car_brand TEXT, car_model TEXT,
-    name TEXT, email TEXT, date TEXT,
-    completed INTEGER DEFAULT 0
-  );
-`);
+// Run migrations to ensure all tables, columns and indexes are created
+await runMigrations(db);
 
 const { c } = await db.get("SELECT COUNT(*) AS c FROM car_names");
 console.log(`Seeded ${c} car names.`);

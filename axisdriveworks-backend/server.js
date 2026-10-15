@@ -1,16 +1,20 @@
 import express from "express";
 import cors from "cors";
 import fs from "fs";
-import crypto from "crypto";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import helmet from "helmet";
 import compression from "compression";
+import sqlite3 from "sqlite3";
+import { open } from "sqlite";
+import cookieParser from "cookie-parser";
 import { registerSuggestRoute } from "./lib/suggestRoute.js";
 import { registerCarSpecsRoute } from "./lib/carSpecsRoute.js";
+import { registerAuthRoutes } from "./lib/authRoute.js";
+import { registerReservationsRoutes } from "./lib/reservationsRoute.js";
 import { runMigrations } from "./lib/migrations.js";
-import { slugify, makeSpecKey } from "./lib/slug.js";
+import { slugify, makeSpecKey, resolveBrandSlug } from "./lib/slug.js";
 
 dotenv.config();
 
@@ -26,19 +30,17 @@ app.set("trust proxy", 1);
 // HTTP compression for all JSON / API responses
 app.use(compression());
 
-// Session secret — in production, use a strong env var
-const SESSION_SECRET = process.env.SESSION_SECRET || "axis-driveworks-secret-key-change-in-production";
-const SESSION_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24 hours
-
 // =============================================
 // SECURITY MIDDLEWARE
 // =============================================
 
 // Helmet — comprehensive HTTP security headers (CSP, HSTS, X-Frame, etc.)
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow static asset serving cross-origin
-  contentSecurityPolicy: false // Disable CSP for API server (frontend handles its own)
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow static asset serving cross-origin
+    contentSecurityPolicy: false // API server only
+  })
+);
 
 // CORS — strict origin allowlist with explicit methods & headers
 app.use(
@@ -47,8 +49,7 @@ app.use(
       "http://localhost:5173",
       "http://localhost:5174",
       "http://localhost:3000",
-      process.env.FRONTEND_URL,
-      "https://axis-driveworks-ui.onrender.com"
+      process.env.FRONTEND_URL
     ].filter(Boolean),
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -56,10 +57,11 @@ app.use(
   })
 );
 
-// Request size limiting — prevent payload bombs
+// Request size limiting & cookie parsing
 app.use(express.json({ limit: "10kb" }));
+app.use(cookieParser());
 
-// Input sanitization middleware — strip HTML/script from all string body fields
+// Input sanitization middleware
 function sanitizeValue(value) {
   if (typeof value === "string") {
     return value.replace(/<[^>]*>/g, "").trim();
@@ -80,10 +82,25 @@ app.use((req, _res, next) => {
 });
 
 // =============================================
+// STATIC ASSETS (Mounted before rate limiter)
+// =============================================
+
+const assetsPath = path.join(__dirname, "data", "axisdriveworks-3d-assets");
+app.use(
+  "/assets",
+  express.static(assetsPath, {
+    maxAge: "7d",
+    setHeaders: (res) => {
+      res.setHeader("Cache-Control", "public, max-age=604800");
+    }
+  })
+);
+
+// =============================================
 // SLIDING WINDOW RATE LIMITER (Tiered)
 // =============================================
 
-const rateBuckets = new Map(); // IP -> { timestamps: number[] }
+const rateBuckets = new Map(); // IP:tier -> { timestamps: number[] }
 
 const RATE_TIERS = {
   suggest: { limit: 60, windowMs: 60_000 },
@@ -91,24 +108,22 @@ const RATE_TIERS = {
   search: { limit: 30, windowMs: 60_000 },
   images: { limit: 30, windowMs: 60_000 },
   reserve: { limit: 10, windowMs: 60_000 },
-  auth: { limit: 15, windowMs: 60_000 },
   general: { limit: 60, windowMs: 60_000 }
 };
 
-function getTierForPath(path) {
-  if (path.startsWith("/api/suggest")) return "suggest";
-  if (path.startsWith("/api/car-specs")) return "specs";
-  if (path.startsWith("/api/search")) return "search";
-  if (path.startsWith("/api/images")) return "images";
-  if (path.startsWith("/api/reserve") || path.startsWith("/api/reservations")) return "reserve";
-  if (path.startsWith("/api/auth")) return "auth";
+function getTierForPath(urlPath) {
+  if (urlPath.startsWith("/api/suggest")) return "suggest";
+  if (urlPath.startsWith("/api/car-specs")) return "specs";
+  if (urlPath.startsWith("/api/search")) return "search";
+  if (urlPath.startsWith("/api/images")) return "images";
+  if (urlPath.startsWith("/api/reserve") || urlPath.startsWith("/api/reservations")) return "reserve";
   return "general";
 }
 
 function slidingWindowRateLimit(req, res, next) {
   const ip = req.ip;
   const tier = getTierForPath(req.path);
-  const { limit, windowMs } = RATE_TIERS[tier];
+  const { limit, windowMs } = RATE_TIERS[tier] || RATE_TIERS.general;
   const now = Date.now();
   const bucketKey = `${ip}:${tier}`;
 
@@ -117,8 +132,7 @@ function slidingWindowRateLimit(req, res, next) {
   }
 
   const bucket = rateBuckets.get(bucketKey);
-  // Remove timestamps outside the current window
-  bucket.timestamps = bucket.timestamps.filter(ts => now - ts < windowMs);
+  bucket.timestamps = bucket.timestamps.filter((ts) => now - ts < windowMs);
 
   if (bucket.timestamps.length >= limit) {
     const oldestInWindow = bucket.timestamps[0];
@@ -146,30 +160,12 @@ app.use(slidingWindowRateLimit);
 setInterval(() => {
   const now = Date.now();
   for (const [key, bucket] of rateBuckets.entries()) {
-    bucket.timestamps = bucket.timestamps.filter(ts => now - ts < 120_000);
+    bucket.timestamps = bucket.timestamps.filter((ts) => now - ts < 120_000);
     if (bucket.timestamps.length === 0) {
       rateBuckets.delete(key);
     }
   }
 }, 5 * 60 * 1000);
-
-// =============================================
-// STATIC ASSETS (3D Models)
-// =============================================
-
-const assetsPath = path.join(__dirname, "data", "axisdriveworks-3d-assets");
-app.use(
-  "/assets",
-  express.static(assetsPath, {
-    maxAge: "365d",
-    immutable: true,
-    setHeaders: (res) => {
-      res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-    }
-  })
-);
-
-console.log("🛠️  Assets being served with immutable cache from:", assetsPath);
 
 // Request logging (development)
 if (process.env.NODE_ENV !== "production") {
@@ -182,9 +178,6 @@ if (process.env.NODE_ENV !== "production") {
 // =============================================
 // DATABASE
 // =============================================
-
-import sqlite3 from "sqlite3";
-import { open } from "sqlite";
 
 let db;
 let dataReady = false;
@@ -203,25 +196,7 @@ async function initDB() {
       driver: sqlite3.Database
     });
 
-    // Auto-create reservations table if it doesn't exist
-    await db.exec(`
-      CREATE TABLE IF NOT EXISTS reservations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        car_id INTEGER,
-        car_brand TEXT,
-        car_model TEXT,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        date TEXT NOT NULL,
-        completed INTEGER DEFAULT 0,
-        created_at TEXT DEFAULT (datetime('now'))
-      )
-    `);
-
-    // Create index on email for scoped queries
-    await db.exec(`CREATE INDEX IF NOT EXISTS idx_reservations_email ON reservations(email)`);
-
-    // Run migrations for specs and counter tables
+    // Run unified migrations (only place tables and schemas are created/updated)
     await runMigrations(db);
 
     dataReady = true;
@@ -236,80 +211,21 @@ async function initDB() {
 initDB();
 
 // =============================================
-// SESSION AUTH (Email-based, HMAC-SHA256)
-// =============================================
-
-function generateSessionToken(email) {
-  const payload = JSON.stringify({
-    email: email.toLowerCase().trim(),
-    exp: Date.now() + SESSION_EXPIRY_MS,
-    iat: Date.now()
-  });
-  const payloadB64 = Buffer.from(payload).toString("base64url");
-  const signature = crypto.createHmac("sha256", SESSION_SECRET).update(payloadB64).digest("base64url");
-  return `${payloadB64}.${signature}`;
-}
-
-function verifySessionToken(token) {
-  if (!token || typeof token !== "string") return null;
-
-  const parts = token.split(".");
-  if (parts.length !== 2) return null;
-
-  const [payloadB64, signature] = parts;
-  const expectedSig = crypto.createHmac("sha256", SESSION_SECRET).update(payloadB64).digest("base64url");
-
-  // Timing-safe comparison to prevent timing attacks
-  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSig))) {
-    return null;
-  }
-
-  try {
-    const payload = JSON.parse(Buffer.from(payloadB64, "base64url").toString());
-    if (payload.exp < Date.now()) return null; // Token expired
-    return payload;
-  } catch {
-    return null;
-  }
-}
-
-// Session middleware — extracts and validates auth token
-function requireSession(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Authentication required. Please provide your email to access bookings." });
-  }
-
-  const token = authHeader.slice(7);
-  const session = verifySessionToken(token);
-
-  if (!session) {
-    return res.status(401).json({ error: "Invalid or expired session. Please re-authenticate with your email." });
-  }
-
-  req.userEmail = session.email;
-  next();
-}
-
-// Email validation helper
-function isValidEmail(email) {
-  return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
-}
-
-// =============================================
 // ROUTES
 // =============================================
 
 app.get("/", (_req, res) => {
   res.json({
     name: "Axis DriveWorks API",
-    version: "3.0.0 (Secured)",
+    version: "1.0.0",
     status: dataReady ? "operational" : "loading",
     endpoints: {
       suggest: "/api/suggest?q={query}",
       specs: "/api/car-specs?brand={brand}&model={model}",
-      images: "/api/images?q={query}",
-      auth: "/api/auth/session",
+      brandCars: "/api/brand/:brand/cars",
+      reserve: "/api/reserve",
+      reservationsLookup: "/api/reservations/lookup",
+      reservations: "/api/reservations",
       health: "/health"
     }
   });
@@ -323,29 +239,17 @@ app.get("/health", (_req, res) => {
   }
 });
 
-// --- Auth ---
-
-app.post("/api/auth/session", (req, res) => {
-  const { email } = req.body;
-
-  if (!email || !isValidEmail(email)) {
-    return res.status(400).json({ error: "Please provide a valid email address." });
-  }
-
-  const token = generateSessionToken(email);
-  res.json({
-    token,
-    email: email.toLowerCase().trim(),
-    expiresIn: SESSION_EXPIRY_MS / 1000 // seconds
-  });
-});
-
-// --- Car Data (Public) ---
-
+// Register public car catalog and search routes
 registerSuggestRoute(app, () => db, () => dataReady);
 registerCarSpecsRoute(app, () => db, () => dataReady);
 
-// Paginated Brand Cars Endpoint
+// Register authentication routes (Google OAuth / Firebase token exchange + hardened cookies)
+registerAuthRoutes(app, () => db, () => dataReady);
+
+// Register reservations routes
+registerReservationsRoutes(app, () => db, () => dataReady);
+
+// Paginated Brand Cars Endpoint with slug resolution & brand alias support
 app.get("/api/brand/:brand/cars", async (req, res) => {
   if (!dataReady) return res.status(503).json({ error: "Database Loading" });
 
@@ -358,32 +262,33 @@ app.get("/api/brand/:brand/cars", async (req, res) => {
   const page = Math.max(1, parseInt(rawPage, 10) || 1);
   const limit = 12;
   const offset = (page - 1) * limit;
+  const brandSlug = resolveBrandSlug(brand);
 
   try {
     const totalRow = await db.get(
-      "SELECT COUNT(*) as count FROM car_names WHERE brand = ? COLLATE NOCASE",
-      [brand]
+      "SELECT COUNT(*) as count FROM car_names WHERE brand_slug = ? OR brand = ? COLLATE NOCASE",
+      [brandSlug, brand]
     );
     const total = totalRow?.count || 0;
 
     const rows = await db.all(
-      `SELECT id, brand, model, year_start, year_end, body_style, has_3d_model, model_3d_id, model_3d_label
+      `SELECT id, brand, model, year_start, year_end, body_style, has_3d_model, model_3d_id, model_3d_label, brand_slug, model_slug
          FROM car_names
-        WHERE brand = ? COLLATE NOCASE
+        WHERE brand_slug = ? OR brand = ? COLLATE NOCASE
         ORDER BY has_3d_model DESC, model ASC
         LIMIT ? OFFSET ?`,
-      [brand, limit, offset]
+      [brandSlug, brand, limit, offset]
     );
 
     const enhanced = rows.map((r) => ({
       ...r,
-      brand_slug: slugify(r.brand),
-      model_slug: slugify(r.model),
+      brand_slug: r.brand_slug || slugify(r.brand),
+      model_slug: r.model_slug || slugify(r.model),
       spec_key: makeSpecKey(r.brand, r.model),
     }));
 
     res.json({
-      brand,
+      brand: rows[0]?.brand || brand,
       page,
       limit,
       total,
@@ -393,289 +298,6 @@ app.get("/api/brand/:brand/cars", async (req, res) => {
   } catch (err) {
     console.error("Brand cars query failed:", err);
     res.status(500).json({ error: "Failed to fetch brand cars." });
-  }
-});
-
-
-
-
-// --- Reservations (Authenticated + Scoped by Email) ---
-
-// Resolves authorization from Bearer token, x-manage-token header, or query param
-function resolveUserAccess(req) {
-  const authHeader = req.headers.authorization;
-  const headerToken = req.headers["x-manage-token"];
-  const queryToken = req.query.token;
-
-  let token = null;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    token = authHeader.slice(7).trim();
-  } else if (headerToken) {
-    token = String(headerToken).trim();
-  } else if (queryToken) {
-    token = String(queryToken).trim();
-  }
-
-  if (!token) return null;
-
-  // 1. Check ADMIN_TOKEN
-  const adminToken = process.env.ADMIN_TOKEN;
-  if (adminToken && token === adminToken) {
-    return { isAdmin: true, role: "admin" };
-  }
-
-  // 2. Check signed session token
-  const session = verifySessionToken(token);
-  if (session) {
-    return { isUser: true, email: session.email.toLowerCase().trim(), role: "user" };
-  }
-
-  // 3. Check manage_token format (alphanumeric string)
-  if (typeof token === "string" && /^[a-zA-Z0-9_-]{16,64}$/.test(token)) {
-    return { isUser: true, manageToken: token, role: "token" };
-  }
-
-  return null;
-}
-
-// =============================================
-// RESERVATIONS (Scoped by manage_token & Email)
-// =============================================
-
-app.post("/api/reserve", async (req, res) => {
-  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
-
-  if (!req.body || typeof req.body !== "object") {
-    return res.status(400).json({ error: "Missing or invalid request payload." });
-  }
-
-  const { car_id, car_brand, car_model, name, date, spec_key } = req.body;
-  let email = req.body.email;
-
-  // If session is present, prefer session email
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith("Bearer ")) {
-    const session = verifySessionToken(authHeader.slice(7).trim());
-    if (session?.email) email = session.email;
-  }
-
-  if (!email || !isValidEmail(email)) {
-    return res.status(400).json({ error: "A valid email address is required." });
-  }
-
-  if (!name || typeof name !== "string" || name.trim().length < 2 || name.trim().length > 100) {
-    return res.status(400).json({ error: "Name must be between 2 and 100 characters." });
-  }
-
-  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return res.status(400).json({ error: "Date must be formatted as YYYY-MM-DD." });
-  }
-
-  // Prevent bookings in the past
-  const bookingDate = new Date(`${date}T00:00:00`);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if (isNaN(bookingDate.getTime()) || bookingDate < today) {
-    return res.status(400).json({ error: "Cannot book a test drive in the past." });
-  }
-
-  const cleanBrand = String(car_brand || "").slice(0, 100).trim();
-  const cleanModel = String(car_model || "").slice(0, 100).trim();
-  const cleanName = name.trim();
-  const cleanEmail = email.toLowerCase().trim();
-
-  // Cryptographically secure manage_token for user ownership
-  const manageToken = crypto.randomBytes(24).toString("hex");
-  const createdAt = Date.now();
-
-  try {
-    const result = await db.run(
-      `INSERT INTO reservations 
-       (car_id, car_brand, car_model, name, email, date, completed, manage_token, created_at) 
-       VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?)`,
-      [car_id || null, cleanBrand, cleanModel, cleanName, cleanEmail, date, manageToken, createdAt]
-    );
-
-    res.status(201).json({
-      ok: true,
-      success: true,
-      id: result.lastID,
-      manage_token: manageToken,
-      message: "Reservation confirmed successfully."
-    });
-  } catch (err) {
-    console.error("Reservation error:", err);
-    res.status(500).json({ error: "Failed to create reservation." });
-  }
-});
-
-// GET /api/reservations: Only returns bookings belonging to the requesting user/token (or all if ADMIN_TOKEN)
-app.get("/api/reservations", async (req, res) => {
-  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
-
-  const access = resolveUserAccess(req);
-  if (!access) {
-    return res.status(401).json({ error: "Authentication or booking manage token required to access reservations." });
-  }
-
-  try {
-    let reservations = [];
-    if (access.isAdmin) {
-      reservations = await db.all("SELECT * FROM reservations ORDER BY id DESC");
-    } else if (access.manageToken) {
-      reservations = await db.all(
-        "SELECT id, car_id, car_brand, car_model, name, email, date, completed, manage_token, created_at FROM reservations WHERE manage_token = ? ORDER BY id DESC",
-        [access.manageToken]
-      );
-    } else if (access.email) {
-      reservations = await db.all(
-        "SELECT id, car_id, car_brand, car_model, name, email, date, completed, manage_token, created_at FROM reservations WHERE email = ? COLLATE NOCASE ORDER BY id DESC",
-        [access.email]
-      );
-    }
-
-    res.json(reservations);
-  } catch (err) {
-    console.error("Reservations query error:", err);
-    res.status(500).json({ error: "Failed to fetch reservations." });
-  }
-});
-
-// PUT /api/reservations/:id/complete: Mark booking as completed (404 on unknown ID)
-app.put("/api/reservations/:id/complete", async (req, res) => {
-  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
-
-  const access = resolveUserAccess(req);
-  if (!access) {
-    return res.status(401).json({ error: "Authentication or manage token required." });
-  }
-
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id) || id <= 0) return res.status(400).json({ error: "Invalid reservation ID." });
-
-  try {
-    let reservation = null;
-    if (access.isAdmin) {
-      reservation = await db.get("SELECT * FROM reservations WHERE id = ?", [id]);
-    } else if (access.manageToken) {
-      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND manage_token = ?", [id, access.manageToken]);
-    } else if (access.email) {
-      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND email = ? COLLATE NOCASE", [id, access.email]);
-    }
-
-    if (!reservation) {
-      return res.status(404).json({ error: "Reservation not found." });
-    }
-
-    await db.run("UPDATE reservations SET completed = 1 WHERE id = ?", [id]);
-    res.json({ ok: true, success: true, message: "Reservation marked as completed." });
-  } catch (err) {
-    console.error("Complete reservation error:", err);
-    res.status(500).json({ error: "Failed to update reservation." });
-  }
-});
-
-// DELETE /api/reservations/:id: Cancel booking (404 on unknown ID)
-app.delete("/api/reservations/:id", async (req, res) => {
-  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
-
-  const access = resolveUserAccess(req);
-  if (!access) {
-    return res.status(401).json({ error: "Authentication or manage token required." });
-  }
-
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id) || id <= 0) return res.status(400).json({ error: "Invalid reservation ID." });
-
-  try {
-    let reservation = null;
-    if (access.isAdmin) {
-      reservation = await db.get("SELECT * FROM reservations WHERE id = ?", [id]);
-    } else if (access.manageToken) {
-      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND manage_token = ?", [id, access.manageToken]);
-    } else if (access.email) {
-      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND email = ? COLLATE NOCASE", [id, access.email]);
-    }
-
-    if (!reservation) {
-      return res.status(404).json({ error: "Reservation not found." });
-    }
-
-    await db.run("DELETE FROM reservations WHERE id = ?", [id]);
-    res.json({ ok: true, success: true, message: "Reservation cancelled successfully." });
-  } catch (err) {
-    console.error("Cancel reservation error:", err);
-    res.status(500).json({ error: "Failed to cancel reservation." });
-  }
-});
-
-// PUT /api/reservations/:id/reschedule: Reschedule booking date (404 on unknown ID)
-app.put("/api/reservations/:id/reschedule", async (req, res) => {
-  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
-
-  const access = resolveUserAccess(req);
-  if (!access) {
-    return res.status(401).json({ error: "Authentication or manage token required." });
-  }
-
-  const id = parseInt(req.params.id, 10);
-  if (isNaN(id) || id <= 0) return res.status(400).json({ error: "Invalid reservation ID." });
-
-  const { date } = req.body || {};
-  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-    return res.status(400).json({ error: "Valid date in YYYY-MM-DD format is required." });
-  }
-
-  const bookingDate = new Date(`${date}T00:00:00`);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if (isNaN(bookingDate.getTime()) || bookingDate < today) {
-    return res.status(400).json({ error: "Cannot reschedule to a past date." });
-  }
-
-  try {
-    let reservation = null;
-    if (access.isAdmin) {
-      reservation = await db.get("SELECT * FROM reservations WHERE id = ?", [id]);
-    } else if (access.manageToken) {
-      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND manage_token = ?", [id, access.manageToken]);
-    } else if (access.email) {
-      reservation = await db.get("SELECT * FROM reservations WHERE id = ? AND email = ? COLLATE NOCASE", [id, access.email]);
-    }
-
-    if (!reservation) {
-      return res.status(404).json({ error: "Reservation not found." });
-    }
-
-    await db.run("UPDATE reservations SET date = ?, completed = 0 WHERE id = ?", [date, id]);
-    res.json({ ok: true, success: true, date, message: "Reservation rescheduled successfully." });
-  } catch (err) {
-    console.error("Reschedule reservation error:", err);
-    res.status(500).json({ error: "Failed to reschedule reservation." });
-  }
-});
-
-// Clear user's completed reservations
-app.delete("/api/reservations/completed", async (req, res) => {
-  if (!dataReady) return res.status(503).json({ error: "Database Loading" });
-
-  const access = resolveUserAccess(req);
-  if (!access) {
-    return res.status(401).json({ error: "Authentication required." });
-  }
-
-  try {
-    if (access.isAdmin) {
-      await db.run("DELETE FROM reservations WHERE completed = 1");
-    } else if (access.manageToken) {
-      await db.run("DELETE FROM reservations WHERE completed = 1 AND manage_token = ?", [access.manageToken]);
-    } else if (access.email) {
-      await db.run("DELETE FROM reservations WHERE completed = 1 AND email = ? COLLATE NOCASE", [access.email]);
-    }
-    res.json({ ok: true, success: true });
-  } catch (err) {
-    console.error("Delete completed error:", err);
-    res.status(500).json({ error: "Failed to delete completed reservations." });
   }
 });
 
@@ -693,6 +315,6 @@ app.use((err, _req, res, _next) => {
 // =============================================
 
 app.listen(PORT, () => {
-  console.log(`🚗 Axis DriveWorks backend v3.0 running on http://localhost:${PORT}`);
-  console.log(`🔒 Security: Helmet + Tiered Rate Limiter + Session Auth`);
+  console.log(`🚗 Axis DriveWorks backend running on http://localhost:${PORT}`);
+  console.log(`🔒 Security: Helmet + Tiered Rate Limiter + Per-Booking Token Auth`);
 });

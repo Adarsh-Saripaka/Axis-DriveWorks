@@ -8,6 +8,7 @@ import Search from "./sections/Search";
 import Showcase from "./sections/Showcase";
 import BrandPage from "./sections/BrandPage";
 import BookingsPage from "./sections/BookingsPage";
+import { useAuth } from "./context/AuthContext";
 
 const ModelsLibrary = lazy(() => import("./viewer/ModelsLibrary"));
 const ViewerPage = lazy(() => import("./viewer/ViewerPage"));
@@ -22,6 +23,7 @@ const ScrollToTop = () => {
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user, loginWithGoogle, logout } = useAuth();
 
   const popularBrands = [
     { name: "BMW", logo: "https://upload.wikimedia.org/wikipedia/commons/4/44/BMW.svg" },
@@ -74,6 +76,51 @@ const Home = () => {
             >
               Contact
             </a>
+
+            {user ? (
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "12px" }}>
+                {user.picture && (
+                  <img
+                    src={user.picture}
+                    alt={user.name}
+                    style={{ width: "26px", height: "26px", borderRadius: "50%", border: "1px solid #00ffff" }}
+                  />
+                )}
+                <button
+                  onClick={logout}
+                  style={{
+                    background: "transparent",
+                    border: "1px solid rgba(255,100,100,0.4)",
+                    color: "#ff8888",
+                    borderRadius: "15px",
+                    padding: "4px 10px",
+                    fontSize: "0.75rem",
+                    cursor: "pointer"
+                  }}
+                >
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={loginWithGoogle}
+                style={{
+                  background: "rgba(0,255,255,0.1)",
+                  border: "1px solid #00ffff",
+                  color: "#00ffff",
+                  borderRadius: "20px",
+                  padding: "5px 12px",
+                  fontSize: "0.8rem",
+                  cursor: "pointer",
+                  marginLeft: "12px",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px"
+                }}
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </div>
       </header>

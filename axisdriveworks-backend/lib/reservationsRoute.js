@@ -1,6 +1,12 @@
 import crypto from "crypto";
 import { resolveCarBySlugs, makeSpecKey } from "./slug.js";
 import { resolveUserFromSession } from "./authRoute.js";
+import {
+  verifyAdminToken,
+  isValidEmail,
+  validateReservationPayload,
+  logSecurityAudit
+} from "./security.js";
 
 /**
  * Resolves authorization from Bearer token only.
@@ -15,9 +21,8 @@ function resolveAuthHeader(req) {
   const token = authHeader.slice(7).trim();
   if (!token) return null;
 
-  // 1. Check ADMIN_TOKEN (must be at least 16 characters in production)
-  const adminToken = process.env.ADMIN_TOKEN;
-  if (adminToken && adminToken.length >= 16 && token === adminToken) {
+  // 1. Check ADMIN_TOKEN via timing-safe constant-time comparison
+  if (verifyAdminToken(token)) {
     return { isAdmin: true, role: "admin" };
   }
 
@@ -27,10 +32,6 @@ function resolveAuthHeader(req) {
   }
 
   return null;
-}
-
-function isValidEmail(email) {
-  return typeof email === "string" && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
 }
 
 export function registerReservationsRoutes(app, getDb, isReady) {
@@ -46,8 +47,10 @@ export function registerReservationsRoutes(app, getDb, isReady) {
   app.post("/api/reserve", async (req, res) => {
     if (!isReady()) return res.status(503).json({ error: "Database Loading" });
 
-    if (!req.body || typeof req.body !== "object") {
-      return res.status(400).json({ error: "Missing or invalid request payload." });
+    // Strict schema & type validation
+    const payloadValidation = validateReservationPayload(req.body);
+    if (!payloadValidation.valid) {
+      return res.status(400).json({ error: payloadValidation.error });
     }
 
     const db = getDb();
@@ -69,13 +72,6 @@ export function registerReservationsRoutes(app, getDb, isReady) {
     }
 
     const cleanName = (typeof name === "string" && name.trim()) ? name.trim() : (sessionUser.name || "Test Driver");
-    if (cleanName.length < 2 || cleanName.length > 100) {
-      return res.status(400).json({ error: "Name must be between 2 and 100 characters." });
-    }
-
-    if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      return res.status(400).json({ error: "Date must be formatted as YYYY-MM-DD." });
-    }
 
     // Compare date against today using localized ISO date string (YYYY-MM-DD)
     const today = new Date().toLocaleDateString("en-CA");
@@ -93,7 +89,7 @@ export function registerReservationsRoutes(app, getDb, isReady) {
     const cleanModel = carRow.model;
     const specKey = req.body.spec_key || makeSpecKey(cleanBrand, cleanModel);
 
-    // Cryptographically secure manage_token
+    // Cryptographically secure manage_token — generated once, returned only upon creation
     const manageToken = crypto.randomBytes(24).toString("hex");
     const createdAt = Date.now();
 
@@ -104,6 +100,15 @@ export function registerReservationsRoutes(app, getDb, isReady) {
          VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`,
         [carRow.id, cleanBrand, cleanModel, cleanName, userEmail, userUid, date, manageToken, specKey, createdAt]
       );
+
+      logSecurityAudit("RESERVATION_CREATED", {
+        reservationId: result.lastID,
+        uid: userUid,
+        email: userEmail,
+        car: `${cleanBrand} ${cleanModel}`,
+        date,
+        ip: req.ip
+      });
 
       res.status(201).json({
         ok: true,
@@ -119,6 +124,7 @@ export function registerReservationsRoutes(app, getDb, isReady) {
   });
 
   // POST /api/reservations/lookup: Retrieve reservations for tokens or authenticated session
+  // Note: manage_token is deliberately omitted from SELECT results to prevent token leakage
   app.post("/api/reservations/lookup", async (req, res) => {
     if (!isReady()) return res.status(503).json({ error: "Database Loading" });
 
@@ -127,14 +133,14 @@ export function registerReservationsRoutes(app, getDb, isReady) {
 
     if (sessionUser?.isAdmin) {
       const allRows = await db.all(
-        "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, manage_token, spec_key, created_at FROM reservations ORDER BY date ASC, id DESC"
+        "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, spec_key, created_at FROM reservations ORDER BY date ASC, id DESC"
       );
       return res.json(allRows);
     }
 
     if (sessionUser) {
       const rows = await db.all(
-        `SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, manage_token, spec_key, created_at 
+        `SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, spec_key, created_at 
            FROM reservations 
           WHERE uid = ? OR email = ? COLLATE NOCASE 
           ORDER BY date ASC, id DESC`,
@@ -155,7 +161,7 @@ export function registerReservationsRoutes(app, getDb, isReady) {
     try {
       const placeholders = validTokens.map(() => "?").join(",");
       const rows = await db.all(
-        `SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, manage_token, spec_key, created_at 
+        `SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, spec_key, created_at 
            FROM reservations 
           WHERE manage_token IN (${placeholders}) 
           ORDER BY date ASC, id DESC`,
@@ -169,6 +175,7 @@ export function registerReservationsRoutes(app, getDb, isReady) {
   });
 
   // GET /api/reservations: Fetch reservations for session user or Bearer manage_token / ADMIN_TOKEN
+  // Note: manage_token is deliberately omitted from SELECT results to prevent token leakage
   app.get("/api/reservations", async (req, res) => {
     if (!isReady()) return res.status(503).json({ error: "Database Loading" });
 
@@ -183,21 +190,21 @@ export function registerReservationsRoutes(app, getDb, isReady) {
     try {
       if (sessionUser?.isAdmin || headerAuth?.isAdmin) {
         const rows = await db.all(
-          "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, manage_token, spec_key, created_at FROM reservations ORDER BY date ASC, id DESC"
+          "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, spec_key, created_at FROM reservations ORDER BY date ASC, id DESC"
         );
         return res.json(rows);
       }
 
       if (sessionUser) {
         const rows = await db.all(
-          "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, manage_token, spec_key, created_at FROM reservations WHERE uid = ? OR email = ? COLLATE NOCASE ORDER BY date ASC, id DESC",
+          "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, spec_key, created_at FROM reservations WHERE uid = ? OR email = ? COLLATE NOCASE ORDER BY date ASC, id DESC",
           [sessionUser.uid, sessionUser.email]
         );
         return res.json(rows);
       }
 
       const rows = await db.all(
-        "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, manage_token, spec_key, created_at FROM reservations WHERE manage_token = ? ORDER BY date ASC, id DESC",
+        "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, spec_key, created_at FROM reservations WHERE manage_token = ? ORDER BY date ASC, id DESC",
         [headerAuth.manageToken]
       );
       res.json(rows);
@@ -271,6 +278,49 @@ export function registerReservationsRoutes(app, getDb, isReady) {
     return null;
   }
 
+  // POST /api/reservations/:id/rotate-token: Rotates a manage_token securely
+  app.post("/api/reservations/:id/rotate-token", async (req, res) => {
+    if (!isReady()) return res.status(503).json({ error: "Database Loading" });
+
+    const id = parseInt(req.params.id, 10);
+    if (isNaN(id) || id <= 0) return res.status(400).json({ error: "Invalid reservation ID." });
+
+    const db = getDb();
+    const sessionUser = await resolveUserFromSession(req, db);
+    const headerAuth = resolveAuthHeader(req);
+
+    if (!sessionUser && !headerAuth) {
+      return res.status(401).json({ error: "Authentication or valid manage token required." });
+    }
+
+    try {
+      const reservation = await findUserReservation(db, id, sessionUser, headerAuth);
+      if (!reservation) {
+        return res.status(404).json({ error: "Reservation not found." });
+      }
+
+      const newManageToken = crypto.randomBytes(24).toString("hex");
+      await db.run("UPDATE reservations SET manage_token = ? WHERE id = ?", [newManageToken, id]);
+
+      logSecurityAudit("TOKEN_ROTATED", {
+        reservationId: id,
+        user: sessionUser?.uid || "token-bearer",
+        ip: req.ip
+      });
+
+      res.json({
+        ok: true,
+        success: true,
+        id,
+        manage_token: newManageToken,
+        message: "Booking manage token rotated successfully."
+      });
+    } catch (err) {
+      console.error("Rotate token error:", err);
+      res.status(500).json({ error: "Failed to rotate token." });
+    }
+  });
+
   // PUT /api/reservations/:id/complete: Mark reservation as completed
   app.put("/api/reservations/:id/complete", async (req, res) => {
     if (!isReady()) return res.status(503).json({ error: "Database Loading" });
@@ -293,6 +343,13 @@ export function registerReservationsRoutes(app, getDb, isReady) {
       }
 
       await db.run("UPDATE reservations SET completed = 1 WHERE id = ?", [id]);
+
+      logSecurityAudit("RESERVATION_COMPLETED", {
+        reservationId: id,
+        user: sessionUser?.uid || "token-bearer",
+        ip: req.ip
+      });
+
       res.json({ ok: true, success: true, message: "Reservation marked as completed." });
     } catch (err) {
       console.error("Complete reservation error:", err);
@@ -332,6 +389,14 @@ export function registerReservationsRoutes(app, getDb, isReady) {
       }
 
       await db.run("UPDATE reservations SET date = ?, completed = 0 WHERE id = ?", [date, id]);
+
+      logSecurityAudit("RESERVATION_RESCHEDULED", {
+        reservationId: id,
+        newDate: date,
+        user: sessionUser?.uid || "token-bearer",
+        ip: req.ip
+      });
+
       res.json({ ok: true, success: true, date, message: "Reservation rescheduled successfully." });
     } catch (err) {
       console.error("Reschedule reservation error:", err);
@@ -361,6 +426,13 @@ export function registerReservationsRoutes(app, getDb, isReady) {
       }
 
       await db.run("DELETE FROM reservations WHERE id = ?", [id]);
+
+      logSecurityAudit("RESERVATION_CANCELLED", {
+        reservationId: id,
+        user: sessionUser?.uid || "token-bearer",
+        ip: req.ip
+      });
+
       res.json({ ok: true, success: true, message: "Reservation cancelled successfully." });
     } catch (err) {
       console.error("Cancel reservation error:", err);

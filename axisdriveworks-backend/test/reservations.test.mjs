@@ -257,3 +257,51 @@ test("ADMIN access with Authorization Bearer ADMIN_TOKEN succeeds", async () => 
   const data = await res.json();
   assert.ok(Array.isArray(data));
 });
+
+test("GET /api/reservations does NOT expose manage_token in query results", async () => {
+  // Re-create a booking to check returned fields
+  const bookRes = await fetch(`${baseUrl}/api/reserve`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    },
+    body: JSON.stringify({
+      car_brand: "Audi",
+      car_model: "R8",
+      name: "Alice Walker",
+      date: "2099-11-20"
+    })
+  });
+  assert.equal(bookRes.status, 201);
+  const bookData = await bookRes.json();
+  const resId = bookData.id;
+  const initialToken = bookData.manage_token;
+  assert.ok(initialToken, "manage_token must be returned once on creation");
+
+  // Query reservations via session
+  const getRes = await fetch(`${baseUrl}/api/reservations`, {
+    headers: {
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    }
+  });
+  const rows = await getRes.json();
+  assert.ok(rows.length > 0);
+  const target = rows.find((r) => r.id === resId);
+  assert.ok(target);
+  assert.equal(target.manage_token, undefined, "manage_token must NOT be present in query responses");
+
+  // Rotate manage token
+  const rotateRes = await fetch(`${baseUrl}/api/reservations/${resId}/rotate-token`, {
+    method: "POST",
+    headers: {
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    }
+  });
+  assert.equal(rotateRes.status, 200);
+  const rotateData = await rotateRes.json();
+  assert.equal(rotateData.ok, true);
+  assert.ok(rotateData.manage_token);
+  assert.notEqual(rotateData.manage_token, initialToken, "Rotated token must be different from initial token");
+});
+

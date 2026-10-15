@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { createRemoteJWKSet, jwtVerify } from "jose";
+import { verifyAdminToken } from "./security.js";
 
 const GOOGLE_JWKS = createRemoteJWKSet(
   new URL("https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com")
@@ -47,8 +48,7 @@ export async function resolveUserFromSession(req, db) {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith("Bearer ")) {
     const bearer = authHeader.slice(7).trim();
-    const adminToken = process.env.ADMIN_TOKEN;
-    if (adminToken && adminToken.length >= 16 && bearer === adminToken) {
+    if (verifyAdminToken(bearer)) {
       return { isAdmin: true, role: "admin", uid: "admin", email: "admin@axisdriveworks.internal", name: "Administrator" };
     }
   }

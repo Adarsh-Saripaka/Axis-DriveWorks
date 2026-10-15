@@ -15,8 +15,12 @@ import { registerAuthRoutes } from "./lib/authRoute.js";
 import { registerReservationsRoutes } from "./lib/reservationsRoute.js";
 import { runMigrations } from "./lib/migrations.js";
 import { slugify, makeSpecKey, resolveBrandSlug } from "./lib/slug.js";
+import { assertAdminTokenConfigured } from "./lib/security.js";
 
 dotenv.config();
+
+// Assert ADMIN_TOKEN strength and prevent insecure defaults
+assertAdminTokenConfigured();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,8 +28,15 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Enable reverse proxy support for Render / load balancers
-app.set("trust proxy", 1);
+// Trust proxy configuration: only trust reverse proxy if explicitly configured or running in production behind a proxy
+const trustProxySetting = process.env.TRUST_PROXY;
+if (trustProxySetting === "true" || trustProxySetting === "1") {
+  app.set("trust proxy", 1);
+} else if (process.env.NODE_ENV === "production" && trustProxySetting !== "false") {
+  app.set("trust proxy", 1);
+} else {
+  app.set("trust proxy", false);
+}
 
 // HTTP compression for all JSON / API responses
 app.use(compression());
@@ -34,11 +45,47 @@ app.use(compression());
 // SECURITY MIDDLEWARE
 // =============================================
 
-// Helmet — comprehensive HTTP security headers (CSP, HSTS, X-Frame, etc.)
+// Helmet — comprehensive HTTP security headers with strict Content Security Policy
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow static asset serving cross-origin
-    contentSecurityPolicy: false // API server only
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          process.env.NODE_ENV === "production" ? "'self'" : "'self' 'unsafe-eval' 'unsafe-inline'",
+          "https://apis.google.com",
+          "https://*.firebaseapp.com"
+        ],
+        connectSrc: [
+          "'self'",
+          "http://localhost:5000",
+          "http://localhost:5173",
+          "http://localhost:5174",
+          "http://localhost:3000",
+          "https://*.googleapis.com",
+          "https://*.firebaseio.com",
+          "https://identitytoolkit.googleapis.com",
+          "https://securetoken.googleapis.com",
+          process.env.FRONTEND_URL
+        ].filter(Boolean),
+        imgSrc: [
+          "'self'",
+          "data:",
+          "blob:",
+          "https://lh3.googleusercontent.com",
+          "https://images.unsplash.com",
+          "https://*.wikimedia.org",
+          "https:"
+        ],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        frameAncestors: ["'none'"]
+      }
+    }
   })
 );
 
@@ -57,29 +104,9 @@ app.use(
   })
 );
 
-// Request size limiting & cookie parsing
+// Request size limiting & cookie parsing (replaces naive regex stripping with schema validation)
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
-
-// Input sanitization middleware
-function sanitizeValue(value) {
-  if (typeof value === "string") {
-    return value.replace(/<[^>]*>/g, "").trim();
-  }
-  if (typeof value === "object" && value !== null) {
-    for (const key of Object.keys(value)) {
-      value[key] = sanitizeValue(value[key]);
-    }
-  }
-  return value;
-}
-
-app.use((req, _res, next) => {
-  if (req.body && typeof req.body === "object") {
-    sanitizeValue(req.body);
-  }
-  next();
-});
 
 // =============================================
 // STATIC ASSETS (Mounted before rate limiter)
@@ -101,6 +128,7 @@ app.use(
 // =============================================
 
 const rateBuckets = new Map(); // IP:tier -> { timestamps: number[] }
+const MAX_RATE_BUCKETS = 10000;
 
 const RATE_TIERS = {
   suggest: { limit: 60, windowMs: 60_000 },
@@ -121,13 +149,24 @@ function getTierForPath(urlPath) {
 }
 
 function slidingWindowRateLimit(req, res, next) {
-  const ip = req.ip;
+  const ip = req.ip || "unknown";
   const tier = getTierForPath(req.path);
   const { limit, windowMs } = RATE_TIERS[tier] || RATE_TIERS.general;
   const now = Date.now();
   const bucketKey = `${ip}:${tier}`;
 
   if (!rateBuckets.has(bucketKey)) {
+    // Memory leak / exhaustion guard: if buckets exceed cap, evict oldest entries
+    if (rateBuckets.size >= MAX_RATE_BUCKETS) {
+      const keysToDelete = [];
+      for (const [key, b] of rateBuckets.entries()) {
+        if (!b.timestamps.length || now - b.timestamps[b.timestamps.length - 1] > windowMs) {
+          keysToDelete.push(key);
+        }
+        if (keysToDelete.length >= 500) break;
+      }
+      for (const k of keysToDelete) rateBuckets.delete(k);
+    }
     rateBuckets.set(bucketKey, { timestamps: [] });
   }
 

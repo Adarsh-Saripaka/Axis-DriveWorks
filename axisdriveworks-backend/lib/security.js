@@ -48,9 +48,33 @@ export function assertAdminTokenConfigured() {
     return;
   }
 
-  if (isProd && token.length < 24) {
-    console.warn("⚠️  [SECURITY NOTICE] For optimal security in production, ADMIN_TOKEN should be at least 24 characters.");
+  if (isProd && token.length < 32) {
+    throw new Error("FATAL: ADMIN_TOKEN must be at least 32 characters in production!");
   }
+}
+
+/**
+ * Anti-CSRF Guard middleware for state-mutating requests (POST, PUT, DELETE).
+ * Validates the presence of the custom X-Requested-With header on ambient cookie sessions.
+ * Machine-to-machine requests bearing Authorization: Bearer bypass this check.
+ */
+export function csrfGuard(req, res, next) {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+    return next();
+  }
+
+  // Allow Bearer token requests (API clients / tests)
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return next();
+  }
+
+  const xrw = req.headers["x-requested-with"];
+  if (xrw !== "fetch" && xrw !== "XMLHttpRequest") {
+    return res.status(403).json({ error: "Forbidden: Missing X-Requested-With CSRF protection header." });
+  }
+
+  next();
 }
 
 /**

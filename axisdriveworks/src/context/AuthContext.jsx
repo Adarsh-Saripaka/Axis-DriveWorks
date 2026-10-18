@@ -58,7 +58,10 @@ export function AuthProvider({ children }) {
     // Token Separation: We do not store Google idToken or accessToken on the client!
     const res = await fetch(`${BASE_URL}/auth/session`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "X-Requested-With": "fetch"
+      },
       body: JSON.stringify({ idToken }),
       credentials: "include"
     });
@@ -78,6 +81,7 @@ export function AuthProvider({ children }) {
     try {
       await fetch(`${BASE_URL}/auth/logout`, {
         method: "POST",
+        headers: { "X-Requested-With": "fetch" },
         credentials: "include"
       });
     } catch (err) {

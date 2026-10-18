@@ -461,7 +461,10 @@ export function prefetchCarSpecs(brand, model) {
  */
 export async function bookTestDrive(data, signal = null) {
   try {
-    const headers = { "Content-Type": "application/json" };
+    const headers = { 
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch"
+    };
 
     const res = await fetch(`${BASE_URL}/reserve`, {
       method: "POST",
@@ -504,7 +507,10 @@ export async function getReservations(signal = null) {
     const tokens = getManageTokens();
     const res = await fetch(`${BASE_URL}/reservations/lookup`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "X-Requested-With": "fetch"
+      },
       body: JSON.stringify({ tokens }),
       credentials: "include",
       signal
@@ -529,7 +535,9 @@ export async function getReservations(signal = null) {
 export async function cancelReservation(id, token = null, signal = null) {
   try {
     const effectiveToken = token || getManageTokens()[0];
-    const headers = {};
+    const headers = {
+      "X-Requested-With": "fetch"
+    };
     if (effectiveToken) {
       headers["Authorization"] = `Bearer ${effectiveToken}`;
     }
@@ -565,7 +573,10 @@ export async function cancelReservation(id, token = null, signal = null) {
 export async function rescheduleReservation(id, newDate, token = null, signal = null) {
   try {
     const effectiveToken = token || getManageTokens()[0];
-    const headers = { "Content-Type": "application/json" };
+    const headers = { 
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch"
+    };
     if (effectiveToken) {
       headers["Authorization"] = `Bearer ${effectiveToken}`;
     }
@@ -598,7 +609,10 @@ export async function rescheduleReservation(id, newDate, token = null, signal = 
 export async function markReservationComplete(id, token = null, signal = null) {
   try {
     const effectiveToken = token || getManageTokens()[0];
-    const headers = {};
+    const headers = {
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch"
+    };
     if (effectiveToken) {
       headers["Authorization"] = `Bearer ${effectiveToken}`;
     }
@@ -627,7 +641,10 @@ export async function clearCompletedReservations(signal = null) {
     const tokens = getManageTokens();
     const res = await fetch(`${BASE_URL}/reservations/clear-completed`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "X-Requested-With": "fetch"
+      },
       body: JSON.stringify({ tokens }),
       credentials: "include",
       signal

@@ -7,6 +7,7 @@ import { open } from "sqlite";
 import { registerReservationsRoutes } from "../lib/reservationsRoute.js";
 import { registerAuthRoutes, SESSION_COOKIE_NAME } from "../lib/authRoute.js";
 import { runMigrations } from "../lib/migrations.js";
+import { csrfGuard } from "../lib/security.js";
 
 const TEST_ADMIN_TOKEN = "super-secret-admin-token-123456";
 const TEST_SESSION_ID = "valid-test-session-token-abcdef123456";
@@ -63,6 +64,7 @@ before(async () => {
   app = express();
   app.use(express.json());
   app.use(cookieParser());
+  app.use("/api", csrfGuard);
 
   registerAuthRoutes(app, () => db, () => true);
   registerReservationsRoutes(app, () => db, () => true);
@@ -114,7 +116,10 @@ test("GET /api/auth/me returns user profile with valid session cookie", async ()
 test("POST /api/reserve without session cookie rejects with 401", async () => {
   const res = await fetch(`${baseUrl}/api/reserve`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch"
+    },
     body: JSON.stringify({
       car_brand: "Audi",
       car_model: "R8",
@@ -130,6 +135,7 @@ test("POST /api/reserve rejects booking for nonexistent car with 404", async () 
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     },
     body: JSON.stringify({
@@ -147,6 +153,7 @@ test("POST /api/reserve rejects booking in the past with 400", async () => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     },
     body: JSON.stringify({
@@ -167,6 +174,7 @@ test("POST /api/reserve creates booking for authenticated user with verified ema
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     },
     body: JSON.stringify({
@@ -204,6 +212,7 @@ test("PUT /api/reservations/:id/reschedule updates date for owner session", asyn
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     },
     body: JSON.stringify({ date: "2099-06-20" })
@@ -218,6 +227,7 @@ test("PUT /api/reservations/:id/complete marks completed for owner session", asy
   const res = await fetch(`${baseUrl}/api/reservations/${createdId}/complete`, {
     method: "PUT",
     headers: {
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     }
   });
@@ -230,6 +240,7 @@ test("POST /api/reservations/clear-completed clears completed for owner session"
   const res = await fetch(`${baseUrl}/api/reservations/clear-completed`, {
     method: "POST",
     headers: {
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     }
   });
@@ -264,6 +275,7 @@ test("GET /api/reservations does NOT expose manage_token in query results", asyn
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     },
     body: JSON.stringify({
@@ -295,6 +307,7 @@ test("GET /api/reservations does NOT expose manage_token in query results", asyn
   const rotateRes = await fetch(`${baseUrl}/api/reservations/${resId}/rotate-token`, {
     method: "POST",
     headers: {
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     }
   });
@@ -310,6 +323,7 @@ test("POST /api/reserve ignores spoofed email/uid in body and binds authenticate
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     },
     body: JSON.stringify({
@@ -337,6 +351,7 @@ test("POST /api/reserve rejects duplicate booking for same user + car + date wit
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     },
     body: JSON.stringify({
@@ -353,6 +368,7 @@ test("POST /api/reserve rejects duplicate booking for same user + car + date wit
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
       Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
     },
     body: JSON.stringify({
@@ -366,4 +382,47 @@ test("POST /api/reserve rejects duplicate booking for same user + car + date wit
   const err = await res2.json();
   assert.match(err.error, /already have an active test drive reservation/i);
 });
+
+test("POST /api/reserve without X-Requested-With header fails with 403 CSRF", async () => {
+  const res = await fetch(`${baseUrl}/api/reserve`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+      // Omit X-Requested-With
+    },
+    body: JSON.stringify({
+      car_brand: "Porsche",
+      car_model: "911",
+      name: "Alice",
+      date: "2099-07-01"
+    })
+  });
+  assert.equal(res.status, 403);
+  const data = await res.json();
+  assert.match(data.error, /CSRF/i);
+});
+
+test("POST /api/auth/logout with session cookie clears session from database", async () => {
+  const logoutSessionId = "temp-logout-session-id-123456";
+  const now = Date.now();
+  await db.run(
+    `INSERT INTO user_sessions (session_id, uid, email, name, picture, created_at, last_active, expires_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+    [logoutSessionId, "temp-user", "temp@example.com", "Temp", null, now, now, now + 86400000]
+  );
+
+  const res = await fetch(`${baseUrl}/api/auth/logout`, {
+    method: "POST",
+    headers: {
+      "X-Requested-With": "fetch",
+      Cookie: `${SESSION_COOKIE_NAME}=${logoutSessionId}`
+    }
+  });
+  assert.equal(res.status, 200);
+
+  const sessionRow = await db.get("SELECT session_id FROM user_sessions WHERE session_id = ?", [logoutSessionId]);
+  assert.equal(sessionRow, undefined);
+});
+
 

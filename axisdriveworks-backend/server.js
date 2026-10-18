@@ -15,7 +15,7 @@ import { registerAuthRoutes } from "./lib/authRoute.js";
 import { registerReservationsRoutes } from "./lib/reservationsRoute.js";
 import { runMigrations } from "./lib/migrations.js";
 import { slugify, makeSpecKey, resolveBrandSlug } from "./lib/slug.js";
-import { assertAdminTokenConfigured } from "./lib/security.js";
+import { assertAdminTokenConfigured, csrfGuard } from "./lib/security.js";
 
 dotenv.config();
 
@@ -45,10 +45,11 @@ app.use(compression());
 // SECURITY MIDDLEWARE
 // =============================================
 
-// Helmet — comprehensive HTTP security headers with strict Content Security Policy
+// Helmet — comprehensive HTTP security headers with strict Content Security Policy & no-referrer
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
+    referrerPolicy: { policy: "no-referrer" },
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
@@ -89,7 +90,7 @@ app.use(
   })
 );
 
-// CORS — strict origin allowlist with explicit methods & headers
+// CORS — strict origin allowlist with explicit methods & headers (including X-Requested-With)
 app.use(
   cors({
     origin: [
@@ -99,7 +100,7 @@ app.use(
       process.env.FRONTEND_URL
     ].filter(Boolean),
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
     credentials: true
   })
 );
@@ -107,6 +108,26 @@ app.use(
 // Request size limiting & cookie parsing (replaces naive regex stripping with schema validation)
 app.use(express.json({ limit: "10kb" }));
 app.use(cookieParser());
+
+// Cache-Control: ensure API responses containing sensitive user data are not cached (Fix #4.3)
+app.use("/api", (req, res, next) => {
+  res.set("Cache-Control", "no-store, no-cache, must-revalidate, private");
+  res.set("Pragma", "no-cache");
+  next();
+});
+
+// Reject query-string tokens globally across /api (Fix #4.1)
+app.use("/api", (req, res, next) => {
+  if (req.query && (req.query.token || req.query.manage_token || req.query.session_token)) {
+    return res.status(400).json({
+      error: "Security violation: Tokens must never be provided in the URL query string."
+    });
+  }
+  next();
+});
+
+// Anti-CSRF protection for mutating API requests (Fix #5.3)
+app.use("/api", csrfGuard);
 
 // =============================================
 // STATIC ASSETS (Mounted before rate limiter)

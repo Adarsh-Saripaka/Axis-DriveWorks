@@ -39,9 +39,7 @@ export async function runMigrations(db) {
       created_at INTEGER NOT NULL,
       updated_at INTEGER NOT NULL
     );
-    CREATE INDEX IF NOT EXISTS idx_spec_reports_key ON spec_reports(spec_key);
-    CREATE INDEX IF NOT EXISTS idx_spec_reports_uid ON spec_reports(reporter_uid);
-    CREATE INDEX IF NOT EXISTS idx_spec_reports_status ON spec_reports(status);
+
 
     -- Cached vehicle images (multi-API scoring engine)
     CREATE TABLE IF NOT EXISTS car_images (
@@ -156,6 +154,12 @@ export async function runMigrations(db) {
   if (!reportColNames.has("updated_at")) {
     await db.exec("ALTER TABLE spec_reports ADD COLUMN updated_at INTEGER;");
   }
+
+  await db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_spec_reports_key ON spec_reports(spec_key);
+    CREATE INDEX IF NOT EXISTS idx_spec_reports_uid ON spec_reports(reporter_uid);
+    CREATE INDEX IF NOT EXISTS idx_spec_reports_status ON spec_reports(status);
+  `);
 
   // Ensure slug columns exist on car_names table
   const carNamesTable = await db.get("SELECT name FROM sqlite_master WHERE type='table' AND name='car_names'");

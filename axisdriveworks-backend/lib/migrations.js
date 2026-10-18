@@ -75,6 +75,19 @@ export async function runMigrations(db) {
     );
     CREATE INDEX IF NOT EXISTS idx_sessions_expires ON user_sessions(expires_at);
     CREATE INDEX IF NOT EXISTS idx_sessions_uid ON user_sessions(uid);
+
+    -- User registry (Source of truth for accounts and roles)
+    CREATE TABLE IF NOT EXISTS users (
+      uid TEXT PRIMARY KEY,
+      email TEXT NOT NULL,
+      name TEXT,
+      picture TEXT,
+      role TEXT DEFAULT 'user',
+      created_at INTEGER NOT NULL,
+      last_login_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_users_email ON users(email COLLATE NOCASE);
+    CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
   `);
 
   // Ensure columns exist on legacy/existing reservations table

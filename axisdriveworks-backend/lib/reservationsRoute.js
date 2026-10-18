@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { resolveCarBySlugs, makeSpecKey } from "./slug.js";
-import { resolveUserFromSession } from "./authRoute.js";
+import { resolveUserFromSession, createAuthMiddleware } from "./authRoute.js";
 import {
   verifyAdminToken,
   isValidEmail,
@@ -34,7 +34,22 @@ function resolveAuthHeader(req) {
   return null;
 }
 
+/**
+ * Pure authorization check for reservation ownership.
+ * Grants access if user is admin, matches owner UID/email, or possesses reservation manage_token.
+ */
+export function canAccessReservation(user, reservation, manageToken = null) {
+  if (!user && !manageToken) return false;
+  if (user?.role === "admin" || user?.isAdmin) return true;
+  if (user?.uid && reservation.uid === user.uid) return true;
+  if (user?.email && reservation.email && user.email.toLowerCase() === reservation.email.toLowerCase()) return true;
+  if (manageToken && reservation.manage_token === manageToken) return true;
+  return false;
+}
+
 export function registerReservationsRoutes(app, getDb, isReady) {
+  const { requireAuth, requireRole, optionalAuth } = createAuthMiddleware(getDb);
+
   // Reject tokens passed in query string to prevent credential leaking in logs/history
   app.use("/api/reservations", (req, res, next) => {
     if (req.query.token) {
@@ -44,7 +59,7 @@ export function registerReservationsRoutes(app, getDb, isReady) {
   });
 
   // POST /api/reserve: Book a test drive (requires authenticated Google session or Admin)
-  app.post("/api/reserve", async (req, res) => {
+  app.post("/api/reserve", requireAuth, async (req, res) => {
     if (!isReady()) return res.status(503).json({ error: "Database Loading" });
 
     // Strict schema & type validation
@@ -54,16 +69,10 @@ export function registerReservationsRoutes(app, getDb, isReady) {
     }
 
     const db = getDb();
-    const sessionUser = await resolveUserFromSession(req, db);
-
-    if (!sessionUser) {
-      return res.status(401).json({
-        error: "Authentication required. Please sign in with Google to book a test drive."
-      });
-    }
+    const sessionUser = req.user;
 
     const { car_brand, car_model, name, date } = req.body;
-    // Guaranteed verified email from session to prevent identity spoofing
+    // Guaranteed verified identity bound strictly from verified req.user (ignores any client spoofing)
     const userEmail = sessionUser.email;
     const userUid = sessionUser.uid;
 
@@ -88,6 +97,22 @@ export function registerReservationsRoutes(app, getDb, isReady) {
     const cleanBrand = carRow.brand;
     const cleanModel = carRow.model;
     const specKey = req.body.spec_key || makeSpecKey(cleanBrand, cleanModel);
+
+    // Duplicate booking prevention (Flaw #9): check if same user/vehicle/date already has an active booking
+    const duplicate = await db.get(
+      `SELECT id FROM reservations 
+       WHERE (uid = ? OR email = ? COLLATE NOCASE) 
+         AND car_brand = ? COLLATE NOCASE 
+         AND car_model = ? COLLATE NOCASE 
+         AND date = ? 
+         AND completed = 0`,
+      [userUid, userEmail, cleanBrand, cleanModel, date]
+    );
+    if (duplicate) {
+      return res.status(409).json({
+        error: "You already have an active test drive reservation for this vehicle on this date."
+      });
+    }
 
     // Cryptographically secure manage_token — generated once, returned only upon creation
     const manageToken = crypto.randomBytes(24).toString("hex");
@@ -266,15 +291,9 @@ export function registerReservationsRoutes(app, getDb, isReady) {
   async function findUserReservation(db, id, sessionUser, headerAuth) {
     const reservation = await db.get("SELECT * FROM reservations WHERE id = ?", [id]);
     if (!reservation) return null;
-
-    if (sessionUser?.isAdmin || headerAuth?.isAdmin) return reservation;
-    if (sessionUser && (sessionUser.uid === reservation.uid || sessionUser.email?.toLowerCase() === reservation.email?.toLowerCase())) {
+    if (canAccessReservation(sessionUser, reservation, headerAuth?.manageToken)) {
       return reservation;
     }
-    if (headerAuth?.manageToken && headerAuth.manageToken === reservation.manage_token) {
-      return reservation;
-    }
-
     return null;
   }
 

@@ -65,7 +65,10 @@ export async function resolveUserFromSession(req, db) {
 
   try {
     const session = await db.get(
-      "SELECT session_id, uid, email, name, picture, created_at, last_active, expires_at FROM user_sessions WHERE session_id = ?",
+      `SELECT s.session_id, s.uid, s.email, s.name, s.picture, s.created_at, s.last_active, s.expires_at, u.role 
+       FROM user_sessions s 
+       LEFT JOIN users u ON s.uid = u.uid 
+       WHERE s.session_id = ?`,
       [sessionId]
     );
 
@@ -88,18 +91,64 @@ export async function resolveUserFromSession(req, db) {
     // Update last_active timestamp
     await db.run("UPDATE user_sessions SET last_active = ? WHERE session_id = ?", [now, sessionId]);
 
+    const role = session.role || "user";
     return {
       sessionId: session.session_id,
       uid: session.uid,
       email: session.email,
       name: session.name,
       picture: session.picture,
-      isAdmin: false
+      role,
+      isAdmin: role === "admin"
     };
   } catch (err) {
     console.error("Session lookup error:", err);
     return null;
   }
+}
+
+/**
+ * Express middleware generator for authentication and role authorization.
+ * Binds req.user when authenticated.
+ */
+export function createAuthMiddleware(getDb) {
+  const requireAuth = async (req, res, next) => {
+    const db = getDb();
+    const user = await resolveUserFromSession(req, db);
+
+    if (!user) {
+      return res.status(401).json({
+        error: "Authentication required. Please sign in to continue."
+      });
+    }
+
+    req.user = user;
+    next();
+  };
+
+  const requireRole = (...roles) => (req, res, next) => {
+    if (!req.user) {
+      return res.status(401).json({ error: "Unauthenticated" });
+    }
+
+    const currentRole = req.user.role || (req.user.isAdmin ? "admin" : "user");
+    if (!roles.includes(currentRole)) {
+      return res.status(403).json({ error: "Forbidden: Insufficient privileges." });
+    }
+
+    next();
+  };
+
+  const optionalAuth = async (req, res, next) => {
+    const db = getDb();
+    const user = await resolveUserFromSession(req, db);
+    if (user) {
+      req.user = user;
+    }
+    next();
+  };
+
+  return { requireAuth, requireRole, optionalAuth };
 }
 
 export function registerAuthRoutes(app, getDb, isReady) {
@@ -129,6 +178,18 @@ export function registerAuthRoutes(app, getDb, isReady) {
       const sessionId = crypto.randomBytes(32).toString("hex");
       const now = Date.now();
       const expiresAt = now + SESSION_MAX_AGE_MS;
+
+      // Upsert into user registry
+      await db.run(
+        `INSERT INTO users (uid, email, name, picture, role, created_at, last_login_at)
+         VALUES (?, ?, ?, ?, 'user', ?, ?)
+         ON CONFLICT(uid) DO UPDATE SET
+           email = excluded.email,
+           name = excluded.name,
+           picture = excluded.picture,
+           last_login_at = excluded.last_login_at`,
+        [decodedUser.uid, decodedUser.email, decodedUser.name, decodedUser.picture, now, now]
+      );
 
       await db.run(
         `INSERT INTO user_sessions (session_id, uid, email, name, picture, created_at, last_active, expires_at)

@@ -305,3 +305,65 @@ test("GET /api/reservations does NOT expose manage_token in query results", asyn
   assert.notEqual(rotateData.manage_token, initialToken, "Rotated token must be different from initial token");
 });
 
+test("POST /api/reserve ignores spoofed email/uid in body and binds authenticated session identity", async () => {
+  const res = await fetch(`${baseUrl}/api/reserve`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    },
+    body: JSON.stringify({
+      car_brand: "Porsche",
+      car_model: "911",
+      date: "2099-12-01",
+      email: "spoofed-hacker@attacker.com",
+      uid: "spoofed-hacker-uid",
+      name: "Spoofer"
+    })
+  });
+  assert.equal(res.status, 201);
+  const data = await res.json();
+  assert.equal(data.ok, true);
+
+  // Verify in database that the reservation has Alice's UID and email, NOT spoofed values
+  const row = await db.get("SELECT email, uid FROM reservations WHERE id = ?", [data.id]);
+  assert.equal(row.uid, TEST_USER.uid);
+  assert.equal(row.email, TEST_USER.email);
+});
+
+test("POST /api/reserve rejects duplicate booking for same user + car + date with 409", async () => {
+  // First booking for Porsche 911 on 2099-12-05
+  const res1 = await fetch(`${baseUrl}/api/reserve`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    },
+    body: JSON.stringify({
+      car_brand: "Porsche",
+      car_model: "911",
+      date: "2099-12-05",
+      name: "Alice"
+    })
+  });
+  assert.equal(res1.status, 201);
+
+  // Duplicate booking attempt
+  const res2 = await fetch(`${baseUrl}/api/reserve`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    },
+    body: JSON.stringify({
+      car_brand: "Porsche",
+      car_model: "911",
+      date: "2099-12-05",
+      name: "Alice"
+    })
+  });
+  assert.equal(res2.status, 409);
+  const err = await res2.json();
+  assert.match(err.error, /already have an active test drive reservation/i);
+});
+

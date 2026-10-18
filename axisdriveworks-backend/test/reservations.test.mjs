@@ -6,6 +6,7 @@ import sqlite3 from "sqlite3";
 import { open } from "sqlite";
 import { registerReservationsRoutes } from "../lib/reservationsRoute.js";
 import { registerAuthRoutes, SESSION_COOKIE_NAME } from "../lib/authRoute.js";
+import { registerCarSpecsRoute } from "../lib/carSpecsRoute.js";
 import { runMigrations } from "../lib/migrations.js";
 import { csrfGuard } from "../lib/security.js";
 
@@ -68,6 +69,7 @@ before(async () => {
 
   registerAuthRoutes(app, () => db, () => true);
   registerReservationsRoutes(app, () => db, () => true);
+  registerCarSpecsRoute(app, () => db, () => true);
 
   await new Promise((resolve) => {
     server = app.listen(0, () => {
@@ -318,7 +320,7 @@ test("GET /api/reservations does NOT expose manage_token in query results", asyn
   assert.notEqual(rotateData.manage_token, initialToken, "Rotated token must be different from initial token");
 });
 
-test("POST /api/reserve ignores spoofed email/uid in body and binds authenticated session identity", async () => {
+test("POST /api/reserve strictly rejects smuggled unknown fields in body with 400", async () => {
   const res = await fetch(`${baseUrl}/api/reserve`, {
     method: "POST",
     headers: {
@@ -335,19 +337,38 @@ test("POST /api/reserve ignores spoofed email/uid in body and binds authenticate
       name: "Spoofer"
     })
   });
+  assert.equal(res.status, 400);
+  const data = await res.json();
+  assert.equal(data.error, "Invalid input");
+});
+
+test("POST /api/reserve creates booking with valid allowlisted schema and binds authenticated session", async () => {
+  const res = await fetch(`${baseUrl}/api/reserve`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    },
+    body: JSON.stringify({
+      car_brand: "Porsche",
+      car_model: "911",
+      date: "2099-12-01",
+      name: "Alice"
+    })
+  });
   assert.equal(res.status, 201);
   const data = await res.json();
   assert.equal(data.ok, true);
 
-  // Verify in database that the reservation has Alice's UID and email, NOT spoofed values
   const row = await db.get("SELECT email, uid FROM reservations WHERE id = ?", [data.id]);
   assert.equal(row.uid, TEST_USER.uid);
   assert.equal(row.email, TEST_USER.email);
 });
 
 test("POST /api/reserve rejects duplicate booking for same user + car + date with 409", async () => {
-  // First booking for Porsche 911 on 2099-12-05
-  const res1 = await fetch(`${baseUrl}/api/reserve`, {
+  // Duplicate booking attempt (same user, car, and date as previous test)
+  const res = await fetch(`${baseUrl}/api/reserve`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -357,29 +378,12 @@ test("POST /api/reserve rejects duplicate booking for same user + car + date wit
     body: JSON.stringify({
       car_brand: "Porsche",
       car_model: "911",
-      date: "2099-12-05",
+      date: "2099-12-01",
       name: "Alice"
     })
   });
-  assert.equal(res1.status, 201);
-
-  // Duplicate booking attempt
-  const res2 = await fetch(`${baseUrl}/api/reserve`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Requested-With": "fetch",
-      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
-    },
-    body: JSON.stringify({
-      car_brand: "Porsche",
-      car_model: "911",
-      date: "2099-12-05",
-      name: "Alice"
-    })
-  });
-  assert.equal(res2.status, 409);
-  const err = await res2.json();
+  assert.equal(res.status, 409);
+  const err = await res.json();
   assert.match(err.error, /already have an active test drive reservation/i);
 });
 
@@ -424,5 +428,92 @@ test("POST /api/auth/logout with session cookie clears session from database", a
   const sessionRow = await db.get("SELECT session_id FROM user_sessions WHERE session_id = ?", [logoutSessionId]);
   assert.equal(sessionRow, undefined);
 });
+
+test("POST /api/car-specs/report without session cookie rejects with 401", async () => {
+  const res = await fetch(`${baseUrl}/api/car-specs/report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch"
+    },
+    body: JSON.stringify({
+      spec_key: "porsche_911",
+      message: "Horsepower is listed incorrectly"
+    })
+  });
+  assert.equal(res.status, 401);
+});
+
+test("POST /api/car-specs/report rejects invalid field with 400", async () => {
+  const res = await fetch(`${baseUrl}/api/car-specs/report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    },
+    body: JSON.stringify({
+      spec_key: "porsche_911",
+      field: "invalid_field_name",
+      message: "Invalid field report"
+    })
+  });
+  assert.equal(res.status, 400);
+});
+
+test("POST /api/car-specs/report queues valid correction into moderation queue with 202", async () => {
+  const res = await fetch(`${baseUrl}/api/car-specs/report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    },
+    body: JSON.stringify({
+      spec_key: "porsche_911",
+      field: "horsepower",
+      proposed_value: "450",
+      message: "The 911 Carrera S has 443 hp instead of 379 hp."
+    })
+  });
+  assert.equal(res.status, 202);
+  const data = await res.json();
+  assert.equal(data.ok, true);
+  assert.ok(data.id);
+
+  const reportRow = await db.get("SELECT * FROM spec_reports WHERE id = ?", [data.id]);
+  assert.equal(reportRow.status, "pending");
+  assert.equal(reportRow.field, "horsepower");
+  assert.equal(reportRow.proposed_value, "450");
+  assert.equal(reportRow.reporter_uid, TEST_USER.uid);
+});
+
+test("POST /api/car-specs/report resubmission for same vehicle and field updates pending report (deduplicated)", async () => {
+  const res = await fetch(`${baseUrl}/api/car-specs/report`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch",
+      Cookie: `${SESSION_COOKIE_NAME}=${TEST_SESSION_ID}`
+    },
+    body: JSON.stringify({
+      spec_key: "porsche_911",
+      field: "horsepower",
+      proposed_value: "473",
+      message: "Updated correction: The 911 GTS has 473 hp."
+    })
+  });
+  assert.equal(res.status, 200);
+  const data = await res.json();
+  assert.equal(data.ok, true);
+
+  const reportRows = await db.all(
+    "SELECT * FROM spec_reports WHERE reporter_uid = ? AND spec_key = ? AND field = ?",
+    [TEST_USER.uid, "porsche_911", "horsepower"]
+  );
+  assert.equal(reportRows.length, 1);
+  assert.equal(reportRows[0].proposed_value, "473");
+});
+
 
 

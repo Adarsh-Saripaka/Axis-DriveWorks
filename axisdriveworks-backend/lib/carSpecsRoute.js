@@ -1,6 +1,9 @@
 import { makeSpecKey, slugify } from "./slug.js";
 import { fetchCarSpecs } from "./specsFetcher.js";
 import { findBestCarImage } from "./imageEngine.js";
+import { createAuthMiddleware } from "./authRoute.js";
+import { validateBody, ReportSchema } from "./validation.js";
+import { logSecurityAudit } from "./security.js";
 
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
 const inFlightRequests = new Map(); // spec_key -> Promise<Object>
@@ -10,6 +13,7 @@ function getTodayKey() {
 }
 
 export function registerCarSpecsRoute(app, getDb, isReady) {
+  const { requireAuth } = createAuthMiddleware(getDb);
   // GET /api/car-specs?brand=&model=
   app.get("/api/car-specs", async (req, res) => {
     if (!isReady()) return res.status(503).json({ error: "Database Loading" });
@@ -288,30 +292,98 @@ export function registerCarSpecsRoute(app, getDb, isReady) {
     res.json(bestImage);
   });
 
-  // POST /api/car-specs/report (Report incorrect data)
-  app.post("/api/car-specs/report", async (req, res) => {
+  // POST /api/car-specs/report (Report incorrect data - Authenticated Moderation Queue)
+  app.post("/api/car-specs/report", requireAuth, validateBody(ReportSchema), async (req, res) => {
     if (!isReady()) return res.status(503).json({ error: "Database Loading" });
 
-    const { spec_key, message } = req.body || {};
-    const cleanKey = String(spec_key || "").trim();
-    const cleanMsg = String(message || "").trim();
+    const db = getDb();
+    const user = req.user;
+    const { spec_key, field, proposed_value, message } = req.body;
 
-    if (!cleanKey) {
-      return res.status(400).json({ error: "Missing spec_key." });
-    }
-    if (!cleanMsg || cleanMsg.length < 5 || cleanMsg.length > 500) {
-      return res.status(400).json({ error: "Report message must be between 5 and 500 characters." });
+    // Referential Integrity Check: Verify that the vehicle/spec_key exists
+    const specExists = await db.get("SELECT spec_key FROM car_specs WHERE spec_key = ?", [spec_key]);
+    if (!specExists) {
+      // Check if it matches a catalog car
+      const carExists = await db.get(
+        "SELECT id FROM car_names WHERE search_key = ? OR brand_slug = ? OR model_slug = ?",
+        [spec_key.toLowerCase(), spec_key.toLowerCase(), spec_key.toLowerCase()]
+      );
+      if (!carExists && !spec_key.includes("_")) {
+        return res.status(404).json({ error: "Referenced vehicle does not exist in the catalogue." });
+      }
     }
 
+    // Atomic Daily User Quota (Max 20 reports per user per day to stop slow-drip bloat)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayMs = todayStart.getTime();
+
+    const dailyCount = await db.get(
+      "SELECT COUNT(*) as count FROM spec_reports WHERE reporter_uid = ? AND created_at >= ?",
+      [user.uid, todayMs]
+    );
+
+    if (dailyCount && dailyCount.count >= 20) {
+      return res.status(429).json({
+        error: "Daily report quota reached. Maximum 20 reports per user per day."
+      });
+    }
+
+    // Moderation Queue & Deduplication: Resubmitting updates existing pending report
+    const existingPending = await db.get(
+      "SELECT id FROM spec_reports WHERE reporter_uid = ? AND spec_key = ? AND field = ? AND status = 'pending'",
+      [user.uid, spec_key, field]
+    );
+
+    const now = Date.now();
     try {
-      await getDb().run(
-        "INSERT INTO spec_reports (spec_key, message, created_at) VALUES (?, ?, ?)",
-        [cleanKey, cleanMsg, Date.now()]
+      if (existingPending) {
+        await db.run(
+          `UPDATE spec_reports 
+           SET proposed_value = ?, message = ?, updated_at = ? 
+           WHERE id = ?`,
+          [proposed_value || null, message, now, existingPending.id]
+        );
+
+        logSecurityAudit("SPEC_REPORT_UPDATED", {
+          reportId: existingPending.id,
+          uid: user.uid,
+          specKey: spec_key,
+          field,
+          ip: req.ip
+        });
+
+        return res.status(200).json({
+          ok: true,
+          success: true,
+          id: existingPending.id,
+          message: "Your pending correction report has been updated."
+        });
+      }
+
+      const result = await db.run(
+        `INSERT INTO spec_reports 
+         (spec_key, field, proposed_value, message, reporter_uid, reporter_email, status, created_at, updated_at) 
+         VALUES (?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
+        [spec_key, field, proposed_value || null, message, user.uid, user.email, now, now]
       );
 
-      res.json({ success: true, message: "Thank you. Your report has been recorded for review." });
+      logSecurityAudit("SPEC_REPORT_CREATED", {
+        reportId: result.lastID,
+        uid: user.uid,
+        specKey: spec_key,
+        field,
+        ip: req.ip
+      });
+
+      res.status(202).json({
+        ok: true,
+        success: true,
+        id: result.lastID,
+        message: "Thank you. Your correction report has been queued for moderation review."
+      });
     } catch (err) {
-      console.error("Failed to save spec report:", err);
+      console.error("Failed to queue spec report:", err);
       res.status(500).json({ error: "Could not submit report." });
     }
   });

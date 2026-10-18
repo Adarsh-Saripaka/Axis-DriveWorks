@@ -26,14 +26,22 @@ export async function runMigrations(db) {
       lookups INTEGER NOT NULL DEFAULT 0
     );
 
-    -- User reports for incorrect data
+    -- User reports for incorrect data (Moderation Queue)
     CREATE TABLE IF NOT EXISTS spec_reports (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       spec_key TEXT NOT NULL,
+      field TEXT NOT NULL DEFAULT 'general',
+      proposed_value TEXT,
       message TEXT NOT NULL,
-      created_at INTEGER NOT NULL
+      reporter_uid TEXT,
+      reporter_email TEXT,
+      status TEXT DEFAULT 'pending',
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_spec_reports_key ON spec_reports(spec_key);
+    CREATE INDEX IF NOT EXISTS idx_spec_reports_uid ON spec_reports(reporter_uid);
+    CREATE INDEX IF NOT EXISTS idx_spec_reports_status ON spec_reports(status);
 
     -- Cached vehicle images (multi-API scoring engine)
     CREATE TABLE IF NOT EXISTS car_images (
@@ -125,6 +133,28 @@ export async function runMigrations(db) {
   }
   if (!specsColNames.has("prompt_version")) {
     await db.exec("ALTER TABLE car_specs ADD COLUMN prompt_version TEXT DEFAULT 'v1';");
+  }
+
+  // Ensure columns exist on spec_reports table
+  const reportColumns = await db.all("PRAGMA table_info(spec_reports)");
+  const reportColNames = new Set(reportColumns.map((c) => c.name));
+  if (!reportColNames.has("field")) {
+    await db.exec("ALTER TABLE spec_reports ADD COLUMN field TEXT DEFAULT 'general';");
+  }
+  if (!reportColNames.has("proposed_value")) {
+    await db.exec("ALTER TABLE spec_reports ADD COLUMN proposed_value TEXT;");
+  }
+  if (!reportColNames.has("reporter_uid")) {
+    await db.exec("ALTER TABLE spec_reports ADD COLUMN reporter_uid TEXT;");
+  }
+  if (!reportColNames.has("reporter_email")) {
+    await db.exec("ALTER TABLE spec_reports ADD COLUMN reporter_email TEXT;");
+  }
+  if (!reportColNames.has("status")) {
+    await db.exec("ALTER TABLE spec_reports ADD COLUMN status TEXT DEFAULT 'pending';");
+  }
+  if (!reportColNames.has("updated_at")) {
+    await db.exec("ALTER TABLE spec_reports ADD COLUMN updated_at INTEGER;");
   }
 
   // Ensure slug columns exist on car_names table

@@ -417,14 +417,27 @@ export async function fetchCarSpecs(brand, model, signal = null) {
  * @param {AbortSignal} [signal=null]
  * @returns {Promise<{ok: boolean, message?: string}>}
  */
-export async function reportCarSpecs(specKey, message, signal = null) {
+export async function reportCarSpecs(specKey, message, field = "general", proposedValue = "", signal = null) {
   try {
+    const payload = {
+      spec_key: specKey,
+      field: field || "general",
+      message: message.trim()
+    };
+    if (proposedValue) {
+      payload.proposed_value = proposedValue.trim();
+    }
+
     const res = await fetch(
       `${BASE_URL}/car-specs/report`,
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ spec_key: specKey, message }),
+        headers: { 
+          "Content-Type": "application/json",
+          "X-Requested-With": "fetch"
+        },
+        body: JSON.stringify(payload),
+        credentials: "include",
         signal
       }
     );

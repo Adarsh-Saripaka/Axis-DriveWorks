@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import { resolveCarBySlugs, makeSpecKey } from "./slug.js";
 import { resolveUserFromSession, createAuthMiddleware } from "./authRoute.js";
+import { validateBody, ReservationSchema } from "./validation.js";
 import {
   verifyAdminToken,
   isValidEmail,
@@ -59,14 +60,8 @@ export function registerReservationsRoutes(app, getDb, isReady) {
   });
 
   // POST /api/reserve: Book a test drive (requires authenticated Google session or Admin)
-  app.post("/api/reserve", requireAuth, async (req, res) => {
+  app.post("/api/reserve", requireAuth, validateBody(ReservationSchema), async (req, res) => {
     if (!isReady()) return res.status(503).json({ error: "Database Loading" });
-
-    // Strict schema & type validation
-    const payloadValidation = validateReservationPayload(req.body);
-    if (!payloadValidation.valid) {
-      return res.status(400).json({ error: payloadValidation.error });
-    }
 
     const db = getDb();
     const sessionUser = req.user;

@@ -148,12 +148,13 @@ app.use(
 // SLIDING WINDOW RATE LIMITER (Tiered)
 // =============================================
 
-const rateBuckets = new Map(); // IP:tier -> { timestamps: number[] }
+const rateBuckets = new Map(); // clientKey:tier -> { timestamps: number[] }
 const MAX_RATE_BUCKETS = 10000;
 
 const RATE_TIERS = {
   suggest: { limit: 60, windowMs: 60_000 },
   specs: { limit: 30, windowMs: 60_000 },
+  report: { limit: 10, windowMs: 60 * 60_000 }, // Max 10 reports per hour
   search: { limit: 30, windowMs: 60_000 },
   images: { limit: 30, windowMs: 60_000 },
   reserve: { limit: 10, windowMs: 60_000 },
@@ -161,6 +162,7 @@ const RATE_TIERS = {
 };
 
 function getTierForPath(urlPath) {
+  if (urlPath.startsWith("/api/car-specs/report")) return "report";
   if (urlPath.startsWith("/api/suggest")) return "suggest";
   if (urlPath.startsWith("/api/car-specs")) return "specs";
   if (urlPath.startsWith("/api/search")) return "search";
@@ -169,12 +171,27 @@ function getTierForPath(urlPath) {
   return "general";
 }
 
-function slidingWindowRateLimit(req, res, next) {
+/**
+ * Derives rate limit client key: Prioritizes authenticated user UID/session over shared IP.
+ */
+function getClientKey(req) {
+  if (req.user?.uid) {
+    return `u:${req.user.uid}`;
+  }
+  const sessionCookie = req.cookies?.adw_session;
+  if (sessionCookie && typeof sessionCookie === "string") {
+    return `s:${sessionCookie.slice(0, 16)}`;
+  }
   const ip = req.ip || "unknown";
+  return `ip:${ip}`;
+}
+
+function slidingWindowRateLimit(req, res, next) {
+  const clientKey = getClientKey(req);
   const tier = getTierForPath(req.path);
   const { limit, windowMs } = RATE_TIERS[tier] || RATE_TIERS.general;
   const now = Date.now();
-  const bucketKey = `${ip}:${tier}`;
+  const bucketKey = `${clientKey}:${tier}`;
 
   if (!rateBuckets.has(bucketKey)) {
     // Memory leak / exhaustion guard: if buckets exceed cap, evict oldest entries

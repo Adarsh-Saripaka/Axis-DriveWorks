@@ -78,11 +78,23 @@ export function csrfGuard(req, res, next) {
 }
 
 /**
+ * Lightweight JSON audit logger for structured cloud logging (Group 8 #19)
+ */
+export const audit = (event, req, extra = {}) => {
+  const uid = req?.user?.uid || req?.user?.id || req?.user?.email || null;
+  const ip = req?.ip || req?.socket?.remoteAddress || null;
+  console.log(JSON.stringify({ type: "audit", timestamp: new Date().toISOString(), event, uid, ip, ...extra }));
+};
+
+/**
  * Standard security audit logger for sensitive authentication and booking operations.
+ * Emits clean structured JSON for observability and cloud log collectors.
  */
 export function logSecurityAudit(action, details = {}) {
-  const timestamp = new Date().toISOString();
-  console.log(`🛡️  [SECURITY AUDIT] ${timestamp} | ACTION: ${action} | ${JSON.stringify(details)}`);
+  const uid = details.userId || details.user || details.ownerUid || details.uid || null;
+  const ip = details.ip || null;
+  const { userId, user, ownerUid, ...rest } = details;
+  console.log(JSON.stringify({ type: "audit", timestamp: new Date().toISOString(), event: action, uid, ip, ...rest }));
 }
 
 /**

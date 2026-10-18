@@ -194,8 +194,26 @@ export function registerReservationsRoutes(app, getDb, isReady) {
     }
   });
 
+const toPublicReservation = (r) => ({
+  id: r.id,
+  car_id: r.car_id,
+  car_brand: r.car_brand,
+  car_model: r.car_model,
+  name: r.name,
+  email: r.email,
+  uid: r.uid,
+  date: r.date,
+  completed: r.completed,
+  spec_key: r.spec_key,
+  created_at: r.created_at
+});
+
+const toAdminReservation = (r) => ({
+  ...toPublicReservation(r)
+});
+
   // GET /api/reservations: Fetch reservations for session user or Bearer manage_token / ADMIN_TOKEN
-  // Note: manage_token is deliberately omitted from SELECT results to prevent token leakage
+  // Note: All results are explicitly mapped to strictly allowlisted fields
   app.get("/api/reservations", async (req, res) => {
     if (!isReady()) return res.status(503).json({ error: "Database Loading" });
 
@@ -212,7 +230,7 @@ export function registerReservationsRoutes(app, getDb, isReady) {
         const rows = await db.all(
           "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, spec_key, created_at FROM reservations ORDER BY date ASC, id DESC"
         );
-        return res.json(rows);
+        return res.json(rows.map(toAdminReservation));
       }
 
       if (sessionUser) {
@@ -220,14 +238,14 @@ export function registerReservationsRoutes(app, getDb, isReady) {
           "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, spec_key, created_at FROM reservations WHERE uid = ? OR email = ? COLLATE NOCASE ORDER BY date ASC, id DESC",
           [sessionUser.uid, sessionUser.email]
         );
-        return res.json(rows);
+        return res.json(rows.map(toPublicReservation));
       }
 
       const rows = await db.all(
         "SELECT id, car_id, car_brand, car_model, name, email, uid, date, completed, spec_key, created_at FROM reservations WHERE manage_token = ? ORDER BY date ASC, id DESC",
         [headerAuth.manageToken]
       );
-      res.json(rows);
+      res.json(rows.map(toPublicReservation));
     } catch (err) {
       console.error("Reservations query error:", err);
       res.status(500).json({ error: "Failed to fetch reservations." });

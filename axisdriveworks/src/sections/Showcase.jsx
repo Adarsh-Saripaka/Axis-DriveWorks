@@ -253,6 +253,11 @@ export default function Showcase() {
                 {specs.body_style && <span>{specs.body_style}</span>}
                 {specs.country_origin && <span>{specs.country_origin}</span>}
                 {specs.variant_used && <span className="variant-badge">{specs.variant_used}</span>}
+                {(specs.isEstimate || carData.confidence === "baseline") && (
+                  <span className="badge-estimate" title={specs.source || "Estimated values based on catalog baseline"}>
+                    ⚠ Estimated values
+                  </span>
+                )}
               </div>
 
               {/* 3D SHOWROOM BUTTON (Only shown when 3D asset is available) */}

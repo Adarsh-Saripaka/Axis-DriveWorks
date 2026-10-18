@@ -8,6 +8,58 @@ const RAW_BASE = (typeof import.meta !== "undefined" && import.meta.env)
   : "http://localhost:5000";
 const BASE_URL = `${RAW_BASE.replace(/\/+$/, "")}/api`;
 
+/**
+ * Centralized API request wrapper with auto-retry, auth expiration dispatch, and uniform error handling.
+ */
+/**
+ * Centralized API request wrapper with auto-retry, auth expiration dispatch, and uniform error handling.
+ */
+export async function apiRequest(path, { method = "GET", body, headers = {}, retries = 1, signal = null } = {}) {
+  const url = path.startsWith("http://") || path.startsWith("https://")
+    ? path
+    : `${BASE_URL}${path.startsWith("/api") ? path.slice(4) : (path.startsWith("/") ? path : `/${path}`)}`;
+
+  for (let attempt = 0; ; attempt++) {
+    try {
+      const isJson = body && typeof body === "object" && !(body instanceof FormData);
+      const reqHeaders = {
+        "X-Requested-With": "fetch",
+        ...(isJson ? { "Content-Type": "application/json" } : {}),
+        ...headers
+      };
+
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+        headers: reqHeaders,
+        body: isJson ? JSON.stringify(body) : body,
+        signal
+      });
+
+      if (res.status === 401) {
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("auth:expired"));
+        }
+        throw new Error("Session expired");
+      }
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || `HTTP ${res.status}`);
+      }
+
+      return await res.json();
+    } catch (err) {
+      if (err?.name === "AbortError") throw err;
+      const retryable = method === "GET" && attempt < retries && err.message !== "Session expired";
+      if (!retryable) {
+        console.error(`[api] ${method} ${path}:`, err.message);
+        throw err;
+      }
+    }
+  }
+}
+
 // ============================================================================
 // SECTION 2: DEVICE-BOUND BOOKING TOKENS
 // ============================================================================
@@ -255,14 +307,11 @@ export async function getCarImage(carName, signal = null) {
 
   const fetchPromise = (async () => {
     try {
-      const res = await apiRequest(`${BASE_URL}/images?q=${encodeURIComponent(carName)}`, {}, signal);
-      if (res && res.ok) {
-        const data = await res.json();
-        if (data?.url) {
-          imageCache.set(cacheKey, data.url);
-          scheduleCacheSave();
-          return data.url;
-        }
+      const data = await apiRequest(`/images?q=${encodeURIComponent(carName)}`, { signal });
+      if (data?.url) {
+        imageCache.set(cacheKey, data.url);
+        scheduleCacheSave();
+        return data.url;
       }
     } catch {
       // Quiet fail to fallback
@@ -288,38 +337,6 @@ export async function getCarImage(carName, signal = null) {
 // SECTION 4: CAR DATA API (PUBLIC)
 // ============================================================================
 
-async function apiRequest(url, options = {}, signal = null) {
-  const fetchOpts = signal ? { ...options, signal } : options;
-  try {
-    let res = await fetch(url, fetchOpts);
-
-    if (res.status === 429) {
-      const data = await res.json().catch(() => ({}));
-      const retryAfter = data.retryAfter || 5;
-      console.warn(`Backend rate limited. Retrying after ${retryAfter}s once...`);
-
-      await new Promise(r => setTimeout(r, retryAfter * 1000));
-      res = await fetch(url, fetchOpts);
-
-      if (res.status === 429) {
-        return { rateLimited: true, retryAfter };
-      }
-    }
-
-    if (res.status === 401) {
-      return { authError: true };
-    }
-
-    return res;
-  } catch (err) {
-    if (err.name === "AbortError") {
-      return { aborted: true };
-    }
-    console.error("API request failed:", err);
-    return null;
-  }
-}
-
 /**
  * Fetches vehicle suggestions for autocomplete.
  * @param {string} query Search input.
@@ -331,16 +348,7 @@ export async function fetchSuggestions(query, signal = null) {
     const trimmed = String(query || "").trim();
     if (trimmed.length < 2) return [];
 
-    const res = await apiRequest(
-      `${BASE_URL}/suggest?q=${encodeURIComponent(trimmed)}`,
-      {},
-      signal
-    );
-
-    if (!res || res.rateLimited || res.authError || res.aborted) return [];
-    if (!res.ok) return [];
-
-    const data = await res.json();
+    const data = await apiRequest(`/suggest?q=${encodeURIComponent(trimmed)}`, { signal });
     return Array.isArray(data) ? data : [];
   } catch (err) {
     if (err?.name === "AbortError") return [];
@@ -358,20 +366,7 @@ export async function fetchSuggestions(query, signal = null) {
  */
 export async function fetchBrandCars(brand, page = 1, signal = null) {
   try {
-    const res = await apiRequest(
-      `${BASE_URL}/brand/${encodeURIComponent(brand)}/cars?page=${page}`,
-      {},
-      signal
-    );
-
-    if (!res || res.rateLimited || res.authError || res.aborted) {
-      return { brand, page: 1, total: 0, totalPages: 1, cars: [] };
-    }
-    if (!res.ok) {
-      return { brand, page: 1, total: 0, totalPages: 1, cars: [] };
-    }
-
-    const data = await res.json();
+    const data = await apiRequest(`/brand/${encodeURIComponent(brand)}/cars?page=${page}`, { signal });
     return data || { brand, page: 1, total: 0, totalPages: 1, cars: [] };
   } catch (err) {
     if (err?.name === "AbortError") {
@@ -391,18 +386,10 @@ export async function fetchBrandCars(brand, page = 1, signal = null) {
  */
 export async function fetchCarSpecs(brand, model, signal = null) {
   try {
-    const res = await fetch(
-      `${BASE_URL}/car-specs?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`,
-      { signal }
+    return await apiRequest(
+      `/car-specs?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`,
+      { method: "GET", retries: 1, signal }
     );
-
-    if (!res || !res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      console.warn("Car specs fetch returned non-200:", res?.status, errData);
-      return null;
-    }
-
-    return await res.json();
   } catch (err) {
     if (err?.name === "AbortError") return null;
     console.error("Fetch car specs failed:", err);
@@ -414,6 +401,8 @@ export async function fetchCarSpecs(brand, model, signal = null) {
  * Submits a user report for incorrect specification data.
  * @param {string} specKey Stable spec_key.
  * @param {string} message Description of error.
+ * @param {string} [field="general"] Target field name.
+ * @param {string} [proposedValue=""] Proposed correction.
  * @param {AbortSignal} [signal=null]
  * @returns {Promise<{ok: boolean, message?: string}>}
  */
@@ -428,27 +417,17 @@ export async function reportCarSpecs(specKey, message, field = "general", propos
       payload.proposed_value = proposedValue.trim();
     }
 
-    const res = await fetch(
-      `${BASE_URL}/car-specs/report`,
-      {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "X-Requested-With": "fetch"
-        },
-        body: JSON.stringify(payload),
-        credentials: "include",
-        signal
-      }
-    );
+    const data = await apiRequest("/car-specs/report", {
+      method: "POST",
+      body: payload,
+      signal
+    });
 
-    if (!res || !res.ok) return { ok: false };
-    const data = await res.json();
     return { ok: true, message: data.message };
   } catch (err) {
     if (err?.name === "AbortError") return { ok: false };
     console.error("Report car specs failed:", err);
-    return { ok: false };
+    return { ok: false, error: err.message };
   }
 }
 
@@ -463,7 +442,7 @@ export async function reportCarSpecs(specKey, message, field = "general", propos
  */
 export function prefetchCarSpecs(brand, model) {
   if (!brand || !model) return;
-  fetch(`${BASE_URL}/car-specs?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`).catch(() => {});
+  apiRequest(`/car-specs?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`).catch(() => {});
 }
 
 /**
@@ -474,25 +453,12 @@ export function prefetchCarSpecs(brand, model) {
  */
 export async function bookTestDrive(data, signal = null) {
   try {
-    const headers = { 
-      "Content-Type": "application/json",
-      "X-Requested-With": "fetch"
-    };
-
-    const res = await fetch(`${BASE_URL}/reserve`, {
+    const result = await apiRequest("/reserve", {
       method: "POST",
-      headers,
-      body: JSON.stringify(data),
-      credentials: "include",
+      body: data,
       signal
     });
 
-    if (!res.ok) {
-      const errData = await res.json().catch(() => ({}));
-      return { ok: false, error: errData.error || `Server responded with ${res.status}` };
-    }
-
-    const result = await res.json();
     if (result.manage_token) {
       saveManageToken(result.manage_token);
     }
@@ -505,7 +471,6 @@ export async function bookTestDrive(data, signal = null) {
     };
   } catch (err) {
     if (err?.name === "AbortError") return { ok: false, error: "aborted" };
-    console.error("Booking failed:", err);
     return { ok: false, error: err.message || "Network error" };
   }
 }
@@ -518,19 +483,12 @@ export async function bookTestDrive(data, signal = null) {
 export async function getReservations(signal = null) {
   try {
     const tokens = getManageTokens();
-    const res = await fetch(`${BASE_URL}/reservations/lookup`, {
+    const data = await apiRequest("/reservations/lookup", {
       method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "X-Requested-With": "fetch"
-      },
-      body: JSON.stringify({ tokens }),
-      credentials: "include",
+      body: { tokens },
       signal
     });
-
-    if (!res.ok) return [];
-    return await res.json();
+    return Array.isArray(data) ? data : [];
   } catch (err) {
     if (err?.name === "AbortError") return [];
     console.error("Failed to fetch reservations:", err);
@@ -548,24 +506,14 @@ export async function getReservations(signal = null) {
 export async function cancelReservation(id, token = null, signal = null) {
   try {
     const effectiveToken = token || getManageTokens()[0];
-    const headers = {
-      "X-Requested-With": "fetch"
-    };
-    if (effectiveToken) {
-      headers["Authorization"] = `Bearer ${effectiveToken}`;
-    }
+    const headers = effectiveToken ? { Authorization: `Bearer ${effectiveToken}` } : {};
 
-    const res = await fetch(`${BASE_URL}/reservations/${id}`, {
+    await apiRequest(`/reservations/${id}`, {
       method: "DELETE",
       headers,
-      credentials: "include",
       signal
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      return { ok: false, error: err.error || "Failed to cancel reservation." };
-    }
     if (effectiveToken) {
       removeManageToken(effectiveToken);
     }
@@ -586,26 +534,15 @@ export async function cancelReservation(id, token = null, signal = null) {
 export async function rescheduleReservation(id, newDate, token = null, signal = null) {
   try {
     const effectiveToken = token || getManageTokens()[0];
-    const headers = { 
-      "Content-Type": "application/json",
-      "X-Requested-With": "fetch"
-    };
-    if (effectiveToken) {
-      headers["Authorization"] = `Bearer ${effectiveToken}`;
-    }
+    const headers = effectiveToken ? { Authorization: `Bearer ${effectiveToken}` } : {};
 
-    const res = await fetch(`${BASE_URL}/reservations/${id}/reschedule`, {
+    await apiRequest(`/reservations/${id}/reschedule`, {
       method: "PUT",
       headers,
-      body: JSON.stringify({ date: newDate }),
-      credentials: "include",
+      body: { date: newDate },
       signal
     });
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      return { ok: false, error: err.error || "Failed to reschedule reservation." };
-    }
     return { ok: true, date: newDate };
   } catch (err) {
     return { ok: false, error: err.message || "Network error" };
@@ -622,22 +559,14 @@ export async function rescheduleReservation(id, newDate, token = null, signal = 
 export async function markReservationComplete(id, token = null, signal = null) {
   try {
     const effectiveToken = token || getManageTokens()[0];
-    const headers = {
-      "Content-Type": "application/json",
-      "X-Requested-With": "fetch"
-    };
-    if (effectiveToken) {
-      headers["Authorization"] = `Bearer ${effectiveToken}`;
-    }
+    const headers = effectiveToken ? { Authorization: `Bearer ${effectiveToken}` } : {};
 
-    const res = await fetch(`${BASE_URL}/reservations/${id}/complete`, {
+    await apiRequest(`/reservations/${id}/complete`, {
       method: "PUT",
       headers,
-      credentials: "include",
       signal
     });
 
-    if (!res.ok) return { ok: false };
     return { ok: true };
   } catch (err) {
     return { ok: false, error: err.message };
@@ -652,18 +581,11 @@ export async function markReservationComplete(id, token = null, signal = null) {
 export async function clearCompletedReservations(signal = null) {
   try {
     const tokens = getManageTokens();
-    const res = await fetch(`${BASE_URL}/reservations/clear-completed`, {
+    await apiRequest("/reservations/clear-completed", {
       method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "X-Requested-With": "fetch"
-      },
-      body: JSON.stringify({ tokens }),
-      credentials: "include",
+      body: { tokens },
       signal
     });
-
-    if (!res.ok) return { ok: false };
     return { ok: true };
   } catch {
     return { ok: false };

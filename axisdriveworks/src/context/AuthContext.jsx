@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { signInWithGoogle, signOutFromFirebase, isFirebaseConfigured } from "../lib/firebase";
+import { apiRequest } from "../Api/FetchApi";
 
 const AuthContext = createContext({
   user: null,
@@ -10,11 +11,6 @@ const AuthContext = createContext({
   checkAuth: async () => {}
 });
 
-const RAW_BASE = (typeof import.meta !== "undefined" && import.meta.env)
-  ? (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || "http://localhost:5000")
-  : "http://localhost:5000";
-const BASE_URL = `${RAW_BASE.replace(/\/+$/, "")}/api`;
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,22 +18,14 @@ export function AuthProvider({ children }) {
   // Check existing session cookie on load
   const checkAuth = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/auth/me`, {
-        method: "GET",
-        credentials: "include"
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.authenticated && data.user) {
-          setUser(data.user);
-          return data.user;
-        }
+      const data = await apiRequest("/auth/me");
+      if (data?.authenticated && data?.user) {
+        setUser(data.user);
+        return data.user;
       }
       setUser(null);
       return null;
-    } catch (err) {
-      console.warn("Session check failed:", err);
+    } catch {
       setUser(null);
       return null;
     } finally {
@@ -47,6 +35,13 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     checkAuth();
+
+    // Group 6 #11: When any API request encounters 401 Session expired, clear client session state
+    const handleAuthExpired = () => {
+      setUser(null);
+    };
+    window.addEventListener("auth:expired", handleAuthExpired);
+    return () => window.removeEventListener("auth:expired", handleAuthExpired);
   }, []);
 
   const loginWithGoogle = async () => {
@@ -56,33 +51,23 @@ export function AuthProvider({ children }) {
 
     // 2. Exchange ID token with backend for hardened HttpOnly session cookie
     // Token Separation: We do not store Google idToken or accessToken on the client!
-    const res = await fetch(`${BASE_URL}/auth/session`, {
-      method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "X-Requested-With": "fetch"
-      },
-      body: JSON.stringify({ idToken }),
-      credentials: "include"
-    });
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
+    try {
+      const data = await apiRequest("/auth/session", {
+        method: "POST",
+        body: { idToken }
+      });
+      setUser(data.user);
+      return data.user;
+    } catch (err) {
       await signOutFromFirebase();
-      throw new Error(err.error || "Failed to establish secure server session.");
+      throw new Error(err.message || "Failed to establish secure server session.");
     }
-
-    const data = await res.json();
-    setUser(data.user);
-    return data.user;
   };
 
   const logout = async () => {
     try {
-      await fetch(`${BASE_URL}/auth/logout`, {
-        method: "POST",
-        headers: { "X-Requested-With": "fetch" },
-        credentials: "include"
+      await apiRequest("/auth/logout", {
+        method: "POST"
       });
     } catch (err) {
       console.warn("Backend logout failed:", err);

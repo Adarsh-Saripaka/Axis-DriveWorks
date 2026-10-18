@@ -61,6 +61,7 @@ app.use(
         ],
         connectSrc: [
           "'self'",
+          "blob:",
           "http://localhost:5000",
           "http://localhost:5173",
           "http://localhost:5174",
@@ -71,12 +72,14 @@ app.use(
           "https://securetoken.googleapis.com",
           process.env.FRONTEND_URL
         ].filter(Boolean),
+        workerSrc: ["'self'", "blob:"],
         imgSrc: [
           "'self'",
           "data:",
           "blob:",
           "https://lh3.googleusercontent.com",
           "https://images.unsplash.com",
+          "https://images.pexels.com",
           "https://*.wikimedia.org",
           "https:"
         ],

@@ -76,6 +76,22 @@ function Model({ url, color, wheelColor, bodyFinish, isExploded, stance }) {
 
   useEffect(() => {
     const config = MODEL_MANIFEST[modelKey];
+    let paintCount = 0;
+
+    const applyBodyFinish = (mat) => {
+      if (!mat || !mat.color) return;
+      mat.color.set(color);
+      if (bodyFinish === "matte") {
+        mat.roughness = 0.7;
+        mat.metalness = 0.1;
+      } else if (bodyFinish === "gloss") {
+        mat.roughness = 0.1;
+        mat.metalness = 0.2;
+      } else { // metallic
+        mat.roughness = 0.2;
+        mat.metalness = 0.8;
+      }
+    };
 
     model.traverse((child) => {
       if (child.isMesh) {
@@ -99,21 +115,11 @@ function Model({ url, color, wheelColor, bodyFinish, isExploded, stance }) {
 
         // Apply Colors
         if (isPaint && !isGlass) {
-          child.material.color.set(color);
-          
-          if (bodyFinish === "matte") {
-            child.material.roughness = 0.7;
-            child.material.metalness = 0.1;
-          } else if (bodyFinish === "gloss") {
-            child.material.roughness = 0.1;
-            child.material.metalness = 0.2;
-          } else { // metallic
-            child.material.roughness = 0.2;
-            child.material.metalness = 0.8;
-          }
+          paintCount++;
+          applyBodyFinish(child.material);
         }
 
-        if (isWheel && !isGlass) {
+        if (isWheel && !isGlass && child.material?.color) {
           child.material.color.set(wheelColor);
         }
 
@@ -133,6 +139,24 @@ function Model({ url, color, wheelColor, bodyFinish, isExploded, stance }) {
         }
       }
     });
+
+    // Fallback: If no paint parts were matched, the largest mesh by volume is almost always the car body
+    if (paintCount === 0) {
+      let biggest = null;
+      let maxVol = 0;
+      model.traverse((o) => {
+        if (!o.isMesh) return;
+        const s = new THREE.Box3().setFromObject(o).getSize(new THREE.Vector3());
+        const vol = s.x * s.y * s.z;
+        if (vol > maxVol) {
+          maxVol = vol;
+          biggest = o;
+        }
+      });
+      if (biggest?.material) {
+        applyBodyFinish(biggest.material);
+      }
+    }
   }, [model, color, wheelColor, bodyFinish, isExploded, stance, modelKey]);
 
   return <primitive object={model} />;
@@ -146,9 +170,18 @@ function DriveController({ driveMode, targetRef }) {
 
   useEffect(() => {
     if (!driveMode) return;
-    const handleKeyDown = (e) => setKeys((k) => ({ ...k, [e.key.toLowerCase()]: true }));
+    const CONTROL_KEYS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", " ", "w", "a", "s", "d", "W", "A", "S", "D"];
+
+    const handleKeyDown = (e) => {
+      if (e.target?.matches?.("input, textarea, select")) return; // don't break typing
+      if (CONTROL_KEYS.includes(e.key)) {
+        e.preventDefault(); // Stop page scrolling while driving
+      }
+      setKeys((k) => ({ ...k, [e.key.toLowerCase()]: true }));
+    };
     const handleKeyUp = (e) => setKeys((k) => ({ ...k, [e.key.toLowerCase()]: false }));
-    window.addEventListener("keydown", handleKeyDown);
+
+    window.addEventListener("keydown", handleKeyDown, { passive: false });
     window.addEventListener("keyup", handleKeyUp);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);

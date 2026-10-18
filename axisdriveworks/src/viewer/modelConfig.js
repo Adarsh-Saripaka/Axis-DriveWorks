@@ -52,13 +52,14 @@ export const MODEL_MANIFEST = {
   }
 };
 
+export const BODY_HINTS = /body|paint|carpaint|exterior|shell|metal/i;
+
 export const smartMatchMaterial = (meshName, matName) => {
-  const name = (meshName + " " + matName).toLowerCase();
+  const combined = `${meshName || ""} ${matName || ""}`;
+  const name = combined.toLowerCase();
   
-  const isPaint = name.includes("paint") || 
-                  name.includes("body") || 
+  const isPaint = BODY_HINTS.test(combined) || 
                   name.includes("car_exterior") ||
-                  name.includes("metal") ||
                   name === "material_0";
 
   const isWheel = (name.includes("wheel") || name.includes("rim") || name.includes("alloy")) && 
@@ -67,7 +68,7 @@ export const smartMatchMaterial = (meshName, matName) => {
 
   const isGlass = name.includes("glass") || 
                   name.includes("window") || 
-                  name.includes("windshield") ||
+                  name.includes("windshield") || 
                   name.includes("transparent");
 
   return { isPaint, isWheel, isGlass };

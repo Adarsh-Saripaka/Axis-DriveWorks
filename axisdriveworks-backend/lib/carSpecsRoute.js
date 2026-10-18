@@ -46,8 +46,16 @@ export function registerCarSpecsRoute(app, getDb, isReady) {
 
     if (cachedRow && now - cachedRow.fetched_at < NINETY_DAYS_MS) {
       const bestImage = await findBestCarImage(db, specKey, cleanBrand, cleanModel);
+      const rawSpecs = JSON.parse(cachedRow.data);
+      const isEstimate = cachedRow.confidence === "baseline" || cachedRow.confidence === "low";
+      const specs = {
+        ...rawSpecs,
+        isEstimate,
+        source: isEstimate ? "Estimated specifications based on catalog baseline" : "Verified automotive records"
+      };
+
       return res.json({
-        specs: JSON.parse(cachedRow.data),
+        specs,
         confidence: cachedRow.confidence,
         source_urls: JSON.parse(cachedRow.source_urls),
         fetched_at: cachedRow.fetched_at,
@@ -225,6 +233,8 @@ export function registerCarSpecsRoute(app, getDb, isReady) {
         country_origin: null,
         source_urls: [],
         confidence: "baseline",
+        isEstimate: true,
+        source: "Catalog baseline / estimated specifications",
         notes: specsPromise.reason?.message
           ? `AI research notice: ${specsPromise.reason.message}`
           : "Verified catalog entry. Configure GEMINI_API_KEY in axisdriveworks-backend/.env for live deep AI research."

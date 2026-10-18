@@ -40,3 +40,14 @@ export const AVAILABLE_MODELS = [
   { id: "toyota_supra", brand: "Toyota", name: "Supra MK5 A90", url: `${BASE}/toyota/toyota_supra_mk5_a90.glb`, img: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?q=80&w=600&auto=format&fit=crop" },
   { id: "vw_golf", brand: "Volkswagen", name: "VW Golf II", url: `${BASE}/volkswagen/volkswagen_golf_ii.glb`, img: "https://images.unsplash.com/photo-1563255152-edbd9eb1a64b?q=80&w=600&auto=format&fit=crop" }
 ];
+
+export const DEFAULT_MODEL = AVAILABLE_MODELS[3]?.url || `${BASE}/bmw/2021_bmw_m4_competition.glb`;
+
+export const getModelUrl = (carId) => {
+  if (!carId) return DEFAULT_MODEL;
+  const found = AVAILABLE_MODELS.find(
+    (m) => m.id === carId || m.name.toLowerCase().includes(String(carId).toLowerCase())
+  );
+  return found?.url ?? DEFAULT_MODEL;
+};
+

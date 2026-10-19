@@ -143,14 +143,19 @@ export default function Showcase() {
 
     const data = new FormData(e.target);
     const name = String(data.get("name") || user?.name || "").trim();
-    const date = String(data.get("date") || "").trim();
+    let date = String(data.get("date") || "").trim();
+
+    // Ensure format is YYYY-MM-DD if browser passes locale date like MM/DD/YYYY
+    if (/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/.test(date)) {
+      const parts = date.split(/[/-]/);
+      date = `${parts[2]}-${parts[0].padStart(2, "0")}-${parts[1].padStart(2, "0")}`;
+    }
 
     try {
       const newBooking = {
         car_brand: brandName,
         car_model: modelName,
         name,
-        email: user?.email,
         date,
         spec_key: specKey
       };

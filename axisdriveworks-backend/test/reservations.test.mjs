@@ -515,5 +515,67 @@ test("POST /api/car-specs/report resubmission for same vehicle and field updates
   assert.equal(reportRows[0].proposed_value, "473");
 });
 
+test("POST /api/auth/magic-link generates a single-use token and records in database", async () => {
+  const res = await fetch(`${baseUrl}/api/auth/magic-link`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch"
+    },
+    body: JSON.stringify({ email: "driver@example.com" })
+  });
+  assert.equal(res.status, 200);
+  const data = await res.json();
+  assert.equal(data.ok, true);
+  assert.ok(data.debugUrl);
+
+  const row = await db.get("SELECT * FROM magic_links WHERE email = 'driver@example.com'");
+  assert.ok(row);
+  assert.equal(row.used, 0);
+  assert.ok(row.expires_at > Date.now());
+});
+
+test("POST /api/auth/verify-magic sets HttpOnly session cookie and logs user in", async () => {
+  const row = await db.get("SELECT token FROM magic_links WHERE email = 'driver@example.com'");
+  assert.ok(row?.token);
+
+  const res = await fetch(`${baseUrl}/api/auth/verify-magic`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch"
+    },
+    body: JSON.stringify({ magicToken: row.token })
+  });
+
+  assert.equal(res.status, 200);
+  const data = await res.json();
+  assert.equal(data.ok, true);
+  assert.equal(data.authenticated, true);
+  assert.equal(data.user.email, "driver@example.com");
+
+  // Verify cookie was set
+  const setCookie = res.headers.get("set-cookie");
+  assert.ok(setCookie);
+  assert.ok(setCookie.includes(SESSION_COOKIE_NAME));
+  assert.ok(setCookie.toLowerCase().includes("httponly"));
+
+  // Verify magic link is marked consumed
+  const updatedRow = await db.get("SELECT used FROM magic_links WHERE token = ?", [row.token]);
+  assert.equal(updatedRow.used, 1);
+
+  // Verify second attempt with same token fails with 410 Gone
+  const replayRes = await fetch(`${baseUrl}/api/auth/verify-magic`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Requested-With": "fetch"
+    },
+    body: JSON.stringify({ magicToken: row.token })
+  });
+  assert.equal(replayRes.status, 410);
+});
+
+
 
 

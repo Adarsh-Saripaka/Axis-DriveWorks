@@ -45,7 +45,8 @@ export async function apiRequest(path, { method = "GET", body, headers = {}, ret
 
       if (!res.ok) {
         const errJson = await res.json().catch(() => ({}));
-        throw new Error(errJson.error || `HTTP ${res.status}`);
+        const detailedMsg = errJson.issues?.[0]?.message || errJson.error || `HTTP ${res.status}`;
+        throw new Error(detailedMsg);
       }
 
       return await res.json();
@@ -591,3 +592,36 @@ export async function clearCompletedReservations(signal = null) {
     return { ok: false };
   }
 }
+
+/**
+ * Requests a single-use magic login link sent to the user's email.
+ * @param {string} email
+ * @returns {Promise<{ok: boolean, message?: string, debugUrl?: string, error?: string}>}
+ */
+export async function requestMagicLink(email) {
+  try {
+    return await apiRequest("/auth/magic-link", {
+      method: "POST",
+      body: { email }
+    });
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+}
+
+/**
+ * Exchanges a single-use magic token for an authenticated HttpOnly session cookie.
+ * @param {string} magicToken
+ * @returns {Promise<{ok: boolean, user?: object, error?: string}>}
+ */
+export async function verifyMagicToken(magicToken) {
+  try {
+    return await apiRequest("/auth/verify-magic", {
+      method: "POST",
+      body: { magicToken }
+    });
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+}
+

@@ -17,7 +17,17 @@ export const ReservationSchema = z
   .object({
     car_brand: cleanText(100, 1),
     car_model: cleanText(100, 1),
-    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must follow YYYY-MM-DD format"),
+    date: z
+      .string()
+      .transform((val) => {
+        const trimmed = val.trim();
+        if (/^\d{1,2}[/-]\d{1,2}[/-]\d{4}$/.test(trimmed)) {
+          const parts = trimmed.split(/[/-]/);
+          return `${parts[2]}-${parts[0].padStart(2, "0")}-${parts[1].padStart(2, "0")}`;
+        }
+        return trimmed;
+      })
+      .pipe(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must follow YYYY-MM-DD format")),
     name: cleanText(100, 2).optional(),
     spec_key: z.string().max(200).optional()
   })

@@ -8,7 +8,8 @@ import {
   clearCompletedReservations,
   getManageTokens,
   saveManageToken,
-  clearAllManageTokens
+  clearAllManageTokens,
+  requestMagicLink
 } from "../Api/FetchApi";
 import { useAuth } from "../context/AuthContext";
 import "./BookingsPage.css";
@@ -17,13 +18,17 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
   const [tokenInput, setTokenInput] = useState("");
   const [tokenError, setTokenError] = useState("");
+  const [magicEmail, setMagicEmail] = useState("");
+  const [magicMessage, setMagicMessage] = useState("");
+  const [magicDebugUrl, setMagicDebugUrl] = useState("");
+  const [magicLoading, setMagicLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [actionError, setActionError] = useState("");
   const [reschedulingId, setReschedulingId] = useState(null);
   const [newDate, setNewDate] = useState("");
   const navigate = useNavigate();
 
-  const { user, loginWithGoogle, logout, loading: authLoading } = useAuth();
+  const { user, loginWithGoogle, loginWithMagicToken, logout, loading: authLoading } = useAuth();
 
   const getErrorMessage = (errType) => {
     if (errType === "rate_limited") return "Too many requests, try again shortly.";
@@ -46,10 +51,57 @@ export default function BookingsPage() {
   };
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const magicToken = params.get("magic_token");
+    if (magicToken) {
+      setLoading(true);
+      loginWithMagicToken(magicToken)
+        .then(() => {
+          // Clean the query parameter from the URL bar without reloading
+          window.history.replaceState({}, document.title, window.location.pathname);
+          loadBookings();
+        })
+        .catch((err) => {
+          setActionError(err.message || "Failed to verify magic link.");
+        })
+        .finally(() => setLoading(false));
+      return;
+    }
+
     if (!authLoading) {
       loadBookings();
     }
   }, [user, authLoading]);
+
+  const handleSendMagicLink = async (e) => {
+    e.preventDefault();
+    setMagicMessage("");
+    setMagicDebugUrl("");
+    setActionError("");
+
+    const trimmed = magicEmail.trim();
+    if (!trimmed || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+      setActionError("Please enter a valid email address.");
+      return;
+    }
+
+    setMagicLoading(true);
+    try {
+      const res = await requestMagicLink(trimmed);
+      if (res.ok) {
+        setMagicMessage(res.message || "Magic link sent! Check your email or use the link below.");
+        if (res.debugUrl) {
+          setMagicDebugUrl(res.debugUrl);
+        }
+      } else {
+        setActionError(res.error || "Failed to generate magic link.");
+      }
+    } catch (err) {
+      setActionError(err.message || "Error requesting magic link.");
+    } finally {
+      setMagicLoading(false);
+    }
+  };
 
   const handleImportToken = async (e) => {
     e.preventDefault();
@@ -174,9 +226,55 @@ export default function BookingsPage() {
             {actionError && <p className="auth-error">{actionError}</p>}
 
             <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: "15px", marginTop: "15px" }}>
-              <p style={{ fontSize: "0.85rem", color: "#aaa" }}>
-                Have a booking manage token?
+              <p style={{ fontSize: "0.88rem", color: "#ddd", marginBottom: "6px", fontWeight: "600" }}>
+                ✨ Access via Email Magic Link
               </p>
+              <p style={{ fontSize: "0.78rem", color: "#888", marginBottom: "12px" }}>
+                Zero passwords or tokens stored on device. Enter your reservation email for an instant login link.
+              </p>
+              <form onSubmit={handleSendMagicLink} className="auth-form">
+                <div className="auth-input-wrapper">
+                  <input
+                    type="email"
+                    value={magicEmail}
+                    onChange={(e) => setMagicEmail(e.target.value)}
+                    placeholder="Enter your booking email"
+                    required
+                  />
+                  <div className="input-glow" />
+                </div>
+                <button
+                  type="submit"
+                  className="auth-submit-btn"
+                  style={{ width: "100%", marginTop: "10px", background: "linear-gradient(90deg, #00ffff, #0088ff)", color: "#000", fontWeight: "700" }}
+                  disabled={magicLoading}
+                >
+                  {magicLoading ? "Sending Link..." : "Send Magic Link ✉️"}
+                </button>
+              </form>
+
+              {magicMessage && (
+                <div style={{ marginTop: "12px", padding: "10px", background: "rgba(0, 255, 255, 0.08)", border: "1px solid rgba(0, 255, 255, 0.25)", borderRadius: "6px", fontSize: "0.8rem", color: "#00ffff" }}>
+                  <p style={{ margin: "0 0 6px 0" }}>{magicMessage}</p>
+                  {magicDebugUrl && (
+                    <button
+                      className="clear-btn"
+                      style={{ fontSize: "0.75rem", padding: "6px 10px", width: "100%", borderColor: "#00ffff", color: "#00ffff", background: "rgba(0, 255, 255, 0.15)", cursor: "pointer" }}
+                      onClick={() => {
+                        window.location.href = magicDebugUrl;
+                      }}
+                    >
+                      🚀 Click to Open Magic Link Demo
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <details style={{ marginTop: "15px", borderTop: "1px solid rgba(255,255,255,0.06)", paddingTop: "10px", textAlign: "left" }}>
+              <summary style={{ fontSize: "0.75rem", color: "#666", cursor: "pointer" }}>
+                Advanced: Have a legacy management token?
+              </summary>
               <form onSubmit={handleImportToken} className="auth-form" style={{ marginTop: "10px" }}>
                 <div className="auth-input-wrapper">
                   <input
@@ -184,16 +282,15 @@ export default function BookingsPage() {
                     value={tokenInput}
                     onChange={(e) => setTokenInput(e.target.value)}
                     placeholder="Paste booking manage token"
-                    required
                   />
                   <div className="input-glow" />
                 </div>
                 {tokenError && <p className="auth-error">{tokenError}</p>}
-                <button type="submit" className="clear-btn" style={{ width: "100%", marginTop: "10px" }}>
+                <button type="submit" className="clear-btn" style={{ width: "100%", marginTop: "8px" }}>
                   View by Token
                 </button>
               </form>
-            </div>
+            </details>
           </div>
         </div>
       </div>

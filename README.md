@@ -38,9 +38,10 @@ I wanted to build something way beyond standard 2D car catalog sites: a place wh
 
 ### 🛡️ 4. Real Backend Security (No Fake Client-Only Auth)
 * **Google Firebase OAuth + Hardened Cookies**: Firebase popup on the client exchanges Google ID tokens for a server-signed, `HttpOnly`, `SameSite=Lax` session cookie. Raw auth tokens are never left lingering in client storage.
+* **Email Magic Links**: Users without a Google account can request single-use, 15-minute cryptographically secure magic links to access reservations without storing sensitive tokens in `localStorage`.
 * **Strict Zod Validation**: All incoming requests are sanitized with Zod schemas in strict mode to prevent payload pollution.
 * **Rate Limiting & CSRF Protection**: Added sliding-window rate limiting on sensitive routes and enforced custom request headers on mutating HTTP methods.
-* **Automated Tests**: Wrote 23 end-to-end integration tests using Node's native test runner (`node --test`) covering auth, CSRF, bookings, and error handling.
+* **Automated Tests**: Wrote 25 end-to-end integration tests using Node's native test runner (`node --test`) covering auth, magic links, CSRF, bookings, and error handling.
 
 ---
 
@@ -142,7 +143,7 @@ npm run dev
 cd axisdriveworks-backend
 npm test
 ```
-*Runs all 23 integration tests verifying security, auth, and reservation flows.*
+*Runs all 25 integration tests verifying security, auth, magic links, and reservation flows.*
 
 ---
 

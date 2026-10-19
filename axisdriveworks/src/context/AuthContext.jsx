@@ -1,12 +1,13 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { signInWithGoogle, signOutFromFirebase, isFirebaseConfigured } from "../lib/firebase";
-import { apiRequest } from "../Api/FetchApi";
+import { apiRequest, verifyMagicToken } from "../Api/FetchApi";
 
 const AuthContext = createContext({
   user: null,
   loading: true,
   isFirebaseConfigured: false,
   loginWithGoogle: async () => {},
+  loginWithMagicToken: async () => {},
   logout: async () => {},
   checkAuth: async () => {}
 });
@@ -64,6 +65,20 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const loginWithMagicToken = async (magicToken) => {
+    setLoading(true);
+    try {
+      const data = await verifyMagicToken(magicToken);
+      if (data?.ok && data?.user) {
+        setUser(data.user);
+        return data.user;
+      }
+      throw new Error(data?.error || "Magic link verification failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       await apiRequest("/auth/logout", {
@@ -83,6 +98,7 @@ export function AuthProvider({ children }) {
         loading,
         isFirebaseConfigured,
         loginWithGoogle,
+        loginWithMagicToken,
         logout,
         checkAuth
       }}

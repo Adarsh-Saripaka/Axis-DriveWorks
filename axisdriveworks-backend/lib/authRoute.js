@@ -163,7 +163,7 @@ export function registerAuthRoutes(app, getDb, isReady) {
       return res.status(400).json({ error: "Firebase ID token is required." });
     }
 
-    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const projectId = process.env.FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID;
     if (!projectId) {
       return res.status(500).json({
         error: "Server configuration missing: FIREBASE_PROJECT_ID is not configured in .env"

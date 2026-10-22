@@ -3,7 +3,7 @@
     "allowJs": true,
     "checkJs": false,
     "jsx": "react-jsx",
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   },
   "include": ["src"]
 }

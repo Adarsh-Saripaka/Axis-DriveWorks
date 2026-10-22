@@ -44,16 +44,21 @@ export default function BrandPage() {
   useEffect(() => {
     let active = true;
     async function loadImages() {
-      const entries = await Promise.all(
+      await Promise.all(
         cars.map(async (car) => {
           const key = car.spec_key || `${car.brand}-${car.model}`;
-          const url = await getCarImage(`${car.brand} ${car.model}`);
-          return [key, url];
+          try {
+            const url = await getCarImage(`${car.brand} ${car.model}`);
+            if (active) {
+              setImages((current) => ({ ...current, [key]: url }));
+            }
+          } catch (err) {
+            if (active) {
+              console.error(`Failed to load image for ${car.brand} ${car.model}:`, err);
+            }
+          }
         })
       );
-      if (active) {
-        setImages(Object.fromEntries(entries));
-      }
     }
     if (cars.length) {
       loadImages();
